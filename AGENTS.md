@@ -77,7 +77,7 @@ src/mommy_chaogu/
 ├── signals/         # 7 条内置告警规则 + 自定义告警
 ├── flows/           # 资金流 ratio 信号 + 监控 + 收盘日报
 ├── earnings/        # 业绩前瞻 vs 实际 比对
-├── agent/           # LLM agent（llm.py provider 真相源 + tools/ 包按域拆分 36 工具 + MCP + 记忆系统 5 层 + Strategy Cards）
+├── agent/           # LLM agent（llm.py provider 真相源 + tools/ 包按域拆分 37 工具（含 run_backtest 信号回放） + MCP + 记忆系统 5 层 + Strategy Cards）
 ├── strategy/        # 用户确认的策略卡校验、版本、来源与监控关联
 ├── workflow/        # 自然语言工作流引擎（9 个预定义工作流 + NLRouter + Executor）
 ├── portfolio/       # 持仓 + 组合分析
@@ -170,8 +170,10 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
   preset-installer / mcp / client / bridge + agent-presets 覆盖行）、投研 preset
   资产（托管 hash 自安装）、写工具审批闸门（`tools/pre-execute` 只 ask，判定表
   移植 `requires_confirmation`）、node 半 `/mommy/api` 桥（CLI 子进程 + SSE 失效
-  信号 + 认证栅栏）、浏览器半（7 张 toolview 富卡片 + 左侧自选停靠，三段 CJS
-  包裹 + 纯度门禁）。**市场计算逻辑永远不落 TS 侧**
+  信号 + 认证栅栏）、浏览器半（13 张 toolview 富卡片 + 左侧自选停靠，三段 CJS
+  包裹 + 纯度门禁）。**市场计算逻辑永远不落 TS 侧**（含均线——`get_bars
+  include_ma` 服务端计算）。产品 Skill 五件套（onboard/research/strategy/
+  basket-analysis/market-watch-loop）
 - MCP 工具在 DSH 里的公开名是 `mcp__mommy-chaogu__<rawName>`；工具面继续走
   MCP（五宿主共用），数据面走 CLI JSON：`mommy watchlist list --json` 与
   `mommy quote <codes...>`（桥与脚本的稳定契约面）
