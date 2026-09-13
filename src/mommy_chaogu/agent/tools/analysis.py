@@ -64,8 +64,8 @@ DEFS: list[ToolDef] = [
     ToolDef(
         name="check_kline_signal",
         description=(
-            "检查收盘后日线信号：volume_breakout 为放量上涨，"
-            "ma_golden_cross 为 5 日线上穿 20 日线。"
+            "检查收盘后日线信号：volume_breakout 为放量上涨；ma_golden_cross 为 "
+            "fast 日均线上穿 slow 日均线（默认 5/20，窗口可自定义）。"
         ),
         parameters={
             "type": "object",
@@ -80,11 +80,34 @@ DEFS: list[ToolDef] = [
                     "enum": ["volume_breakout", "ma_golden_cross"],
                     "default": "volume_breakout",
                 },
+                "fast": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 120,
+                    "default": 5,
+                    "description": "ma_golden_cross 的短均线窗口（默认 5）",
+                },
+                "slow": {
+                    "type": "integer",
+                    "minimum": 3,
+                    "maximum": 250,
+                    "default": 20,
+                    "description": "ma_golden_cross 的长均线窗口（默认 20；须大于 fast）",
+                },
             },
             "required": ["codes"],
         },
     ),
 ]
+
+
+def _clamp_int(value: Any, default: int, low: int, high: int) -> int:
+    """把任意输入钳到 [low, high] 的整数（默认值兜底）。"""
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(low, min(high, number))
 
 
 def _codes(args: dict[str, Any]) -> list[str]:
@@ -222,9 +245,15 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
     signal = str(args.get("signal", "volume_breakout"))
     if signal not in {"volume_breakout", "ma_golden_cross"}:
         return _json({"error": "signal 必须是 volume_breakout 或 ma_golden_cross"})
+    fast = _clamp_int(args.get("fast", 5), 5, 2, 120)
+    slow = _clamp_int(args.get("slow", 20), 20, 3, 250)
+    if fast >= slow:
+        return _json({"error": f"fast（{fast}）必须小于 slow（{slow}）"})
+    # 窗口越宽需要越多历史 K 线（多取 10 根余量，且不超 adapter 上限）
+    limit = min(max(30, slow + 10), 120)
     results: list[dict[str, Any]] = []
     for code in _codes(args):
-        bars = _completed_daily_bars(ctx.adapter.get_bars(code, interval=BarInterval.D1, limit=30))
+        bars = _completed_daily_bars(ctx.adapter.get_bars(code, interval=BarInterval.D1, limit=limit))
         if not bars:
             continue
         index = len(bars) - 1
@@ -239,16 +268,16 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
                 and volume_ratio > Decimal("1.5")
                 and change_pct > Decimal("2")
             )
-        elif len(bars) >= 22:
+        elif len(bars) >= slow + 2:
             # Check the most recent completed bar and its predecessor for a
             # cross; this avoids reporting an old crossover as current.
             for end in (index - 1, index):
-                if end < 20:
+                if end < slow - 1:
                     continue
-                previous_short = _ma(bars, end - 1, 5)
-                previous_long = _ma(bars, end - 1, 20)
-                current_short = _ma(bars, end, 5)
-                current_long = _ma(bars, end, 20)
+                previous_short = _ma(bars, end - 1, fast)
+                previous_long = _ma(bars, end - 1, slow)
+                current_short = _ma(bars, end, fast)
+                current_long = _ma(bars, end, slow)
                 if previous_short <= previous_long and current_short > current_long:
                     hit = True
                     current = bars[end]
@@ -261,6 +290,8 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
                     "code": current.code,
                     "name": current.name,
                     "signal": signal,
+                    "fast": fast,
+                    "slow": slow,
                     "close": str(current.close),
                     "volume_ratio": str(volume_ratio) if volume_ratio is not None else None,
                     "change_pct": str(change_pct),
