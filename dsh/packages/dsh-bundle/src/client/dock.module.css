@@ -1,0 +1,124 @@
+/* shell.overlay 自选停靠样式（CSS Modules）。 */
+
+.dock {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 224px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--mommy-card-border);
+  background: color-mix(in srgb, var(--mommy-card-bg) 60%, transparent);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  z-index: 40;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 10px 6px;
+}
+
+.title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.grow { flex: 1; }
+
+.button {
+  border: 1px solid var(--mommy-card-border);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  padding: 1px 7px;
+  cursor: pointer;
+}
+.button:hover { background: var(--mommy-card-bg); }
+.button[aria-pressed='true'] { border-color: currentcolor; }
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groups { display: flex; flex-direction: column; gap: 8px; }
+
+.groupName {
+  font-size: 11px;
+  color: var(--mommy-text-dim);
+  padding: 4px 6px 2px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.row:hover { background: var(--mommy-card-bg); }
+.row[data-open='true'] { border-color: var(--mommy-card-border); }
+
+.rowMain {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.name { font-weight: 500; }
+.code { color: var(--mommy-text-dim); font-size: 11px; }
+
+.price {
+  margin-left: auto;
+  font-family: var(--mommy-font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.trend[data-trend='up'] { color: var(--mommy-up); }
+.trend[data-trend='down'] { color: var(--mommy-down); }
+.trend[data-trend='flat'] { color: var(--mommy-flat); }
+
+.detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px 10px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--mommy-text-dim);
+}
+.detail .num { color: inherit; font-family: var(--mommy-font-num); }
+
+.empty {
+  padding: 18px 12px;
+  color: var(--mommy-text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--mommy-text-dim);
+}
+
+.foot {
+  padding: 6px 10px;
+  font-size: 10px;
+  color: var(--mommy-text-dim);
+  border-top: 1px solid var(--mommy-card-border);
+}
