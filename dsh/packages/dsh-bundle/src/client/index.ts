@@ -10,7 +10,21 @@
  * console 可见化。数据经 node 半 /mommy/api 同源桥。
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import { BarsCard, FlowCard, IndexesCard, PredictionsCard, QuoteCard, QuotesCard, WatchlistOpCard } from './cards.tsx'
+import {
+  BacktestCard,
+  BarsCard,
+  FlowCard,
+  FlowHistoryCard,
+  IndexesCard,
+  KlineSignalCard,
+  PredictionsCard,
+  QuoteCard,
+  QuotesCard,
+  RecordConclusionCard,
+  ScreenInflowCard,
+  SimilarEventsCard,
+  WatchlistOpCard,
+} from './cards.tsx'
 import { MommyDock } from './dock.tsx'
 import { en, zh } from './locales.ts'
 import './tokens.css'
@@ -66,6 +80,12 @@ export function apply(ctx: ClientContext): void {
     yield slots.register({ name: 'tool.call.toolview', key: TOOL('get_bars'), locale: NS }, BarsCard)
     yield slots.register({ name: 'tool.call.toolview', key: TOOL('get_prediction_history'), locale: NS }, PredictionsCard)
     yield slots.register({ name: 'tool.call.toolview', key: TOOL('manage_watchlist'), locale: NS }, WatchlistOpCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('check_kline_signal'), locale: NS }, KlineSignalCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('run_backtest'), locale: NS }, BacktestCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('get_money_flow_history'), locale: NS }, FlowHistoryCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('screen_inflow_stocks'), locale: NS }, ScreenInflowCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('search_similar_events'), locale: NS }, SimilarEventsCard)
+    yield slots.register({ name: 'tool.call.toolview', key: TOOL('record_research_conclusion'), locale: NS }, RecordConclusionCard)
   })
 
   // 左侧自选停靠（官方浮层通道）。

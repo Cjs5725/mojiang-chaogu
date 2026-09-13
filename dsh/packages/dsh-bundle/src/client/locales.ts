@@ -26,6 +26,22 @@ export type LocaleKey =
   | 'card.watchlistOp.ok'
   | 'card.watchlistOp.denied'
   | 'card.watchlistOp.error'
+  | 'card.signal.title'
+  | 'card.signal.type'
+  | 'card.backtest.title'
+  | 'card.backtest.signals'
+  | 'card.backtest.winRate'
+  | 'card.backtest.avgReturn'
+  | 'card.backtest.drawdown'
+  | 'card.backtest.hold'
+  | 'card.backtest.caveats'
+  | 'card.flowHistory.title'
+  | 'card.screenInflow.title'
+  | 'card.similarEvents.title'
+  | 'card.recordConclusion.title'
+  | 'card.recordConclusion.saved'
+  | 'card.recordConclusion.needsConfirm'
+  | 'card.recordConclusion.skipped'
   | 'field.open'
   | 'field.high'
   | 'field.low'
@@ -67,6 +83,22 @@ export const zh: Dict = {
   'card.watchlistOp.ok': '已执行',
   'card.watchlistOp.denied': '已拒绝',
   'card.watchlistOp.error': '失败',
+  'card.signal.title': 'K 线信号',
+  'card.signal.type': '信号',
+  'card.backtest.title': '信号回放',
+  'card.backtest.signals': '信号数',
+  'card.backtest.winRate': '胜率',
+  'card.backtest.avgReturn': '平均净收益',
+  'card.backtest.drawdown': '最大回撤',
+  'card.backtest.hold': '持有',
+  'card.backtest.caveats': '探索性评估',
+  'card.flowHistory.title': '历史资金流',
+  'card.screenInflow.title': '主力净流入筛选',
+  'card.similarEvents.title': '相似历史事件',
+  'card.recordConclusion.title': '研究结论',
+  'card.recordConclusion.saved': '已写入记忆',
+  'card.recordConclusion.needsConfirm': '待用户确认',
+  'card.recordConclusion.skipped': '按请求跳过',
   'field.open': '开',
   'field.high': '高',
   'field.low': '低',
@@ -107,6 +139,22 @@ export const en: Dict = {
   'card.watchlistOp.ok': 'Applied',
   'card.watchlistOp.denied': 'Denied by user',
   'card.watchlistOp.error': 'Failed',
+  'card.signal.title': 'K-line signals',
+  'card.signal.type': 'Signal',
+  'card.backtest.title': 'Signal replay',
+  'card.backtest.signals': 'Signals',
+  'card.backtest.winRate': 'Win rate',
+  'card.backtest.avgReturn': 'Avg net return',
+  'card.backtest.drawdown': 'Max drawdown',
+  'card.backtest.hold': 'Hold',
+  'card.backtest.caveats': 'Exploratory',
+  'card.flowHistory.title': 'Money flow history',
+  'card.screenInflow.title': 'Main-inflow screen',
+  'card.similarEvents.title': 'Similar past events',
+  'card.recordConclusion.title': 'Research conclusion',
+  'card.recordConclusion.saved': 'Saved to memory',
+  'card.recordConclusion.needsConfirm': 'Awaiting user confirmation',
+  'card.recordConclusion.skipped': 'Skipped by request',
   'field.open': 'Open',
   'field.high': 'High',
   'field.low': 'Low',

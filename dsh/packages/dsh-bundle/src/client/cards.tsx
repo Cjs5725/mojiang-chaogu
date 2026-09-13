@@ -3,21 +3,27 @@
  * 结构化卡片。key = 宿主公开工具名 `mcp__mommy-chaogu__<rawName>`。
  *
  * 契约（dsh-trading toolview 同款）：running / 解析失败 → null，回落官方
- * 通用工具行，绝不炸对话流。语义移植自 TUI renderers.py 的十卡片清单中
- * 适合对话流的七张：报价 / 批量报价 / 指数 / 资金流 / K 线迷你表 / 预测 /
- * 自选写回执。
+ * 通用工具行，绝不炸对话流。十三张卡：报价 / 批量报价 / 指数 / 资金流 /
+ * K 线迷你表（含 MA 列）/ 预测 / 自选写回执 + 信号 / 回测 / 历史资金流 /
+ * 主力筛选 / 相似事件 / 研究结论回执。
  */
 import type { ReactNode } from 'react'
 import type { ToolCallOwnerProps } from './types.ts'
 import {
   fmtAmountCN,
   fmtPct,
+  parseBacktest,
   parseBars,
+  parseFlowHistory,
   parseFlows,
   parseIndexes,
+  parseKlineSignal,
   parsePredictions,
   parseQuote,
   parseQuotes,
+  parseRecordConclusion,
+  parseScreenInflow,
+  parseSimilarEvents,
   parseWatchlistOp,
   readCall,
   trendOf,
@@ -220,6 +226,8 @@ export function BarsCard(props: CardProps) {
   if (parsed === null) return null
   const newestFirst = [...parsed.bars].reverse()
   const shown = newestFirst.slice(0, 8)
+  // include_ma 时服务端已附 ma_<w> 字段——这里只取窗口名列表渲染列，不在浏览器算指标
+  const maWindows = [...new Set(parsed.bars.flatMap(b => Object.keys(b.ma)))].sort((a, b) => Number(a) - Number(b))
   const t = props.t
   return (
     <div className={css.card} data-mommy-card="bars">
@@ -230,6 +238,9 @@ export function BarsCard(props: CardProps) {
             <th>{t?.('field.date') ?? '日期'}</th>
             <th>{t?.('field.close') ?? '收盘'}</th>
             <th>%</th>
+            {maWindows.map(w => (
+              <th key={w}>MA{w}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -243,6 +254,9 @@ export function BarsCard(props: CardProps) {
                 <td>
                   <Trend value={chg}>{fmtPct(chg)}</Trend>
                 </td>
+                {maWindows.map(w => (
+                  <td key={w}>{b.ma[w] !== null && b.ma[w] !== undefined ? b.ma[w]!.toFixed(2) : '—'}</td>
+                ))}
               </tr>
             )
           })}
@@ -316,6 +330,206 @@ export function WatchlistOpCard(props: CardProps) {
         {op.group !== null && <span className={css.dim}>→ {op.group}</span>}
       </div>
       {op.message !== null && <div className={css.foot}>{op.message}</div>}
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__check_kline_signal：K 线信号卡（放量上涨 / 均线金叉，窗口自定义）。 */
+export function KlineSignalCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const hits = parseKlineSignal(call.resultText)
+  if (hits.length === 0) return null
+  const t = props.t
+  return (
+    <div className={css.card} data-mommy-card="kline-signal">
+      <Head title={`${t?.('card.signal.title') ?? 'K 线信号'} · ${hits.length}`} />
+      <table className={css.table}>
+        <thead>
+          <tr>
+            <th>{t?.('dock.title') ?? '标的'}</th>
+            <th>{t?.('card.signal.type') ?? '信号'}</th>
+            <th>{t?.('field.close') ?? '收盘'}</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hits.map(h => (
+            <tr key={h.code}>
+              <td>
+                {h.name} <span className={css.dim}>{h.code}</span>
+              </td>
+              <td>
+                {h.signal === 'ma_golden_cross' && h.fast !== null && h.slow !== null
+                  ? `MA${h.fast}↑MA${h.slow}`
+                  : h.signal}
+              </td>
+              <td className={css.num}>{h.close?.toFixed(2) ?? '—'}</td>
+              <td>
+                <Trend value={h.changePct}>{fmtPct(h.changePct)}</Trend>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {hits[0]?.volumeRatio !== null && hits[0]?.volumeRatio !== undefined && (
+        <div className={css.foot}>量比 {hits[0].volumeRatio.toFixed(2)}</div>
+      )}
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__run_backtest：回测结果卡（探索性评估，caveats 前置）。 */
+export function BacktestCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const view = parseBacktest(call.resultText)
+  if (view === null) return null
+  const t = props.t
+  return (
+    <div className={css.card} data-mommy-card="backtest">
+      <Head title={t?.('card.backtest.title') ?? '信号回放'} />
+      <Grid
+        rows={[
+          [t?.('card.backtest.signals') ?? '信号数', String(view.totalSignals)],
+          [t?.('card.backtest.winRate') ?? '胜率', `${(view.winRate * 100).toFixed(1)}%`],
+          [t?.('card.backtest.avgReturn') ?? '平均净收益', fmtPct(view.avgReturnPct)],
+          [t?.('card.backtest.drawdown') ?? '最大回撤', fmtPct(view.maxDrawdownPct)],
+          ['Sharpe', view.sharpeRatio.toFixed(2)],
+          [
+            t?.('card.backtest.hold') ?? '持有',
+            view.holdDays !== null ? `${view.holdDays}d` : '—',
+          ],
+        ]}
+      />
+      {view.caveats.length > 0 && (
+        <div className={css.foot}>
+          ⚠ {t?.('card.backtest.caveats') ?? '探索性评估'}：{view.caveats.join('；')}
+        </div>
+      )}
+      {view.message !== '' && <div className={css.foot}>{view.message}</div>}
+      {view.costModel !== '' && <div className={css.foot}>{view.costModel}</div>}
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__get_money_flow_history：历史资金流趋势卡（主力净流入时序）。 */
+export function FlowHistoryCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const flows = parseFlowHistory(call.resultText)
+  if (flows.length === 0) return null
+  const t = props.t
+  const max = Math.max(...flows.map(f => Math.abs(f.mainNet)), 1)
+  return (
+    <div className={css.card} data-mommy-card="flow-history">
+      <Head title={`${t?.('card.flowHistory.title') ?? '历史资金流'} · ${flows[0]?.name ?? ''}`} />
+      <div className={css.list}>
+        {flows
+          .slice()
+          .reverse()
+          .map(f => (
+            <div key={`${f.code}-${f.timestamp}`} className={css.barsBar}>
+              <span className={`${css.k} ${css.dim}`} style={{ minWidth: 74, fontSize: 11 }}>
+                {f.timestamp?.slice(5, 10) ?? '—'}
+              </span>
+              <span className={`${css.trend} ${css.barsBar}`} data-trend={trendOf(f.mainNet)}>
+                <span className={css.barSeg} style={{ width: `${Math.max((Math.abs(f.mainNet) / max) * 110, 2)}px` }} />
+              </span>
+              <span className={`${css.num} ${css.trend}`} data-trend={trendOf(f.mainNet)}>
+                {fmtAmountCN(f.mainNet)}
+              </span>
+            </div>
+          ))}
+      </div>
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__screen_inflow_stocks：主力净流入筛选卡。 */
+export function ScreenInflowCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const { rows, total } = parseScreenInflow(call.resultText)
+  if (rows.length === 0) return null
+  const t = props.t
+  return (
+    <div className={css.card} data-mommy-card="screen-inflow">
+      <Head title={`${t?.('card.screenInflow.title') ?? '主力净流入筛选'} · ${rows.length}/${total}`} />
+      <table className={css.table}>
+        <thead>
+          <tr>
+            <th>{t?.('dock.title') ?? '标的'}</th>
+            <th>{t?.('card.flow.mainNet') ?? '主力净流入'}</th>
+            <th>bp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(r => (
+            <tr key={r.code}>
+              <td>
+                {r.name} <span className={css.dim}>{r.code}</span>
+              </td>
+              <td>
+                <Trend value={r.mainNet}>{fmtAmountCN(r.mainNet)}</Trend>
+              </td>
+              <td>{r.ratioBp !== null ? r.ratioBp.toFixed(0) : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__search_similar_events：相似历史事件检索卡。 */
+export function SimilarEventsCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const events = parseSimilarEvents(call.resultText)
+  if (events.length === 0) return null
+  const t = props.t
+  return (
+    <div className={css.card} data-mommy-card="similar-events">
+      <Head title={`${t?.('card.similarEvents.title') ?? '相似历史事件'} · ${events.length}`} />
+      <div className={css.list}>
+        {events.map(e => (
+          <div key={e.id ?? e.summary} className={css.listItem}>
+            <div className={css.head}>
+              {e.scope !== null && <span className={css.badge}>{e.scope}</span>}
+              {e.score !== null && <span className={`${css.dim} ${css.num}`}>{e.score.toFixed(3)}</span>}
+              {e.timestamp !== null && <span className={css.foot}>{e.timestamp.slice(0, 10)}</span>}
+            </div>
+            <span>{e.summary}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** mcp__mommy-chaogu__record_research_conclusion：研究结论写入回执卡。 */
+export function RecordConclusionCard(props: CardProps) {
+  const call = readCall((props.block ?? {}) as ToolCallBlock)
+  if (call.resultText === null) return null
+  const view = parseRecordConclusion(call.resultText)
+  if (view === null) return null
+  const t = props.t
+  const stateLabel =
+    view.state === 'saved'
+      ? (t?.('card.recordConclusion.saved') ?? '已写入记忆')
+      : view.state === 'confirmation_required'
+        ? (t?.('card.recordConclusion.needsConfirm') ?? '待用户确认')
+        : (t?.('card.recordConclusion.skipped') ?? '按请求跳过')
+  return (
+    <div className={css.card} data-mommy-card="record-conclusion" data-state={view.state}>
+      <div className={css.head}>
+        <span className={css.title}>{t?.('card.recordConclusion.title') ?? '研究结论'}</span>
+        <span className={css.badge} data-state={view.state === 'saved' ? 'ok' : 'error'}>
+          {stateLabel}
+        </span>
+      </div>
+      {view.message !== '' && <div className={css.foot}>{view.message}</div>}
     </div>
   )
 }

@@ -30,12 +30,26 @@ list --json` / `mommy quote ...`，CLI 是工具箱的稳定契约），浏览�
 | 1 Profile+bundle patch | `cordis.patch.yml`（6 行：gate/preset-installer/mcp/client/bridge + agent-presets 覆盖行） | `dsh.profile.bundles` 层序组合；同 id 覆盖行 config 全键 restate |
 | 2 Agent preset | `assets/preset/mommy-investor/`（persona + 技能目录行） | boot 时幂等自安装到 `<数据目录>/dsh-presets`；托管 hash，用户改过的文件永不覆盖 |
 | 3 审批闸门 | `src/gate.ts` | `tools/pre-execute` waterfall 只 ask 不 allow；判定表逐条移植 `agent/service.py` 的 requires_confirmation；headless 无审批者自动 deny（fail-closed 白送） |
-| 4 前端 | `src/client/`（7 张 toolview 富卡片 + 左侧自选停靠）+ `src/bridge.ts`（HTTP/SSE） | 三段 CJS 模块包裹 + 构建期纯度门禁 + CSS Modules 内联；`shell.overlay` / `tool.call.toolview` 官方 slot |
+| 4 前端 | `src/client/`（13 张 toolview 富卡片 + 左侧自选停靠）+ `src/bridge.ts`（HTTP/SSE） | 三段 CJS 模块包裹 + 构建期纯度门禁 + CSS Modules 内联；`shell.overlay` / `tool.call.toolview` 官方 slot |
 
 MCP 工具在宿主里的公开名是 `mcp__mommy-chaogu__<rawName>`——闸门与卡片 key
 都按这个词法。写工具 7 个（strategy_save / strategy_archive /
 strategy_activate_monitor / manage_watchlist{add,remove} / manage_alert{add,remove}
 / backfill_history 除外恒确认的三件套按动作判定）过闸门；读工具不打扰。
+
+## 能力覆盖（四星提升后）
+
+- **技术分析**：`check_kline_signal` 均线窗口可参数化（fast/slow，默认 5/20）；
+  `get_bars` 支持 `include_ma`（MA 序列**服务端**计算，浏览器只渲染）+ 迷你表卡
+  MA 列 + 信号卡；basket-analysis / market-watch-loop 两个分析 Skill 随产品安装
+  （`PRODUCT_SKILL_NAMES` 五件套）。
+- **回测**：`run_backtest` 工具域（flow_in_spike 信号回放，净成本口径 + caveats
+  前置的探索性评估语义）market-only 发布；回测指标卡（信号数/胜率/净收益/回撤/
+  Sharpe + caveats 提示）。
+- **记忆**：相似历史事件检索卡（search_similar_events）+ 研究结论写入回执卡
+  （record_research_conclusion 三态：saved / 待确认 / 跳过）。
+- **数据流**：历史资金流趋势卡（get_money_flow_history）+ 主力净流入筛选卡
+  （screen_inflow_stocks）补齐历史维度。
 
 ## 承重纪律（违反会炸启动或在 review 被拍回）
 

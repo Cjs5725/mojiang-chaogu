@@ -58,7 +58,16 @@ export interface QuoteView {
   timestamp: string | null
 }
 
-const num = (value: unknown): number | null => (typeof value === 'number' && Number.isFinite(value) ? value : null)
+const num = (value: unknown): number | null => {
+  // mommy 工具有两种数值形态：JSON number（quote/bars）与字符串（analysis 域
+  // 的 Decimal 序列化）——统一收有限数值，其余 null。
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
 const str = (value: unknown): string | null => (typeof value === 'string' ? value : null)
 
 function toQuoteView(raw: unknown): QuoteView | null {
@@ -184,6 +193,8 @@ export interface BarView {
   close: number
   volume: number
   changePct: number | null
+  /** include_ma 时服务端附加的均线值（键形如 "5"→ma_5；null=窗口未满）。 */
+  ma: Record<string, number | null>
 }
 
 /** get_bars：K 线数组（新→旧或旧→新都收，展示前统一倒序成新在前）。 */
@@ -202,6 +213,10 @@ export function parseBars(resultText: string): { code: string; name: string; bar
     if (close === null || open === null || timestamp === null) continue
     if (typeof r.code === 'string') code = r.code
     if (typeof r.name === 'string') name = r.name
+    const ma: Record<string, number | null> = {}
+    for (const [key, value] of Object.entries(r)) {
+      if (key.startsWith('ma_')) ma[key.slice(3)] = num(value)
+    }
     bars.push({
       timestamp,
       open,
@@ -210,6 +225,7 @@ export function parseBars(resultText: string): { code: string; name: string; bar
       close,
       volume: num(r.volume) ?? 0,
       changePct: num(r.change_pct),
+      ma,
     })
   }
   if (bars.length === 0) return null
@@ -292,9 +308,164 @@ export function parseWatchlistOp(argsRaw: string, resultText: string | null, isE
   }
 }
 
+/** check_kline_signal：命中列表（数值字段为字符串形态，需强制转换）。 */
+export interface KlineSignalHit {
+  code: string
+  name: string
+  signal: string
+  fast: number | null
+  slow: number | null
+  close: number | null
+  volumeRatio: number | null
+  changePct: number | null
+}
+
+export function parseKlineSignal(resultText: string): KlineSignalHit[] {
+  const data = parseJson(resultText)
+  if (typeof data !== 'object' || data === null) return []
+  const results = (data as Record<string, unknown>).results
+  if (!Array.isArray(results)) return []
+  const hits: KlineSignalHit[] = []
+  for (const item of results) {
+    if (typeof item !== 'object' || item === null) continue
+    const r = item as Record<string, unknown>
+    if (typeof r.code !== 'string') continue
+    hits.push({
+      code: r.code,
+      name: typeof r.name === 'string' ? r.name : r.code,
+      signal: typeof r.signal === 'string' ? r.signal : '',
+      fast: num(r.fast),
+      slow: num(r.slow),
+      close: num(r.close),
+      volumeRatio: num(r.volume_ratio),
+      changePct: num(r.change_pct),
+    })
+  }
+  return hits
+}
+
+/** run_backtest：回放汇总（探索性评估，caveats 必须随卡展示）。 */
+export interface BacktestView {
+  totalSignals: number
+  winningSignals: number
+  losingSignals: number
+  winRate: number
+  avgReturnPct: number
+  avgGrossReturnPct: number
+  maxDrawdownPct: number
+  sharpeRatio: number
+  holdDays: number | null
+  costModel: string
+  caveats: string[]
+  message: string
+}
+
+export function parseBacktest(resultText: string): BacktestView | null {
+  const data = parseJson(resultText)
+  if (typeof data !== 'object' || data === null) return null
+  const r = data as Record<string, unknown>
+  if (!('total_signals' in r)) return null
+  return {
+    totalSignals: num(r.total_signals) ?? 0,
+    winningSignals: num(r.winning_signals) ?? 0,
+    losingSignals: num(r.losing_signals) ?? 0,
+    winRate: num(r.win_rate) ?? 0,
+    avgReturnPct: num(r.avg_return_pct) ?? 0,
+    avgGrossReturnPct: num(r.avg_gross_return_pct) ?? 0,
+    maxDrawdownPct: num(r.max_drawdown_pct) ?? 0,
+    sharpeRatio: num(r.sharpe_ratio) ?? 0,
+    holdDays: num(r.hold_days),
+    costModel: str(r.cost_model) ?? '',
+    caveats: Array.isArray(r.caveats) ? r.caveats.filter((c): c is string => typeof c === 'string') : [],
+    message: str(r.message) ?? '',
+  }
+}
+
+/** get_money_flow_history：与当日资金流同形状的时序列表。 */
+export function parseFlowHistory(resultText: string): FlowView[] {
+  const data = parseJson(resultText)
+  if (!Array.isArray(data)) return []
+  return data.map(toFlowView).filter((f): f is FlowView => f !== null)
+}
+
+/** screen_inflow_stocks：主力净流入达标筛选（数值字段为字符串形态）。 */
+export interface ScreenInflowRow {
+  code: string
+  name: string
+  mainNet: number | null
+  ratioBp: number | null
+}
+
+export function parseScreenInflow(resultText: string): { rows: ScreenInflowRow[]; total: number } {
+  const data = parseJson(resultText)
+  if (typeof data !== 'object' || data === null) return { rows: [], total: 0 }
+  const r = data as Record<string, unknown>
+  if (!Array.isArray(r.results)) return { rows: [], total: 0 }
+  const rows: ScreenInflowRow[] = []
+  for (const item of r.results) {
+    if (typeof item !== 'object' || item === null) continue
+    const row = item as Record<string, unknown>
+    if (typeof row.code !== 'string') continue
+    rows.push({
+      code: row.code,
+      name: typeof row.name === 'string' ? row.name : row.code,
+      mainNet: num(row.main_net),
+      ratioBp: num(row.ratio_bp),
+    })
+  }
+  return { rows, total: num(r.total) ?? rows.length }
+}
+
+/** search_similar_events：语义/关键词检索的历史事件。 */
+export interface SimilarEventView {
+  id: string | null
+  summary: string
+  timestamp: string | null
+  score: number | null
+  scope: string | null
+}
+
+export function parseSimilarEvents(resultText: string): SimilarEventView[] {
+  const data = parseJson(resultText)
+  if (!Array.isArray(data)) return []
+  const views: SimilarEventView[] = []
+  for (const item of data) {
+    if (typeof item !== 'object' || item === null) continue
+    const r = item as Record<string, unknown>
+    views.push({
+      id: str(r.id),
+      summary: str(r.summary) ?? '',
+      timestamp: str(r.timestamp),
+      score: num(r.score),
+      scope: str(r.scope),
+    })
+  }
+  return views.filter(v => v.summary !== '')
+}
+
+/** record_research_conclusion：写入回执三态。 */
+export type RecordConclusionState = 'saved' | 'skipped' | 'confirmation_required'
+
+export interface RecordConclusionView {
+  state: RecordConclusionState
+  message: string
+}
+
+export function parseRecordConclusion(resultText: string): RecordConclusionView | null {
+  const data = parseJson(resultText)
+  if (typeof data !== 'object' || data === null) return null
+  const r = data as Record<string, unknown>
+  if (!('saved' in r)) return null
+  const state: RecordConclusionState = r.saved === true
+    ? 'saved'
+    : r.confirmation_required === true
+      ? 'confirmation_required'
+      : 'skipped'
+  return { state, message: str(r.message) ?? '' }
+}
+
 /** 数值格式化：万/亿中文单位。 */
-export function fmtAmountCN(value: number | null): string {
-  if (value === null) return '—'
+export function fmtAmountCN(value: number | null): string {  if (value === null) return '—'
   const abs = Math.abs(value)
   if (abs >= 1e12) return `${(value / 1e12).toFixed(2)}万亿`
   if (abs >= 1e8) return `${(value / 1e8).toFixed(2)}亿`
