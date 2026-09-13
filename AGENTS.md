@@ -88,6 +88,7 @@ src/mommy_chaogu/
 ├── services/        # 统一数据服务层（工具层和 API 层共用）
 ├── push/            # Server酱微信推送
 ├── channels/        # 本地消息网关（微信二维码授权 + 私聊长轮询）
+├── dsh/             # DSH 产品嫁接子工程（pnpm workspace：@mommy-chaogu/dsh-bundle）
 ├── db_paths.py      # 统一数据库路径管理
 └── cli.py           # argparse 入口（含 mommy 自然语言入口 + 13 个透传子命令）
 ```
@@ -157,6 +158,28 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 - `tui/services/renderers.py` — 工具结果 → 卡片分发；`tui/services/errors.py` — 错误文案友好映射
 - `tui/views/chat.py` — 对话视图（流式 + 卡片容器 + slash/@ 联想 + busy 排队 + Esc）
 - `tui/widgets/` — TopBar / cards（10 种富卡片）/ ToolIndicator / WorkingIndicator / HintBar
+
+## DSH 产品嫁接（dsh/ 子工程 + mommy dsh）
+
+`uv run mommy dsh install|uninstall|doctor|run` —— 把 mommy-chaogu 作为**产品**
+嫁接到 DSH（DeepSeek Harness）web 宿主：独立 DSH_HOME（默认 `<数据目录>/dsh-home`，
+不污染用户 `~/.dsh`）+ `profiles/mommy`，不改宿主源码。架构与承重纪律见
+`dsh/README.md`（四面机制全部真机验证于 0.1.5-rc 系）。
+
+- `dsh/packages/dsh-bundle`（pnpm workspace）：`cordis.patch.yml` 六行（gate /
+  preset-installer / mcp / client / bridge + agent-presets 覆盖行）、投研 preset
+  资产（托管 hash 自安装）、写工具审批闸门（`tools/pre-execute` 只 ask，判定表
+  移植 `requires_confirmation`）、node 半 `/mommy/api` 桥（CLI 子进程 + SSE 失效
+  信号 + 认证栅栏）、浏览器半（7 张 toolview 富卡片 + 左侧自选停靠，三段 CJS
+  包裹 + 纯度门禁）。**市场计算逻辑永远不落 TS 侧**
+- MCP 工具在 DSH 里的公开名是 `mcp__mommy-chaogu__<rawName>`；工具面继续走
+  MCP（五宿主共用），数据面走 CLI JSON：`mommy watchlist list --json` 与
+  `mommy quote <codes...>`（桥与脚本的稳定契约面）
+- `src/mommy_chaogu/cli_commands/dsh_product.py`：安装器（profile manifest +
+  四条绝对路径覆盖行 + Skills，file: 副本强制刷新）；增强模式（`mommy connect
+  dsh`）与产品模式互补共存
+- 开发循环：`pnpm -C dsh build && pnpm -C dsh test` → `uv run mommy dsh install`
+  → `dsh --profile mommy --dump-config` → 真机四步验收（见 dsh/README.md）
 
 ## Web 前端
 
