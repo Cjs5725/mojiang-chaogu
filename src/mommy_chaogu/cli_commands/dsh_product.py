@@ -51,8 +51,15 @@ PROFILE_NAME = "mommy"
 BUNDLE_PACKAGE = "@mommy-chaogu/dsh-bundle"
 #: 与 dsh-bundle 依赖钉版一致的宿主验证基线（0.1.5-rc 系）。
 PRODUCT_TESTED_DSH_VERSION = "0.1.5-rc.2"
-#: preset 挂载的三个产品 Skill（persona 文本引用的名字）。
-PRODUCT_SKILL_NAMES: tuple[str, ...] = ("mommy-onboard", "mommy-research", "mommy-strategy")
+#: preset 挂载的产品 Skill：三件套（persona 文本引用）+ 两个分析 Skill
+#: （篮子均线分析 / 盘内观察循环——宿主可按 skill 脚本跑完整技术分析）。
+PRODUCT_SKILL_NAMES: tuple[str, ...] = (
+    "mommy-onboard",
+    "mommy-research",
+    "mommy-strategy",
+    "basket-analysis",
+    "market-watch-loop",
+)
 
 _WEB_BUNDLES: tuple[str, ...] = ("@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app")
 _HEADLESS_BUNDLES: tuple[str, ...] = ("@deepseek-ai/dsh-base", "@deepseek-ai/dsh-headless")
