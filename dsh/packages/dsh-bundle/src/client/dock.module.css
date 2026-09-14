@@ -1,18 +1,20 @@
-/* shell.overlay 自选停靠样式（CSS Modules）。 */
+/* shell.overlay 自选停靠样式（CSS Modules）。面板挂在宿主 overlay 层内
+   （frame 相对坐标），默认贴侧栏右缘（left 由 dock.tsx 按侧栏实时宽度
+   内联给出），拖拽后的自由位置同样内联注入——CSS 只管形状。 */
 
 .dock {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  position: absolute;
   width: 224px;
+  max-height: calc(100% - 16px);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--mommy-card-border);
-  background: color-mix(in srgb, var(--mommy-card-bg) 60%, transparent);
+  border: 1px solid var(--mommy-card-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--mommy-card-bg) 88%, transparent);
   backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 14%);
   font-size: 12px;
-  z-index: 40;
 }
 
 .head {
@@ -20,7 +22,11 @@
   align-items: center;
   gap: 6px;
   padding: 10px 10px 6px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
+.head:active { cursor: grabbing; }
 
 .title {
   font-weight: 600;
@@ -122,3 +128,23 @@
   color: var(--mommy-text-dim);
   border-top: 1px solid var(--mommy-card-border);
 }
+
+/* 收起态：贴边小药丸，点击展开回面板。 */
+.pill {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--mommy-card-border);
+  border-radius: 999px;
+  background: var(--mommy-card-bg);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 14%);
+  font-size: 12px;
+  cursor: pointer;
+  color: inherit;
+  user-select: none;
+}
+.pill:hover { border-color: currentcolor; }
+.pillCount { font-weight: 600; }

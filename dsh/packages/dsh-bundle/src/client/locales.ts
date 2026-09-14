@@ -9,6 +9,8 @@ export type LocaleKey =
   | 'dock.refresh'
   | 'dock.loading'
   | 'dock.source'
+  | 'dock.collapse'
+  | 'dock.expand'
   | 'card.quote.title'
   | 'card.quotes.title'
   | 'card.indexes.title'
@@ -66,6 +68,8 @@ export const zh: Dict = {
   'dock.refresh': '刷新',
   'dock.loading': '加载中…',
   'dock.source': '来源',
+  'dock.collapse': '收起',
+  'dock.expand': '展开',
   'card.quote.title': '实时报价',
   'card.quotes.title': '批量报价',
   'card.indexes.title': '大盘指数',
@@ -122,6 +126,8 @@ export const en: Dict = {
   'dock.refresh': 'Refresh',
   'dock.loading': 'Loading…',
   'dock.source': 'Source',
+  'dock.collapse': 'Collapse',
+  'dock.expand': 'Expand',
   'card.quote.title': 'Live quote',
   'card.quotes.title': 'Batch quotes',
   'card.indexes.title': 'Market indexes',
