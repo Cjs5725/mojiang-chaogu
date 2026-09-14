@@ -12,7 +12,46 @@
 > slot）本身合格且全部门禁绿，但评审发现若干"会说谎"与"静默失败"缺陷——
 > 它们的共同点是**测试全绿、用户看到的却是错的**。本批修复全部带回归测试。
 
-### 修复
+### 修复（第二波：评审 F2/F8①/F15 + 表面派生化 F3/F5）
+
+- **dock「拉新失败保留旧数据」注释说谎**（F2②③）——报价拉新失败路径
+  曾是全新空 Map 整体替换（注释却写"保留旧数据"），且 `fetchQuotes` 丢弃
+  CLI 的 exit 0 + error 载荷，把「数据源挂了」伪装成「空自选」。现在
+  error 字段透传、失败保留上次快照、脚注显式标注「行情拉新失败，显示上
+  次快照」（`api.ts` / `dock.tsx` / `locales.ts`，+2 vitest）。
+- **审批闸门 fail-open 漂移**（F8①）——前缀命中但判定表查不到的工具曾
+  静默放行（`undefined ?? next()`）。新增 `MOMMY_TOOL_SURFACE` 工具面
+  快照（37+7），未知 mommy 工具一律 `ask`（fail-closed：快照漂移表现为
+  多问一次，绝不静默放行）；头注明确两个「写」概念的裁决——
+  `backfill_history` 写行情缓存非用户数据，刻意不拦（gate.test.ts 语义
+  正名）。
+- **自定义工作流写面无闸**（F15）——编译器曾把含写工具的全部 37 工具喂
+  给编译 LLM，validator 只查存在性、执行器无确认通道：trigger 命中即可
+  自动执行 `manage_watchlist add`。现在编译目录剔除写工具（源头），
+  validator 对写工具出 blocking issue（闸门），判定集与
+  `agent/service.py` 确认白名单同源（`compiler.py` / `validator.py`，
+  +2 测试）。
+- **DEFS 代码正则手抄漂移**（F3）——19 处内联 pattern 收编为 `codes.py`
+  常量：宽面工具（行情/K线/公告/基本面/策略卡）升级 canonical（接受
+  `BRK.B`/`BF-B`）；A 股特有域（资金流×3/业绩催化/金叉/主力筛选/信号
+  回放）诚实收窄为 `^\d{6}$`（旧行为放行美股字母只会换来静默空数据）。
+  元测试 `tests/test_tool_surface_mirrors.py` 焊死：pattern 必须引用
+  常量、宽窄按域裁决。
+- **展示标签表漂移**（F5）——TUI 表补 5 个（注释「覆盖全部工具」终成
+  真话，37/37）、web 表补 12 个；完备性断言进 `test_tool_surface_mirrors.py`，
+  新工具漏配标签直接红灯。BACKEND-CAPABILITIES 的 25 条手抄表改为指向
+  真相源。
+- **文档计数说谎**（F7）——AGENTS.md 透传子命令 13→17、预定义工作流
+  9→10、web 页面 9→13（另 3 重定向 + 404）；BACKEND-CAPABILITIES
+  「25 个底层工具 + 6 研究工作流」→「37 + 7（market-only 发布 19+5）」；
+  DESIGN.md 数据源叙事从两源（efinance+腾讯）更新为四源链
+  （massive→yahoo→efinance→tencent）。
+
+门禁：离线 2313 passed / 14 deselected；`ruff` + `mypy --strict`（223
+文件）干净；dsh `typecheck` + vitest 68/68 + build 通过；web vue-tsc +
+vitest 78/78。
+
+### 修复（第一波）
 
 - **doctor 版本检查假比较**——`mommy dsh doctor` 曾用增强模式基线
   （`0.1.1-rc.2`）做真实比较、再把文案字符串替换成产品基线（`0.1.5-rc.2`）：

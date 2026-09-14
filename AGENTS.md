@@ -79,7 +79,7 @@ src/mommy_chaogu/
 ├── earnings/        # 业绩前瞻 vs 实际 比对
 ├── agent/           # LLM agent（llm.py provider 真相源 + tools/ 包按域拆分 37 工具（含 run_backtest 信号回放） + MCP + 记忆系统 5 层 + Strategy Cards）
 ├── strategy/        # 用户确认的策略卡校验、版本、来源与监控关联
-├── workflow/        # 自然语言工作流引擎（9 个预定义工作流 + NLRouter + Executor）
+├── workflow/        # 自然语言工作流引擎（10 个预定义工作流 + NLRouter + Executor）
 ├── portfolio/       # 持仓 + 组合分析
 ├── backtest/        # 回测引擎（引擎 + 统一评分 + 成本 + 组合 + walk-forward + regime）
 ├── semicon/         # 半导体产业链参考库
@@ -90,7 +90,7 @@ src/mommy_chaogu/
 ├── channels/        # 本地消息网关（微信二维码授权 + 私聊长轮询）
 ├── dsh/             # DSH 产品嫁接子工程（pnpm workspace：@mommy-chaogu/dsh-bundle）
 ├── db_paths.py      # 统一数据库路径管理
-└── cli.py           # argparse 入口（含 mommy 自然语言入口 + 13 个透传子命令）
+└── cli.py           # argparse 入口（含 mommy 自然语言入口 + 17 个透传子命令）
 ```
 
 ## 自然语言入口
@@ -115,7 +115,7 @@ src/mommy_chaogu/
 
 工作流引擎见 `src/mommy_chaogu/workflow/`：
 - `engine.py` — Workflow / WorkflowRegistry / WorkflowExecutor
-- `definitions.py` — 9 个预定义工作流（morning_brief / stock_analysis / sector_scan 等）
+- `definitions.py` — 10 个预定义工作流（morning_brief / us_market_brief / stock_analysis / sector_scan 等）
 - `router.py` — NLRouter（正则匹配优先，fallback 到 AgentService）
 
 Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
@@ -188,7 +188,8 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 `uv run mommy-web` → Vue 3 + shadcn/vue + Tailwind v4。
 
 - 桌面端侧边导航 + 移动端底部 tab（响应式）
-- 9 个页面：仪表盘/行情/主题/持仓/AI对话/个股详情/信号/设置/主题详情
+- 13 个页面：仪表盘/AI对话/设置引导/行情/关注/持仓/个股详情/信号/预测/主题/主题详情/篮子详情/我的
+  （另有 /agent /dashboard /settings 三条重定向与 404 兜底）
 - shadcn 组件（reka-ui）+ lucide 图标
 - A 股配色（红涨绿跌）+ 深色/浅色模式
 - klinecharts K 线图 + WebSocket 实时推送
