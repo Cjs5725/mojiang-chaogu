@@ -253,6 +253,22 @@ class TestDoctor:
         assert "profile_manifest" in report["blocking"]
         assert "product_skills" in report["blocking"]
 
+    def test_doctor_version_check_uses_product_baseline(
+        self, fake_env: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # 回归背景：doctor 曾用 adapter 基线（0.1.1-rc.2）做真实比较、再把文案
+        # 字符串替换成产品基线（0.1.5-rc.2）——真实宿主版本永远对着错误基线判。
+        # 探测到 0.1.5-rc.2 必须判 ok，且 tested 字段就是产品基线。
+        from mommy_chaogu.coding_agents.dsh import parse_dsh_version
+
+        assert parse_dsh_version(dsh_product.PRODUCT_TESTED_DSH_VERSION) is not None
+        monkeypatch.setattr(dsh_product, "_detect_dsh", lambda: ("/usr/local/bin/dsh", "0.1.5-rc.2"))
+        report = doctor_dsh_product()
+        version_check = next(c for c in report["checks"] if c["name"] == "dsh_version")
+        assert version_check["status"] == "ok"
+        assert version_check["tested"] == dsh_product.PRODUCT_TESTED_DSH_VERSION
+        assert "0.1.5-rc.2" in version_check["message"]
+
 
 def check_message(report: dict[str, Any], name: str) -> str:
     return next(check["message"] for check in report["checks"] if check["name"] == name)
@@ -321,14 +337,17 @@ class TestQuoteCli:
     ) -> None:
         from mommy_chaogu.cli_commands import quote as quote_cli
 
-        class FakeChain:
+        # 回归背景：曾有 bug 是 CLI 直接用裸适配器链（无 format_source_label），
+        # source 恒为空串，而本测试 fake 在链上补了该方法照样绿——测试对象
+        # 必须是 CLI 真实使用的适配器构造（缓存层），而非裸链。
+        class FakeCachedAdapter:
             def get_quotes(self, codes: list[str]) -> list[Any]:
                 return [_fake_quote(code) for code in codes]
 
             def format_source_label(self) -> str:
                 return "测试源"
 
-        monkeypatch.setattr("mommy_chaogu.market_data.create_adapter_chain", lambda: FakeChain())
+        monkeypatch.setattr(quote_cli, "_build_quote_adapter", lambda: FakeCachedAdapter())
         rc = quote_cli.main_quote(["600519", "000001"])
         assert rc == 0
         payload = json.loads(capsys.readouterr().out)

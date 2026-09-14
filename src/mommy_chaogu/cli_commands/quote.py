@@ -11,6 +11,10 @@ import argparse
 import json
 import logging
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mommy_chaogu.cache import CachedMarketDataAdapter
 
 _log = logging.getLogger(__name__)
 
@@ -18,9 +22,22 @@ _log = logging.getLogger(__name__)
 MAX_QUOTE_CODES = 50
 
 
+def _build_quote_adapter() -> CachedMarketDataAdapter:
+    """构造与 agent 工具面 / MCP 相同的数据面适配器：缓存层包住适配器链。
+
+    format_source_label 只在缓存层上（裸 FallbackAdapter 没有），绕过缓存层
+    会让 DSH dock 的「来源」脚注永远为空，也绕开了节流与"拉新失败保留旧
+    数据"纪律。独立成函数供测试注入。
+    """
+    from mommy_chaogu.cache import CachedMarketDataAdapter, CacheStore
+    from mommy_chaogu.db_paths import MARKET_DB
+    from mommy_chaogu.market_data import create_adapter_chain
+
+    return CachedMarketDataAdapter(create_adapter_chain(), CacheStore(MARKET_DB))
+
+
 def cmd_quote(args: argparse.Namespace) -> int:
     from mommy_chaogu.agent.tools.base import _quote_to_dict
-    from mommy_chaogu.market_data import create_adapter_chain
 
     codes = [code.strip() for code in args.codes if code.strip()]
     if not codes:
@@ -30,17 +47,14 @@ def cmd_quote(args: argparse.Namespace) -> int:
         print(f"一次最多 {MAX_QUOTE_CODES} 只（当前 {len(codes)}）", file=sys.stderr)
         return 2
 
-    adapter = create_adapter_chain()
+    adapter = _build_quote_adapter()
     try:
         quotes = adapter.get_quotes(codes)
     except Exception as e:  # 拉新失败：输出结构化错误，调用方决定降级
         _log.debug("批量报价失败: %s", e)
         print(json.dumps({"source": "", "quotes": [], "error": str(e)}, ensure_ascii=False))
         return 0
-    label = ""
-    if hasattr(adapter, "format_source_label"):
-        label = str(adapter.format_source_label())
-    payload = {"source": label, "quotes": [_quote_to_dict(q) for q in quotes]}
+    payload = {"source": adapter.format_source_label(), "quotes": [_quote_to_dict(q) for q in quotes]}
     print(json.dumps(payload, ensure_ascii=False))
     return 0
 

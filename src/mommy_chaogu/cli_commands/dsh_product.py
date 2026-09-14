@@ -9,7 +9,7 @@
 3. profile 私有 ``cordis.patch.yml`` 覆盖 bundle 行配置为**绝对路径**（MCP 行绑定
    当前解释器与解析后的数据库路径，桥行绑定 mommy CLI 与数据目录，agent-presets
    行绑定产品 preset root）——覆盖语义全键 restate，不改 bundle 包本身；
-4. 三个产品 Skill 装进 ``<DSH_HOME>/skills``（preset 的 skill-filesystem 发现根）。
+4. 产品 Skill（当前五个）装进 ``<DSH_HOME>/skills``（preset 的 skill-filesystem 发现根）。
 
 preset 与审批闸门由 bundle 在宿主 boot 时自安装/自挂载（TS 侧），Python 侧只做
 确定性落盘。bundle 源码在仓库 ``dsh/`` 子工程（pnpm workspace），安装前需构建。
@@ -382,9 +382,7 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
             }
         )
     else:
-        check = dsh_version_check(version)
-        check["message"] = check["message"].replace("0.1.1-rc.2", PRODUCT_TESTED_DSH_VERSION)
-        checks.append(check)
+        checks.append(dsh_version_check(version, baseline=PRODUCT_TESTED_DSH_VERSION))
 
     manifest_path = directory / "package.json"
     if manifest_path.is_file():
@@ -459,7 +457,7 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
         {
             "name": "product_skills",
             "status": "ok" if not skills_missing else "error",
-            "message": "三个产品 Skill 就位。"
+            "message": f"{len(PRODUCT_SKILL_NAMES)} 个产品 Skill 就位。"
             if not skills_missing
             else f"缺 Skill：{skills_missing}。",
         }
