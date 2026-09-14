@@ -6,6 +6,10 @@
  * 写操作发生在 MCP 子进程里对 node 半不可见，mtime 轮询是诚实的信号：任何
  * 写入（AI 写、用户在 TUI/Web 写）都改变文件时间。store 名是封闭 union，
  * 目前只有 'portfolio'；客户端收到信号后自己 refetch REST（幂等）。
+ *
+ * mommy 的库全部跑 WAL 模式：长驻写者（MCP server）的提交先落 portfolio.db-wal，
+ * checkpoint 前主文件 mtime 不动——只看主文件会漏掉失效信号。签名取
+ * db / db-wal / db-shm 三者 mtime 的最大值。
  */
 import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -25,6 +29,7 @@ export interface EventStreamSource {
 }
 
 const POLL_INTERVAL_MS = 2_000
+const WATCHED_SUFFIXES = ['', '-wal', '-shm'] as const
 
 /** mtime 轮询 → revision 自增 → 扇出。启动失败（文件不存在）静默降级为零信号。 */
 export class RevisionBus implements EventStreamSource {
@@ -40,19 +45,29 @@ export class RevisionBus implements EventStreamSource {
     this.intervalMs = intervalMs
   }
 
-  /** 读当前 mtime 作为基线，避免启动即误发一次信号。 */
-  private async poll(emit: boolean): Promise<void> {
-    try {
-      const stats = await stat(this.dbPath)
-      if (this.lastMtimeMs !== null && stats.mtimeMs !== this.lastMtimeMs && emit) {
-        this.revision += 1
-        const event: MommyInvalidationEvent = { store: 'portfolio', revision: this.revision }
-        for (const listener of this.listeners) listener(event)
+  /** db/-wal/-shm 三者 mtime 最大值；全部缺失返回 null。 */
+  private async currentMtimeMs(): Promise<number | null> {
+    let latest: number | null = null
+    for (const suffix of WATCHED_SUFFIXES) {
+      try {
+        const stats = await stat(`${this.dbPath}${suffix}`)
+        if (latest === null || stats.mtimeMs > latest) latest = stats.mtimeMs
+      } catch {
+        // 文件不存在（未 checkpoint / 无写者 / 库未建）——跳过
       }
-      this.lastMtimeMs = stats.mtimeMs
-    } catch {
-      this.lastMtimeMs = null
     }
+    return latest
+  }
+
+  /** 读当前签名作为基线，避免启动即误发一次信号；建库（null→有值）也是变化。 */
+  private async poll(emit: boolean): Promise<void> {
+    const mtimeMs = await this.currentMtimeMs()
+    if (emit && mtimeMs !== null && mtimeMs !== this.lastMtimeMs) {
+      this.revision += 1
+      const event: MommyInvalidationEvent = { store: 'portfolio', revision: this.revision }
+      for (const listener of this.listeners) listener(event)
+    }
+    this.lastMtimeMs = mtimeMs
   }
 
   start(): void {

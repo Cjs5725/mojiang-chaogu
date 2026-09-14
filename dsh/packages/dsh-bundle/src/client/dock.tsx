@@ -84,8 +84,8 @@ function saveLayout(layout: DockLayout): void {
 }
 
 /** 宿主 AppFrame 在 frame 元素上内联三列 grid 轨道，首列即侧栏当前宽度。 */
-function sidebarWidthOf(frame: Element | null | undefined): number {
-  if (frame === null || frame === undefined) return 0
+function sidebarWidthOf(frame: HTMLElement | null): number {
+  if (frame === null) return 0
   const first = frame.style.gridTemplateColumns.split(' ')[0] ?? ''
   const px = Number.parseFloat(first)
   return Number.isFinite(px) ? px : 0
@@ -101,7 +101,12 @@ export function MommyDock(props: MommyDockProps) {
   const [openCode, setOpenCode] = useState<string | null>(null)
   const [layout, setLayout] = useState<DockLayout>(loadLayout)
   const [sidebarW, setSidebarW] = useState(0)
-  const rootRef = useRef<HTMLDivElement | null>(null)
+  const rootRef = useRef<HTMLElement | null>(null)
+  // 面板根是 div、收起药丸是 button——回调 ref 统一收 HTMLElement（ref 属性
+  // 对元素类型是不变的，useRef<HTMLDivElement> 挂不到 button 上）。
+  const setRootRef = (el: HTMLElement | null): void => {
+    rootRef.current = el
+  }
   const layoutRef = useRef(layout)
   const dragRef = useRef<DragGesture | null>(null)
 
@@ -117,6 +122,9 @@ export function MommyDock(props: MommyDockProps) {
   // 侧栏实时宽度跟随：AppFrame 拖宽/折叠都写 frame 的 style 与
   // data-sidebar-collapsed 属性，属性级监听足够，不需要宿主类型。
   // slot 渲染位会包 display:contents 包装层，祖先一律用 closest 定位。
+  // 收起药丸也必须挂 rootRef：挂载即收起（localStorage 记住 collapsed）时
+  // 药丸是唯一渲染位，effect（依赖 []）只在挂载时跑一次，ref 缺席会让
+  // observer 永不安装、sidebarW 永远为 0——展开后面板压住宿主侧栏。
   useEffect(() => {
     const overlay = rootRef.current?.closest('[data-shell-overlay]')
     const frame = overlay?.parentElement ?? null
@@ -226,6 +234,17 @@ export function MommyDock(props: MommyDockProps) {
     title: t?.('dock.title') ?? '自选',
   }
 
+  const refreshButton = (
+    <button
+      type="button"
+      className={css.button}
+      aria-pressed={state.loading ? 'true' : 'false'}
+      onClick={() => void load()}
+    >
+      {state.loading ? (t?.('dock.loading') ?? '加载中…') : (t?.('dock.refresh') ?? '刷新')}
+    </button>
+  )
+
   const collapseButton = (
     <button
       type="button"
@@ -243,6 +262,7 @@ export function MommyDock(props: MommyDockProps) {
         type="button"
         className={css.pill}
         data-mommy-dock="watchlist"
+        ref={setRootRef}
         style={{ left: layout.pos !== null ? layout.pos.left : autoLeft, top: layout.pos !== null ? layout.pos.top : PANEL_MARGIN }}
         aria-label={t?.('dock.expand') ?? '展开'}
         onClick={() => applyLayout({ ...layoutRef.current, collapsed: false })}
@@ -256,7 +276,7 @@ export function MommyDock(props: MommyDockProps) {
 
   if (state.error !== null && state.entries.length === 0) {
     return (
-      <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={rootRef}>
+      <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={setRootRef}>
         <div className={css.head} {...headDragProps}>
           <span className={css.title}>{t?.('dock.title') ?? '自选'}</span>
           <span className={css.grow} />
@@ -275,10 +295,11 @@ export function MommyDock(props: MommyDockProps) {
 
   if (state.entries.length === 0) {
     return (
-      <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={rootRef}>
+      <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={setRootRef}>
         <div className={css.head} {...headDragProps}>
           <span className={css.title}>{t?.('dock.title') ?? '自选'}</span>
           <span className={css.grow} />
+          {refreshButton}
           {collapseButton}
         </div>
         <div className={css.empty}>
@@ -290,20 +311,13 @@ export function MommyDock(props: MommyDockProps) {
   }
 
   return (
-    <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={rootRef}>
+    <div className={css.dock} data-mommy-dock="watchlist" style={panelStyle} ref={setRootRef}>
       <div className={css.head} {...headDragProps}>
         <span className={css.title}>
           {t?.('dock.title') ?? '自选'} · {state.entries.length}
         </span>
         <span className={css.grow} />
-        <button
-          type="button"
-          className={css.button}
-          aria-pressed={state.loading ? 'true' : 'false'}
-          onClick={() => void load()}
-        >
-          {state.loading ? (t?.('dock.loading') ?? '加载中…') : (t?.('dock.refresh') ?? '刷新')}
-        </button>
+        {refreshButton}
         {collapseButton}
       </div>
       <div className={css.body}>

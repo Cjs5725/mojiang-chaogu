@@ -66,7 +66,7 @@ describe('subscribeMommyEvents（SSE 就绪重拉与去重基数）', () => {
     const fired: string[] = []
     api.subscribeMommyEvents({ portfolio: () => fired.push('portfolio') })
     expect(FakeEventSource.instances).toHaveLength(1)
-    FakeEventSource.instances[0].simulateOpen()
+    FakeEventSource.instances[0]!.simulateOpen()
     expect(fired).toEqual(['portfolio'])
   })
 
@@ -75,7 +75,7 @@ describe('subscribeMommyEvents（SSE 就绪重拉与去重基数）', () => {
     const fired: number[] = []
     const first = FakeEventSource.instances.length
     api.subscribeMommyEvents({ portfolio: () => fired.push(0) })
-    const sse = FakeEventSource.instances[first]
+    const sse = FakeEventSource.instances[first]!
     sse.emitChanged('portfolio', 5)
     expect(fired).toHaveLength(1)
     sse.emitChanged('portfolio', 5) // 同连接内去重仍生效
@@ -89,7 +89,7 @@ describe('subscribeMommyEvents（SSE 就绪重拉与去重基数）', () => {
   it('onerror 后按退避重建连接，成功后重置退避计数', async () => {
     const api = await loadApi()
     api.subscribeMommyEvents({ portfolio: () => {} })
-    const first = FakeEventSource.instances[0]
+    const first = FakeEventSource.instances[0]!
     first.simulateError()
     expect(first.closed).toBe(true)
     // 未到退避时窗（1s）不重建
@@ -97,9 +97,9 @@ describe('subscribeMommyEvents（SSE 就绪重拉与去重基数）', () => {
     expect(FakeEventSource.instances).toHaveLength(1)
     vi.advanceTimersByTime(1)
     expect(FakeEventSource.instances).toHaveLength(2)
-    FakeEventSource.instances[1].simulateOpen()
+    FakeEventSource.instances[1]!.simulateOpen()
     // 二次断连应从 1s 重新起步（成功已重置计数）
-    FakeEventSource.instances[1].simulateError()
+    FakeEventSource.instances[1]!.simulateError()
     vi.advanceTimersByTime(1_000)
     expect(FakeEventSource.instances).toHaveLength(3)
   })
@@ -123,7 +123,7 @@ describe('subscribeMommyEvents（SSE 就绪重拉与去重基数）', () => {
   it('全部退订后取消 pending 重连', async () => {
     const api = await loadApi()
     const unsubscribe = api.subscribeMommyEvents({ portfolio: () => {} })
-    FakeEventSource.instances[0].simulateError()
+    FakeEventSource.instances[0]!.simulateError()
     unsubscribe()
     vi.advanceTimersByTime(60_000)
     expect(FakeEventSource.instances).toHaveLength(1)
