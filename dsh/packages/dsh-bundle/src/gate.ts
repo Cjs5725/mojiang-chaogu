@@ -1,13 +1,23 @@
 /**
  * mommy-chaogu-gate —— 写操作审批闸门（嫁接面 3）。
  *
- * mommy 的 7 个写工具经 MCP 行以 `mcp__mommy-chaogu__<rawName>` 暴露；判定语义
+ * mommy 的写工具经 MCP 行以 `mcp__mommy-chaogu__<rawName>` 暴露；判定语义
  * 逐条移植自 Python 侧 `agent/service.py` 的 requires_confirmation 白名单：
  * strategy_* 三件套恒确认；manage_watchlist / manage_alert 仅 add/remove
  * 动作确认（list 等查询动作不打扰）。挂 `tools/pre-execute` waterfall，
  * 命中返回 `{kind:'ask'}` 交宿主审批层——永不直接 allow（要么 ask 要么
  * next()）；headless 宿主无审批者时 ask 被宿主自动降级 deny（fail-closed
  * 白送，core/tools serviceAsk 语义）。
+ *
+ * 两个容易混淆的「写」概念，刻意不同表：
+ * - 「有副作用」（Python WRITE_TOOL_NAMES / MCP readOnlyHint=False，7 个）：
+ *   含 backfill_history（写行情缓存，非用户数据）与 record_research_conclusion
+ *   （写记忆，其 schema 自带 user_confirmed 参数收授权）——它们不进本表，
+ *   gate 不应拦；gate.test.ts 对 backfill_history 断言不拦是正确语义。
+ * - 「改动用户数据须逐次授权」（确认表 5 项）：自选/告警/策略卡——TUI 确认条
+ *   与本闸门共用这张表。前缀命中、确认表查不到、也不在工具面快照里的名字
+ *   一律 ask（fail-closed）：快照与 Python registry 漂移时宁可多问一次，
+ *   绝不静默放行。
  */
 import Schema from '@deepseek-ai/schemastery'
 import type { GateListener, HostContext, PreToolDecision } from './types.ts'
@@ -40,6 +50,30 @@ export const CONFIRM_BY_ACTION: Readonly<Record<string, ReadonlySet<string>>> = 
   manage_watchlist: new Set(['add', 'remove']),
 }
 
+/**
+ * mommy 工具面快照（37 个基础工具 + 7 个 research 工具 @ 2026-09-14，
+ * 导出自 `agent/tools` registry + `research_tools.RESEARCH_TOOL_DEFS`）。
+ * 只用于 fail-closed 判定：前缀命中但既不在确认表、也不在此快照里的
+ * 工具名 → ask。新增工具后此表过期，表现为多问一次（可见、安全），
+ * 更新此表即可；后续应由 Python 侧导出的 manifest fixture 派生，消灭手抄。
+ */
+export const MOMMY_TOOL_SURFACE: ReadonlySet<string> = new Set([
+  'backfill_history', 'check_earnings_catalyst', 'check_kline_signal',
+  'get_announcements', 'get_bars', 'get_fundamentals', 'get_longhuban',
+  'get_market_indexes', 'get_market_narrative', 'get_memory_context',
+  'get_memory_health', 'get_money_flow_history', 'get_money_flow_today',
+  'get_portfolio', 'get_portfolio_analysis', 'get_prediction_history',
+  'get_quote', 'get_quotes', 'get_sector_ranking', 'get_sector_stocks',
+  'get_theme_stocks', 'get_watchlist', 'list_themes', 'manage_alert',
+  'manage_watchlist', 'record_research_conclusion', 'research_market_brief',
+  'research_money_flow', 'research_portfolio', 'research_sector',
+  'research_stock', 'research_us_market', 'run_backtest',
+  'screen_inflow_stocks', 'search_news', 'search_sector',
+  'search_similar_events', 'strategy_activate_monitor', 'strategy_archive',
+  'strategy_get', 'strategy_list', 'strategy_prepare_application',
+  'strategy_prepare_monitor', 'strategy_save',
+])
+
 /** 与 Python 侧 requires_confirmation(fn_name, fn_args) 同语义的纯判定。 */
 export function requiresConfirmation(rawToolName: string, args: unknown): boolean {
   const actions = CONFIRM_BY_ACTION[rawToolName]
@@ -55,6 +89,8 @@ export function requiresConfirmation(rawToolName: string, args: unknown): boolea
  *
  * 非 mommy 工具或只读调用 → undefined（调用方必须 next()）；写调用 →
  * `{kind:'ask'}`。参数形状不信任（工具自校验 schema，闸门只做保守读取）。
+ * 前缀命中但两张表都查不到的 mommy 工具 → `{kind:'ask'}`（fail-closed）：
+ * 这是判定表与 Python 侧漂移的信号，静默放行会让审批闸门对新增写工具失效。
  */
 export function decideWriteGate(
   toolName: string,
@@ -63,6 +99,18 @@ export function decideWriteGate(
 ): PreToolDecision | undefined {
   if (!toolName.startsWith(prefix)) return undefined
   const rawName = toolName.slice(prefix.length)
+  if (!(CONFIRM_ALWAYS.has(rawName) || CONFIRM_BY_ACTION[rawName] !== undefined)) {
+    if (!MOMMY_TOOL_SURFACE.has(rawName)) {
+      return {
+        kind: 'ask',
+        reason:
+          `mommy tool "${toolName}" is not in the gate's tool surface `
+          + '(the snapshot may have drifted from the Python registry); failing closed — '
+          + 'approve explicitly or update MOMMY_TOOL_SURFACE.',
+      }
+    }
+    return undefined
+  }
   if (!requiresConfirmation(rawName, args)) return undefined
   return {
     kind: 'ask',

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { apply, CONFIRM_ALWAYS, createGateListener, decideWriteGate, requiresConfirmation } from '../src/gate.ts'
+import {
+  apply,
+  CONFIRM_ALWAYS,
+  createGateListener,
+  decideWriteGate,
+  requiresConfirmation,
+} from '../src/gate.ts'
 
 const P = 'mcp__mommy-chaogu__'
 
@@ -16,7 +22,7 @@ describe('requiresConfirmation（Python 侧白名单同语义）', () => {
     expect(requiresConfirmation('manage_alert', { action: 'ADD' })).toBe(true)
     expect(requiresConfirmation('manage_alert', { action: 'list' })).toBe(false)
   })
-  it('读工具不确认', () => {
+  it('读工具不确认（backfill_history 写的是行情缓存而非用户数据——两个「写」概念刻意分表）', () => {
     expect(requiresConfirmation('get_quote', { code: '600519' })).toBe(false)
     expect(requiresConfirmation('backfill_history', {})).toBe(false)
   })
@@ -37,6 +43,12 @@ describe('decideWriteGate（waterfall 决策）', () => {
   })
   it('参数形状异常时保守：恒确认工具仍 ask', () => {
     expect(decideWriteGate(`${P}strategy_archive`, null)).toEqual({ kind: 'ask', reason: expect.any(String) })
+  })
+  it('前缀命中但不在工具面快照 → ask（fail-closed，快照漂移不静默放行）', () => {
+    expect(decideWriteGate(`${P}strategy_delete`, {})).toEqual({
+      kind: 'ask',
+      reason: expect.stringContaining('failing closed'),
+    })
   })
 })
 

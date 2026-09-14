@@ -29,7 +29,9 @@ export function fetchWatchlist(): Promise<WatchlistEntry[]> {
   return fetchJson<WatchlistEntry[]>('/mommy/api/watchlist')
 }
 
-/** 桥返回原始 snake_case 字典；这里强制过 coerceQuote 转视图模型（缺失容错）。 */
+/** 桥返回原始 snake_case 字典；这里强制过 coerceQuote 转视图模型（缺失容错）。
+ *  error 字段透传：CLI 拉新失败输出 exit 0 + error 载荷（桥转 200），调用方
+ *  须凭它判定降级——丢弃它会把「数据源挂了」伪装成「空自选」。 */
 export async function fetchQuotes(codes: string[]): Promise<QuotesPayload> {
   const raw = await fetchJson<{ source: string; quotes: unknown[]; error?: string }>(
     `/mommy/api/quotes?codes=${encodeURIComponent(codes.join(','))}`,
@@ -37,7 +39,9 @@ export async function fetchQuotes(codes: string[]): Promise<QuotesPayload> {
   const quotes = (raw.quotes ?? [])
     .map(coerceQuote)
     .filter((q): q is QuoteView => q !== null)
-  return { source: raw.source, quotes }
+  const payload: QuotesPayload = { source: raw.source, quotes }
+  if (raw.error !== undefined) payload.error = raw.error
+  return payload
 }
 
 export type StoreName = 'portfolio'

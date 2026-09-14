@@ -140,3 +140,45 @@ describe('reconnectDelayMs（退避纯函数）', () => {
     expect(api.reconnectDelayMs(50)).toBe(30_000)
   })
 })
+
+describe('fetchQuotes（错误载荷透传）', () => {
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('CLI exit 0 + error 载荷时把 error 透传给调用方判定降级', async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ source: '', quotes: [], error: 'eastmoney 重试耗尽' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const api = await loadApi()
+    const payload = await api.fetchQuotes(['600519'])
+    expect(payload.error).toBe('eastmoney 重试耗尽')
+    expect(payload.quotes).toEqual([])
+  })
+
+  it('成功载荷的 error 为 undefined（不误报降级）', async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          source: 'eastmoney(缓存)',
+          quotes: [{ code: '600519', name: '贵州茅台', price: 1275.16, change_pct: 0.86, change: 10.9 }],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    const api = await loadApi()
+    const payload = await api.fetchQuotes(['600519'])
+    expect(payload.error).toBeUndefined()
+    expect(payload.quotes).toHaveLength(1)
+    expect(payload.source).toBe('eastmoney(缓存)')
+  })
+})

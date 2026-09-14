@@ -26,6 +26,8 @@ interface DockState {
   entries: WatchlistEntry[]
   quotes: Map<string, QuoteView>
   source: string
+  /** 报价拉新失败原因（非空 = 显示的是上次快照，行情源暂不可用）。 */
+  staleNote: string | null
   error: string | null
   loading: boolean
 }
@@ -50,7 +52,7 @@ interface DragGesture {
   frameHeight: number
 }
 
-const EMPTY: DockState = { entries: [], quotes: new Map(), source: '', error: null, loading: true }
+const EMPTY: DockState = { entries: [], quotes: new Map(), source: '', staleNote: null, error: null, loading: true }
 const STORAGE_KEY = 'mommy.dock.v1'
 const PANEL_WIDTH = 224
 const PANEL_MARGIN = 8
@@ -141,18 +143,33 @@ export function MommyDock(props: MommyDockProps) {
     try {
       const entries = await fetchWatchlist()
       const codes = entries.map(entry => entry.code)
-      let quotes = new Map<string, QuoteView>()
-      let source = ''
+      // 报价是增强：拉新失败（网络异常，或 CLI exit 0 + error 载荷——数据源
+      // 挂了）不拖垮自选列表，保留上次快照并在脚注显式标注 stale——静默清空
+      // 会把「数据源挂了」伪装成「空自选」。
+      let quotes: Map<string, QuoteView> | null = null
+      let source: string | null = null
+      let staleNote: string | null = null
       if (codes.length > 0) {
         try {
           const payload = await fetchQuotes(codes)
-          source = payload.source
-          quotes = new Map(payload.quotes.map(q => [q.code, q]))
-        } catch {
-          // 报价是增强：失败不拖垮自选列表（拉新失败保留旧数据语义）
+          if (payload.error !== undefined) {
+            staleNote = payload.error
+          } else {
+            source = payload.source
+            quotes = new Map(payload.quotes.map(q => [q.code, q]))
+          }
+        } catch (error) {
+          staleNote = error instanceof Error ? error.message : String(error)
         }
       }
-      setState({ entries, quotes, source, error: null, loading: false })
+      setState(prev => ({
+        entries,
+        quotes: quotes ?? prev.quotes,
+        source: source ?? prev.source,
+        staleNote,
+        error: null,
+        loading: false,
+      }))
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -389,6 +406,11 @@ export function MommyDock(props: MommyDockProps) {
           ))}
         </div>
       </div>
+      {state.staleNote !== null && (
+        <div className={css.foot} data-mommy-stale="quotes">
+          {t?.('dock.stale') ?? '行情拉新失败，显示上次快照'}
+        </div>
+      )}
       {state.source !== '' && (
         <div className={css.foot}>
           {t?.('dock.source') ?? '来源'}: {state.source}
