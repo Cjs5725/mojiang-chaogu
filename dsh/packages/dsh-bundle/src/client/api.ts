@@ -54,9 +54,50 @@ let sharedSource: EventSource | null = null
 let sharedHandlers: StoreHandlers = {}
 const seenRevisions = new Map<StoreName, number>()
 
+// —— 断线重连（指数退避，有限次）：宿主 profile patch 是 live-reload，桥路由
+// 会先注销再注册；期间 SSE 断开若不重连，停靠/卡片就永远收不到失效信号。
+// 重试上限同时是 headless 错挂（桥永远缺席）的轰炸护栏。
+const MAX_RECONNECT_ATTEMPTS = 6
+const BASE_RECONNECT_DELAY_MS = 1_000
+const MAX_RECONNECT_DELAY_MS = 30_000
+let reconnectAttempts = 0
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
+export function reconnectDelayMs(attempts: number): number {
+  return Math.min(MAX_RECONNECT_DELAY_MS, BASE_RECONNECT_DELAY_MS * 2 ** attempts)
+}
+
+function cancelReconnect(): void {
+  if (reconnectTimer !== null) {
+    clearTimeout(reconnectTimer)
+    reconnectTimer = null
+  }
+}
+
+function scheduleReconnect(): void {
+  if (reconnectTimer !== null || Object.keys(sharedHandlers).length === 0) return
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) return
+  const delay = reconnectDelayMs(reconnectAttempts)
+  reconnectAttempts += 1
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    void ensureSource()
+  }, delay)
+}
+
 function ensureSource(): EventSource {
   if (sharedSource !== null) return sharedSource
+  cancelReconnect()
   const source = new EventSource('/mommy/api/events')
+  source.onopen = () => {
+    // 连接（重）建立 = 桥就绪信号：首屏 fetch 可能落在 patch live-reload 前的
+    // 旧桥上（profile 覆盖行未生效 → 默认数据目录 → 空表），就绪后统一重拉。
+    // 同时清空 revision 去重基数——新桥实例的 revision 从 1 重新计数，旧基数
+    // 会把换桥后的头几条信号全部吞掉。
+    reconnectAttempts = 0
+    seenRevisions.clear()
+    for (const handler of Object.values(sharedHandlers)) handler?.()
+  }
   source.addEventListener('store.changed', event => {
     try {
       const payload = JSON.parse(String((event as MessageEvent).data)) as InvalidationEvent
@@ -69,9 +110,10 @@ function ensureSource(): EventSource {
     }
   })
   source.onerror = () => {
-    // 宿主桥缺席（headless 错挂等）：关连接，靠调用方一次性 fetch 兜底
     source.close()
-    if (sharedSource === source) sharedSource = null
+    if (sharedSource !== source) return
+    sharedSource = null
+    scheduleReconnect()
   }
   sharedSource = source
   return source
@@ -83,6 +125,7 @@ export function subscribeMommyEvents(handlers: StoreHandlers): () => void {
   for (const [store, handler] of Object.entries(handlers)) {
     if (handler !== undefined) sharedHandlers[store as StoreName] = handler
   }
+  reconnectAttempts = 0
   void ensureSource()
   let active = true
   return () => {
@@ -94,5 +137,7 @@ export function subscribeMommyEvents(handlers: StoreHandlers): () => void {
         delete sharedHandlers[store as StoreName]
       }
     }
+    // 没有订阅者了：pending 的重连也不必再发生。
+    if (Object.keys(sharedHandlers).length === 0) cancelReconnect()
   }
 }
