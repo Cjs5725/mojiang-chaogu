@@ -111,7 +111,9 @@ def build_bundle(bundle: Path) -> None:
     workspace = bundle.parents[1]
     pnpm = shutil.which("pnpm")
     if pnpm is None:
-        raise RuntimeError("没有找到 pnpm；请先安装 pnpm 或手动运行 `pnpm -C dsh install && pnpm -C dsh build`")
+        raise RuntimeError(
+            "没有找到 pnpm；请先安装 pnpm 或手动运行 `pnpm -C dsh install && pnpm -C dsh build`"
+        )
     for args in (["install"], ["build"]):
         result = subprocess.run(
             [pnpm, *args, "--dir", str(workspace)],
@@ -233,7 +235,9 @@ def _merge_profile_patch(path: Path, rows: list[dict[str, Any]]) -> int:
         "# 本文件由 mommy dsh install 生成：只拥有 mommy-chaogu-mcp / mommy-chaogu-preset-installer /\n"
         "# mommy-chaogu-bridge / agent-presets 四个覆盖行，其余行是你自己的，升级时原样保留。\n"
     )
-    _write_atomic(path, header + yaml.dump(patches, Dumper=_PatchDumper, allow_unicode=True, sort_keys=False))
+    _write_atomic(
+        path, header + yaml.dump(patches, Dumper=_PatchDumper, allow_unicode=True, sort_keys=False)
+    )
     return len(rows)
 
 
@@ -298,7 +302,9 @@ def install_dsh_product(
     directory.mkdir(parents=True, exist_ok=True)
 
     manifest = profile_manifest(bundle, web=web)
-    _write_atomic(directory / "package.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    _write_atomic(
+        directory / "package.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+    )
     _install_profile_node_modules(directory)
 
     spec = connection_spec(profile=mcp_profile)
@@ -385,11 +391,29 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         bundles = manifest.get("dsh", {}).get("profile", {}).get("bundles", [])
         if BUNDLE_PACKAGE in bundles:
-            checks.append({"name": "profile_manifest", "status": "ok", "message": f"profile bundles 共 {len(bundles)} 层，含 {BUNDLE_PACKAGE}。"})
+            checks.append(
+                {
+                    "name": "profile_manifest",
+                    "status": "ok",
+                    "message": f"profile bundles 共 {len(bundles)} 层，含 {BUNDLE_PACKAGE}。",
+                }
+            )
         else:
-            checks.append({"name": "profile_manifest", "status": "error", "message": f"profile manifest 缺 {BUNDLE_PACKAGE}，请重跑 mommy dsh install。"})
+            checks.append(
+                {
+                    "name": "profile_manifest",
+                    "status": "error",
+                    "message": f"profile manifest 缺 {BUNDLE_PACKAGE}，请重跑 mommy dsh install。",
+                }
+            )
     else:
-        checks.append({"name": "profile_manifest", "status": "error", "message": f"没有找到 {manifest_path}；先运行 mommy dsh install。"})
+        checks.append(
+            {
+                "name": "profile_manifest",
+                "status": "error",
+                "message": f"没有找到 {manifest_path}；先运行 mommy dsh install。",
+            }
+        )
 
     try:
         bundle = locate_bundle()
@@ -407,17 +431,26 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
     if patch_path.is_file():
         patches = yaml.load(patch_path.read_text(encoding="utf-8"), Loader=_PatchLoader) or []
         ids = {op.get("id") for op in patches if isinstance(op, dict)}
-        expected = {"mommy-chaogu-mcp", "mommy-chaogu-preset-installer", "mommy-chaogu-bridge", "agent-presets"}
+        expected = {
+            "mommy-chaogu-mcp",
+            "mommy-chaogu-preset-installer",
+            "mommy-chaogu-bridge",
+            "agent-presets",
+        }
         missing = expected - ids
         checks.append(
             {
                 "name": "profile_patch",
                 "status": "ok" if not missing else "error",
-                "message": "覆盖行齐备。" if not missing else f"缺覆盖行：{sorted(missing)}；重跑 mommy dsh install。",
+                "message": "覆盖行齐备。"
+                if not missing
+                else f"缺覆盖行：{sorted(missing)}；重跑 mommy dsh install。",
             }
         )
     else:
-        checks.append({"name": "profile_patch", "status": "error", "message": f"没有找到 {patch_path}。"})
+        checks.append(
+            {"name": "profile_patch", "status": "error", "message": f"没有找到 {patch_path}。"}
+        )
 
     skills_missing = [
         name for name in PRODUCT_SKILL_NAMES if not (resolved_home / "skills" / name).is_dir()
@@ -426,7 +459,9 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
         {
             "name": "product_skills",
             "status": "ok" if not skills_missing else "error",
-            "message": "三个产品 Skill 就位。" if not skills_missing else f"缺 Skill：{skills_missing}。",
+            "message": "三个产品 Skill 就位。"
+            if not skills_missing
+            else f"缺 Skill：{skills_missing}。",
         }
     )
 
@@ -434,20 +469,30 @@ def doctor_dsh_product(*, home: Path | None = None) -> dict[str, Any]:
     return {"home": str(resolved_home), "checks": checks, "ok": not blocking, "blocking": blocking}
 
 
-def run_dsh(*, home: Path | None = None) -> NoReturn:
-    """以产品 DSH_HOME 启动 dsh --profile mommy（替换当前进程）。"""
+def run_dsh(*, home: Path | None = None, extra_args: list[str] | None = None) -> NoReturn:
+    """以产品 DSH_HOME 启动 dsh --profile mommy（替换当前进程）。
+
+    extra_args 原样追加在宿主命令之后（如 ``--no-open`` 不自动开浏览器）。
+    """
     resolved_home = (home or product_home()).resolve()
     directory = profile_dir(resolved_home)
     if not (directory / "package.json").is_file():
         raise RuntimeError(f"产品 profile 未安装（{directory}）；先运行 mommy dsh install。")
+    passthrough = list(extra_args or [])
     binary = shutil.which("dsh")
     if binary is not None:
-        command = [binary, "--profile", PROFILE_NAME]
+        command = [binary, "--profile", PROFILE_NAME, *passthrough]
     else:
         npx = shutil.which("npx")
         if npx is None:
-            raise RuntimeError("没有找到 dsh 或 npx；请先安装 DeepSeek Harness（npm i -g @deepseek-ai/dsh）。")
-        command = [npx, "-y", "@deepseek-ai/dsh", "--profile", PROFILE_NAME]
+            raise RuntimeError(
+                "没有找到 dsh 或 npx；请先安装 DeepSeek Harness（npm i -g @deepseek-ai/dsh）。"
+            )
+        command = [npx, "-y", "@deepseek-ai/dsh", "--profile", PROFILE_NAME, *passthrough]
+        if not passthrough:
+            print(
+                "⚠️  PATH 上无 dsh 二进制，npx 回退可能解析到缓存的旧版本；建议 npm i -g @deepseek-ai/dsh。"
+            )
     env = {**os.environ, "DSH_HOME": str(resolved_home)}
     print(f"▶ {' '.join(command)}  (DSH_HOME={resolved_home})")
     os.execvpe(command[0], command, env)
@@ -467,8 +512,12 @@ def cmd_dsh_install(args: argparse.Namespace) -> int:
     )
     print(f"✅ mommy DSH 产品 profile 已安装：{summary['profile']}")
     print(f"   DSH_HOME   {summary['home']}")
-    print(f"   MCP 档位   {summary['mcp_profile']}（market-only=公共行情；--personal 开个人上下文与写操作）")
-    print(f"   覆盖行     {summary['patch_rows']} 条（mcp / preset-installer / bridge / agent-presets）")
+    print(
+        f"   MCP 档位   {summary['mcp_profile']}（market-only=公共行情；--personal 开个人上下文与写操作）"
+    )
+    print(
+        f"   覆盖行     {summary['patch_rows']} 条（mcp / preset-installer / bridge / agent-presets）"
+    )
     print(f"   Skill      {', '.join(summary['skills'])}")
     print(f"   启动       {summary['launch']}")
     return 0
@@ -476,7 +525,11 @@ def cmd_dsh_install(args: argparse.Namespace) -> int:
 
 def cmd_dsh_uninstall(_args: argparse.Namespace) -> int:
     summary = uninstall_dsh_product()
-    print(f"🗑️  已移除产品 profile：{summary['home']}" if summary["profile_removed"] else "ℹ️ 产品 profile 本来就不存在。")
+    print(
+        f"🗑️  已移除产品 profile：{summary['home']}"
+        if summary["profile_removed"]
+        else "ℹ️ 产品 profile 本来就不存在。"
+    )
     print("   未被修改的托管 Skill 已一并移除；你改过的 Skill 目录已保留。")
     return 0
 
@@ -485,7 +538,9 @@ def cmd_dsh_doctor(_args: argparse.Namespace) -> int:
     report = doctor_dsh_product()
     print(f" mommy DSH 产品体检（home={report['home']}）")
     for check in report["checks"]:
-        icon = {"ok": "✅", "error": "❌", "warning": "⚠️ ", "not_checked": "ℹ️ "}.get(check["status"], "·")
+        icon = {"ok": "✅", "error": "❌", "warning": "⚠️ ", "not_checked": "ℹ️ "}.get(
+            check["status"], "·"
+        )
         print(f" {icon} {check['name']}: {check['message']}")
     if report["ok"]:
         print("\n结论：产品 profile 可用。")
@@ -495,7 +550,9 @@ def cmd_dsh_doctor(_args: argparse.Namespace) -> int:
 
 
 def cmd_dsh_run(args: argparse.Namespace) -> int:
-    run_dsh()
+    extra: list[str] = ["--no-open"] if args.no_open else []
+    extra.extend(args.dsh_args)
+    run_dsh(extra_args=extra)
     return 0  # pragma: no cover — execvpe 成功后不再返回
 
 
@@ -508,6 +565,7 @@ def build_dsh_parser() -> argparse.ArgumentParser:
             "  mommy dsh install          安装/升级产品 profile（默认 web 宿主）\n"
             "  mommy dsh install --headless   无头宿主（无 GUI，工具面照常）\n"
             "  mommy dsh run              启动 dsh --profile mommy\n"
+            "  mommy dsh run --no-open    启动但不自动开浏览器（透传底层 dsh）\n"
             "  mommy dsh doctor           逐项体检"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -516,9 +574,13 @@ def build_dsh_parser() -> argparse.ArgumentParser:
 
     p_i = sub.add_parser("install", help="安装/升级产品 profile（幂等）")
     p_i.add_argument("--headless", action="store_true", help="无头宿主（不装 dsh-web-app 层）")
-    p_i.add_argument("--no-build", action="store_true", help="不自动构建 dsh-bundle（产物需已存在）")
+    p_i.add_argument(
+        "--no-build", action="store_true", help="不自动构建 dsh-bundle（产物需已存在）"
+    )
     p_i.add_argument("--force", action="store_true", help="Skill 目标被用户修改过也覆盖")
-    p_i.add_argument("--personal", action="store_true", help="MCP 档位切 personal（默认 market-only）")
+    p_i.add_argument(
+        "--personal", action="store_true", help="MCP 档位切 personal（默认 market-only）"
+    )
     p_i.set_defaults(func=cmd_dsh_install)
 
     p_u = sub.add_parser("uninstall", help="移除产品 profile 与未修改的托管 Skill")
@@ -528,6 +590,14 @@ def build_dsh_parser() -> argparse.ArgumentParser:
     p_d.set_defaults(func=cmd_dsh_doctor)
 
     p_r = sub.add_parser("run", help="启动 dsh --profile mommy")
+    p_r.add_argument(
+        "--no-open", action="store_true", help="不自动打开浏览器（透传底层 dsh --no-open）"
+    )
+    p_r.add_argument(
+        "dsh_args",
+        nargs="*",
+        help="额外透传给底层 dsh 的参数（用 -- 分隔，如 mommy dsh run -- --port 8080）",
+    )
     p_r.set_defaults(func=cmd_dsh_run)
 
     return p

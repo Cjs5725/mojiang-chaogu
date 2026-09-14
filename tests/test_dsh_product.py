@@ -20,6 +20,8 @@ from mommy_chaogu.cli_commands.dsh_product import (
     BUNDLE_PACKAGE,
     PRODUCT_SKILL_NAMES,
     _merge_profile_patch,
+    build_dsh_parser,
+    cmd_dsh_run,
     doctor_dsh_product,
     install_dsh_product,
     locate_bundle,
@@ -52,6 +54,37 @@ class TestPaths:
         bundle = locate_bundle()
         assert (bundle / "cordis.patch.yml").is_file()
         assert bundle.name == "dsh-bundle"
+
+
+class TestRunPassthrough:
+    """run 子命令的参数透传（--no-open 显式 + -- 分隔的任意参数）。"""
+
+    def test_run_plain_has_no_extra_args(self) -> None:
+        args = build_dsh_parser().parse_args(["run"])
+        assert args.no_open is False
+        assert args.dsh_args == []
+
+    def test_run_no_open_flag(self) -> None:
+        args = build_dsh_parser().parse_args(["run", "--no-open"])
+        assert args.no_open is True
+        assert args.dsh_args == []
+
+    def test_run_double_dash_passthrough(self) -> None:
+        args = build_dsh_parser().parse_args(["run", "--", "--port", "8080"])
+        assert args.dsh_args == ["--port", "8080"]
+
+    def test_cmd_run_assembles_extra_args(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        captured: dict[str, list[str]] = {}
+
+        def fake_run_dsh(**kwargs: Any) -> None:
+            captured.update(kwargs)
+
+        monkeypatch.setattr(dsh_product, "run_dsh", fake_run_dsh)
+        rc = cmd_dsh_run(
+            build_dsh_parser().parse_args(["run", "--no-open", "--", "--port", "8080"])
+        )
+        assert rc == 0
+        assert captured["extra_args"] == ["--no-open", "--port", "8080"]
 
 
 class TestProfileManifest:
