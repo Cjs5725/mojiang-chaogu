@@ -6,6 +6,7 @@ from typing import Any
 
 from mommy_chaogu.agent.tools.base import ToolContext, ToolDef, ToolHandler, _clamp_int, _json
 from mommy_chaogu.cache.store import CacheStore
+from mommy_chaogu.codes import INDEX_OR_STOCK_CODE_PATTERN
 from mommy_chaogu.market_data.types import BarInterval
 
 DEFS: list[ToolDef] = [
@@ -17,7 +18,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "code": {
                     "type": "string",
-                    "pattern": "^(\\^[A-Z]{1,6}|[A-Z]{1,6}|\\d{6})$",
+                    "pattern": INDEX_OR_STOCK_CODE_PATTERN,
                     "description": "股票代码（A 股 6 位数字或美股字母；`^` 前缀为美股指数/利率/VIX 如 '^GSPC'）",
                 },
                 "interval": {
@@ -57,7 +58,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "code": {
                     "type": "string",
-                    "pattern": "^(\\^[A-Z]{1,6}|[A-Z]{1,6}|\\d{6})$",
+                    "pattern": INDEX_OR_STOCK_CODE_PATTERN,
                     "description": "股票代码（A 股 6 位数字或美股字母；`^` 前缀为美股指数/利率/VIX 如 '^GSPC'）",
                 },
                 "days": {
@@ -126,9 +127,7 @@ def _handle_get_bars(ctx: ToolContext, args: dict[str, Any]) -> str:
         }
         for window in windows:
             row[f"ma_{window}"] = (
-                round(sum(closes[i - window + 1 : i + 1]) / window, 4)
-                if i + 1 >= window
-                else None
+                round(sum(closes[i - window + 1 : i + 1]) / window, 4) if i + 1 >= window else None
             )
         payload.append(row)
     return _json(payload)

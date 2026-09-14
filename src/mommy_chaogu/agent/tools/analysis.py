@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from mommy_chaogu.agent.tools.base import ToolContext, ToolDef, ToolHandler, _floatify, _json
+from mommy_chaogu.codes import A_SHARE_CODE_PATTERN
 from mommy_chaogu.market_data.fundamentals_api import get_fundamentals
 from mommy_chaogu.market_data.news_api import get_announcements
 from mommy_chaogu.market_data.types import BarInterval
@@ -32,7 +33,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "codes": {
                     "type": "array",
-                    "items": {"type": "string", "pattern": "^\\d{6}$"},
+                    "items": {"type": "string", "pattern": A_SHARE_CODE_PATTERN},
                     "description": "股票代码列表，最多 50 只",
                 },
                 "threshold_bp": {
@@ -54,7 +55,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "codes": {
                     "type": "array",
-                    "items": {"type": "string", "pattern": "^\\d{6}$"},
+                    "items": {"type": "string", "pattern": A_SHARE_CODE_PATTERN},
                     "description": "股票代码列表，最多 50 只",
                 }
             },
@@ -72,7 +73,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "codes": {
                     "type": "array",
-                    "items": {"type": "string", "pattern": "^\\d{6}$"},
+                    "items": {"type": "string", "pattern": A_SHARE_CODE_PATTERN},
                     "description": "股票代码列表，最多 50 只",
                 },
                 "signal": {
@@ -263,7 +264,9 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
     results: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     for code in _codes(args):
-        bars = _completed_daily_bars(ctx.adapter.get_bars(code, interval=BarInterval.D1, limit=limit))
+        bars = _completed_daily_bars(
+            ctx.adapter.get_bars(code, interval=BarInterval.D1, limit=limit)
+        )
         if not bars:
             continue
         index = len(bars) - 1
@@ -297,7 +300,9 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
         else:
             # 历史不足 slow + 2 根：金叉既不能确认也不能否认，显式标出
             # （不与"无信号"混为一谈——上市太久的判断交给调用方）。
-            skipped.append({"code": current.code, "reason": "insufficient_history", "bars": len(bars)})
+            skipped.append(
+                {"code": current.code, "reason": "insufficient_history", "bars": len(bars)}
+            )
         if hit:
             results.append(
                 {

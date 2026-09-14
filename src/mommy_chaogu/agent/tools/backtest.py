@@ -16,6 +16,7 @@ from typing import Any
 
 from mommy_chaogu.agent.tools.base import ToolContext, ToolDef, ToolHandler, _clamp_int, _json
 from mommy_chaogu.backtest.engine import BacktestEngine
+from mommy_chaogu.codes import A_SHARE_CODE_PATTERN
 
 #: 回测样本明细的返回上限（完整明细体积大，抽样给 agent 看趋势即可）
 MAX_SIGNAL_SAMPLES = 20
@@ -35,7 +36,7 @@ DEFS: list[ToolDef] = [
             "properties": {
                 "codes": {
                     "type": "array",
-                    "items": {"type": "string", "pattern": "^\\d{6}$"},
+                    "items": {"type": "string", "pattern": A_SHARE_CODE_PATTERN},
                     "description": "股票代码列表，最多 50 只",
                 },
                 "start_date": {
