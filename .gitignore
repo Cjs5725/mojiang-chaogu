@@ -78,3 +78,6 @@ data/dsh-presets/
 dsh/**/lib/
 dsh/**/node_modules/
 dsh/**/*.tsbuildinfo
+# 本地产物 / 截图（不入仓）
+.zcode/
+gui-test-screenshots/

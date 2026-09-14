@@ -61,7 +61,7 @@
 
 # 技能面（dsh-trading 2026-09-07 实证）：web 宿主禁用 host 面技能发现行，preset
 # 必须自挂 skill-filesystem + tool-skill 才有技能目录；两行都只注册进宿主注册表、
-# 不 provide 服务，无需 cordis:group/isolate。mommy 的三个 Skill 由 Python 安装器
+# 不 provide 服务，无需 cordis:group/isolate。mommy 的产品 Skill 由 Python 安装器
 # 装进 $DSH_HOME/skills（skill-filesystem 的发现根）。
 - id: mommy-chaogu-skill-filesystem
   name: '@deepseek-ai/dsh-skill-filesystem'

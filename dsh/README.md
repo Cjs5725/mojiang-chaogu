@@ -7,6 +7,7 @@ dsh-trading monorepo（四面嫁接机制的实证出处）。
 ```
 快速上手（仓库内）
   pnpm -C dsh install && pnpm -C dsh build   # 构建浏览器半 + host 半
+  pnpm -C dsh typecheck && pnpm -C dsh test  # 类型门禁 + 进程内单测
   uv run mommy dsh install                   # 落 profile + 覆盖行 + Skills
   uv run mommy dsh doctor                    # 逐项体检
   uv run mommy dsh run                       # DSH_HOME=<数据目录>/dsh-home dsh --profile mommy
@@ -14,7 +15,7 @@ dsh-trading monorepo（四面嫁接机制的实证出处）。
 
 ## 架构：Python 内核 + TS 薄壳
 
-mommy 的全部价值在 Python 侧（四库布局、Decimal 纪律、数据源适配、36 个 MCP
+mommy 的全部价值在 Python 侧（四库布局、Decimal 纪律、数据源适配、37 个 MCP
 工具）；`dsh/` 子工程的 TS 代码只做嫁接机制——patch 行、审批闸门、HTTP 桥、
 浏览器 UI slot——**任何市场计算逻辑不得落到 TS 侧**（GUI 壳可替换，数据契约
 不可替换）。

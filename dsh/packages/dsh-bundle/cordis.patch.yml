@@ -13,7 +13,7 @@
 # 行清单（host 面常驻，四层职责）：
 #   mommy-chaogu-gate              写操作审批闸门（tools/pre-execute 只 ask）
 #   mommy-chaogu-preset-installer  投研 preset 幂等自安装（托管 hash，不改用户文件）
-#   mommy-chaogu-mcp               mommy MCP 工具行（36 工具；默认 market-only）
+#   mommy-chaogu-mcp               mommy MCP 工具行（37 工具；默认 market-only）
 #   mommy-chaogu-client            浏览器半（对话流富卡片 + 自选停靠；仅 web 宿主加载）
 #   mommy-chaogu-bridge            node 半 HTTP 桥（/mommy/api + SSE；headless 挂起无害）
 #

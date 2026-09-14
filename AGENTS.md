@@ -180,7 +180,7 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 - `src/mommy_chaogu/cli_commands/dsh_product.py`：安装器（profile manifest +
   四条绝对路径覆盖行 + Skills，file: 副本强制刷新）；增强模式（`mommy connect
   dsh`）与产品模式互补共存
-- 开发循环：`pnpm -C dsh build && pnpm -C dsh test` → `uv run mommy dsh install`
+- 开发循环：`pnpm -C dsh build && pnpm -C dsh typecheck && pnpm -C dsh test` → `uv run mommy dsh install`
   → `dsh --profile mommy --dump-config` → 真机四步验收（见 dsh/README.md）
 
 ## Web 前端

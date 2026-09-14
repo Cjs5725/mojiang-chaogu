@@ -7,7 +7,73 @@
 
 ## [Unreleased]
 
-后续变更将在这里记录。
+> 本段记录 `feat/dsh-product-graft` 分支上 DSH 产品嫁接的评审修复批次
+> （2026-09-13）。评审背景：四面嫁接机制（patch / preset / 审批闸门 / 浏览器
+> slot）本身合格且全部门禁绿，但评审发现若干"会说谎"与"静默失败"缺陷——
+> 它们的共同点是**测试全绿、用户看到的却是错的**。本批修复全部带回归测试。
+
+### 修复
+
+- **doctor 版本检查假比较**——`mommy dsh doctor` 曾用增强模式基线
+  （`0.1.1-rc.2`）做真实比较、再把文案字符串替换成产品基线（`0.1.5-rc.2`）：
+  0.1.5 宿主被报"高于基线 0.1.5-rc.2"，0.1.2 宿主也误报。`dsh_version_check`
+  新增 `baseline` 参数，产品模式传自己的基线，比较与 `tested`/文案同源；
+  删除字符串替换（`coding_agents/dsh.py`、`cli_commands/dsh_product.py`）。
+- **`check_kline_signal` 宽窗口静默死区**——内部取数曾被钳到 120 根，而金叉
+  判定需要 `slow+2` 根：schema 放行 `slow` 到 250，但 ≥119 的请求永远凑不齐
+  K 线，返回空结果且无任何错误。现在按 `slow` 实际取数（adapter 无 120 上限，
+  那只是 `get_bars` 工具的 schema 展示上限）；历史不足的标的以顶层 `skipped`
+  字段显式标出（`reason: insufficient_history`），不再与"无信号"混为一谈，
+  正常路径输出形状不变（`agent/tools/analysis.py`）。
+- **`mommy quote` 的 `source` 恒为空串**——CLI 曾直接用裸适配器链
+  （`FallbackAdapter` 没有 `format_source_label`，该方法只在缓存层上），DSH
+  dock 的「来源」脚注永远不渲染，且绕开了缓存节流与"拉新失败保留旧数据"
+  纪律。现在与 agent 工具面 / MCP 同一构造：缓存层包住适配器链
+  （`cli_commands/quote.py`）。
+- **SSE 失效信号的 WAL 盲区**——失效总线只 stat `portfolio.db` 主文件，而
+  mommy 的库全部跑 WAL 模式：长驻写者（MCP server）的提交先落 `-wal`，
+  checkpoint 前主文件 mtime 不动——AI 写完自选股，dock 收不到失效信号。
+  现在签名取 db / `-wal` / `-shm` 三者 mtime 最大值；建库（null→有值）也算
+  变化（`dsh-bundle/src/events.ts`）。
+- **dock 拖拽升级的三处缺陷**（随拖拽功能一并入库的问题）：
+  1. `Element.style` 类型错误（tsc 报错但不在任何门禁里，被原样提交）；
+  2. 挂载即收起（localStorage 记住 collapsed）时收起药丸没挂 `rootRef`，
+     MutationObserver 永不安装、侧栏宽度永远为 0——展开后面板压住宿主侧栏
+     直到刷新。现在药丸与面板统一走回调 ref；
+  3. 空自选股状态丢失刷新按钮，只能靠 SSE 信号或收起/展开兜底
+     （`dsh-bundle/src/client/dock.tsx`）。
+- **陈旧计数文案**——「三个产品 Skill」（实为五个，doctor 文案改为按
+  `PRODUCT_SKILL_NAMES` 动态生成）、「36 工具」（实为 37）等对齐现实
+  （`dsh_product.py`、`cordis.patch.yml`、`dsh/README.md`、preset 注释）。
+
+### 变更
+
+- **`pnpm -C dsh typecheck` 进入开发循环门禁**——dsh 子工程此前的门禁只有
+  build + vitest（tsdown/vitest 都不做类型检查），本批 5 个 tsc 错误因此全部
+  漏网。根 package.json 增加 `typecheck` 递归脚本，AGENTS.md 与 dsh/README.md
+  的开发循环同步更新。
+- `.gitignore` 补 `.zcode/`、`gui-test-screenshots/` 本地产物目录。
+
+### 测试
+
+- `tests/test_dsh_adapter.py`：`dsh_version_check` 自定义基线驱动真实比较；
+- `tests/test_dsh_product.py`：doctor 探测到 0.1.5-rc.2 判 ok 且 `tested` 为
+  产品基线；quote CLI 回归测试改为 mock 真实使用的适配器构造（旧测试 fake
+  在裸链上补了 `format_source_label`，生产坏着测试照样绿）；
+- `tests/test_dsh_four_star_tools.py`：slow=250 金叉不死区、历史不足显式
+  `skipped`、正常路径无 `skipped` 键；
+- `dsh-bundle/test/events.test.ts`（新增）：只写 `-wal` 也发失效信号、无变化
+  不误发、建库即发首个信号；
+- `dsh-bundle/test/api.test.ts`：清零 possibly-undefined 索引访问。
+
+### 文档
+
+- **`dsh/AGENT-CHECKLIST.md`（新增）**——修复批次的前端回归清单，写给会操作
+  前端的 Agent 直接执行：scratch 数据目录隔离安装（不碰真实自选库）、预检
+  探针（doctor 文案 / quote source / MCP 调用计数）、F1–F8 用例（每条含精确
+  操作、可判定预期、失败指向哪项修复、截图命名）、结果登记表与收尾清理。
+  与 `dsh/TEST-PLAYBOOK.md`（GUI 手册 + 异常登记 A1–A11/H1–H3）互为配套。
+
 
 ## [1.5.0] - 2026-08-19
 
