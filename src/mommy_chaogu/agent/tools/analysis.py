@@ -128,15 +128,22 @@ def _number(value: Any) -> Decimal | None:
         return None
 
 
-def _contract(results: list[dict[str, Any]], total: int | None = None) -> str:
+def _contract(
+    results: list[dict[str, Any]],
+    total: int | None = None,
+    skipped: list[dict[str, Any]] | None = None,
+) -> str:
     total_value = len(results) if total is None else total
-    return _json(
-        {
-            "results": results[:MAX_RESULTS],
-            "count": min(len(results), MAX_RESULTS),
-            "total": total_value,
-        }
-    )
+    payload: dict[str, Any] = {
+        "results": results[:MAX_RESULTS],
+        "count": min(len(results), MAX_RESULTS),
+        "total": total_value,
+    }
+    # skipped：因历史不足无法判定信号的标的（非错误、也非无信号），
+    # 只在有内容时出现——正常路径的输出形状不变。
+    if skipped:
+        payload["skipped"] = skipped
+    return _json(payload)
 
 
 def _handle_screen_inflow_stocks(ctx: ToolContext, args: dict[str, Any]) -> str:
@@ -249,9 +256,12 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
     slow = _clamp_int(args.get("slow", 20), 20, 3, 250)
     if fast >= slow:
         return _json({"error": f"fast（{fast}）必须小于 slow（{slow}）"})
-    # 窗口越宽需要越多历史 K 线（多取 10 根余量，且不超 adapter 上限）
-    limit = min(max(30, slow + 10), 120)
+    # 窗口越宽需要越多历史 K 线（多取 10 根余量）。adapter 的 get_bars 没有
+    # 120 根上限（那是 get_bars 工具 schema 的展示上限），这里按 slow 实际取数，
+    # 否则 slow ≥ 119 时永远凑不齐 slow + 2 根，schema 放行的窗口会静默空结果。
+    limit = max(30, slow + 10)
     results: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
     for code in _codes(args):
         bars = _completed_daily_bars(ctx.adapter.get_bars(code, interval=BarInterval.D1, limit=limit))
         if not bars:
@@ -284,6 +294,10 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
                     volume_ratio = _volume_ratio(bars, end)
                     change_pct = _bar_change_pct(current)
                     break
+        else:
+            # 历史不足 slow + 2 根：金叉既不能确认也不能否认，显式标出
+            # （不与"无信号"混为一谈——上市太久的判断交给调用方）。
+            skipped.append({"code": current.code, "reason": "insufficient_history", "bars": len(bars)})
         if hit:
             results.append(
                 {
@@ -297,7 +311,7 @@ def _handle_check_kline_signal(ctx: ToolContext, args: dict[str, Any]) -> str:
                     "change_pct": str(change_pct),
                 }
             )
-    return _contract(results)
+    return _contract(results, skipped=skipped)
 
 
 HANDLERS: dict[str, ToolHandler] = {

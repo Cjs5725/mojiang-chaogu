@@ -130,6 +130,42 @@ class TestKlineSignalParametrized:
         )
         assert result["results"] == []
 
+    def test_wide_window_beyond_120_bars_hits(self) -> None:
+        # 回归背景：内部取数曾被钳到 120 根，而金叉判定需要 slow+2 根——
+        # slow ≥ 119（schema 放行到 250）永远凑不齐，静默空结果。
+        n = 252
+        closes = [10.0 - i * 0.05 for i in range(n - 2)] + [12.0, 15.0]
+        ctx = _ctx({"600519": _series("600519", [round(c, 4) for c in closes])})
+        result = json.loads(
+            _handle_check_kline_signal(
+                ctx, {"codes": ["600519"], "signal": "ma_golden_cross", "fast": 5, "slow": 250}
+            )
+        )
+        assert len(result["results"]) == 1, "slow=250 的金叉不应落进死区"
+        assert result["results"][0]["slow"] == 250
+
+    def test_insufficient_history_reported_not_silent(self) -> None:
+        # 历史不足 slow+2 根：既不能确认也不能否认金叉——显式标出，
+        # 不与「无信号」混为一谈。
+        ctx = _ctx({"600519": _series("600519", [10.0] * 50)})
+        result = json.loads(
+            _handle_check_kline_signal(
+                ctx, {"codes": ["600519"], "signal": "ma_golden_cross", "fast": 5, "slow": 250}
+            )
+        )
+        assert result["results"] == []
+        assert result["skipped"] == [
+            {"code": "600519", "reason": "insufficient_history", "bars": 50}
+        ]
+
+    def test_normal_output_shape_has_no_skipped_key(self) -> None:
+        ctx = _ctx({"600519": _series("600519", _cross_series())})
+        result = json.loads(
+            _handle_check_kline_signal(ctx, {"codes": ["600519"], "signal": "ma_golden_cross"})
+        )
+        assert result["results"]
+        assert "skipped" not in result
+
 
 class TestBarsIncludeMa:
     def test_include_ma_appends_window_fields(self) -> None:
