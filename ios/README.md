@@ -1,4 +1,4 @@
-# 妈咪炒股 iOS
+# 墨匠工坊 iOS
 
 SwiftUI iOS 17+ MVP。它不是 Web 页的壳，而是直接连接现有 FastAPI / WebSocket 数据管道的原生客户端。
 
@@ -19,14 +19,14 @@ SwiftUI iOS 17+ MVP。它不是 Web 页的壳，而是直接连接现有 FastAPI
 先启动项目后端：
 
 ```bash
-uv run mommy-web
+uv run mojiang-web
 ```
-然后打开 `MommyChaogu.xcodeproj`，选择 iPhone 模拟器运行。也可以重新生成工程：
+然后打开 `MojiangChaogu.xcodeproj`，选择 iPhone 模拟器运行。也可以重新生成工程：
 
 ```bash
 cd ios
 xcodegen generate
-open MommyChaogu.xcodeproj
+open MojiangChaogu.xcodeproj
 ```
 
 默认服务地址是 `http://127.0.0.1:8000`，适用于模拟器连接本机服务。真机请在「我的 → 模型与连接」中改成 Mac 的局域网地址，例如 `http://192.168.1.20:8000`，并确保后端监听局域网接口。
@@ -45,10 +45,10 @@ open MommyChaogu.xcodeproj
 
 ```bash
 xcodebuild \
-  -project MommyChaogu.xcodeproj \
-  -scheme MommyChaogu \
+  -project MojiangChaogu.xcodeproj \
+  -scheme MojiangChaogu \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-  -derivedDataPath /tmp/mommy-chaogu-ios-derived \
+  -derivedDataPath /tmp/mojiang-chaogu-ios-derived \
   CODE_SIGNING_ALLOWED=NO test
 ```
 

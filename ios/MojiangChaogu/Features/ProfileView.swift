@@ -65,7 +65,7 @@ struct SettingsView: View {
     @State private var config = ServerConfiguration()
     var body: some View {
         Form {
-            Section("妈咪炒股服务") {
+            Section("墨匠工坊服务") {
                 TextField("https://your-server", text: $config.baseURL).textInputAutocapitalization(.never).keyboardType(.URL)
                 SecureField("访问令牌（可选）", text: $config.accessToken)
                 Text("大模型密钥保留在服务端；App 不直接保存 DeepSeek、OpenAI、Kimi、MiniMax 或 GLM 的密钥。").font(.caption).foregroundStyle(palette.secondary)

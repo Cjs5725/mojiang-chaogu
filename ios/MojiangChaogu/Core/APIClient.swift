@@ -58,11 +58,11 @@ final class APIClient {
         if nsError.domain == NSURLErrorDomain {
             switch URLError.Code(rawValue: nsError.code) {
             case .notConnectedToInternet, .cannotConnectToHost, .cannotFindHost:
-                return "无法连接妈咪炒股服务，请确认后端已启动，并检查服务地址。"
+                return "无法连接墨匠工坊服务，请确认后端已启动，并检查服务地址。"
             case .networkConnectionLost:
-                return "与妈咪炒股服务的连接中断，请稍后重试。"
+                return "与墨匠工坊服务的连接中断，请稍后重试。"
             case .timedOut:
-                return "连接妈咪炒股服务超时，请确认后端可访问。"
+                return "连接墨匠工坊服务超时，请确认后端可访问。"
             default:
                 break
             }
@@ -72,7 +72,7 @@ final class APIClient {
         if detail.contains("socket") || detail.contains("not connected") {
             return "AI 实时通道未连接，请确认后端已启动并可访问。"
         }
-        return "连接妈咪炒股服务失败，请检查服务地址或稍后重试。"
+        return "连接墨匠工坊服务失败，请检查服务地址或稍后重试。"
     }
 
     private func request<T: Decodable, Body: Encodable>(_ path: String, method: String, query: [URLQueryItem], body: Body?) async throws -> T {

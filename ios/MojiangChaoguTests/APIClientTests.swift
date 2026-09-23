@@ -1,5 +1,5 @@
 import XCTest
-@testable import MommyChaogu
+@testable import MojiangChaogu
 
 final class APIClientTests: XCTestCase {
     override func tearDown() {

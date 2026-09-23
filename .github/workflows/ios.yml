@@ -30,12 +30,12 @@ jobs:
       - name: Verify generated project is current
         run: |
           xcodegen generate --spec ios/project.yml
-          git diff --exit-code -- ios/MommyChaogu.xcodeproj
+          git diff --exit-code -- ios/MojiangChaogu.xcodeproj
       - name: Build and test
         run: |
           SIMULATOR_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; data=json.load(sys.stdin)["devices"]; print(next(device["udid"] for runtime in data.values() for device in runtime if device["name"].startswith("iPhone")))')
           xcodebuild test \
-            -project ios/MommyChaogu.xcodeproj \
-            -scheme MommyChaogu \
+            -project ios/MojiangChaogu.xcodeproj \
+            -scheme MojiangChaogu \
             -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
             CODE_SIGNING_ALLOWED=NO

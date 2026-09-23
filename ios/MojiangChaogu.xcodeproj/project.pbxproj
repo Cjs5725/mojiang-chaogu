@@ -18,7 +18,7 @@
 		6A59A074BF7C546DFB822050 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3B53AE0AE7D939B2AEC092 /* APIClientTests.swift */; };
 		986EBC7E22489966475178B0 /* BasketsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59D697FFFF40846216A9B15 /* BasketsView.swift */; };
 		AB20D627ADF36A7C0B4A05F5 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855FA505376EA84A2991EF18 /* DashboardView.swift */; };
-		ABCDAB480237C9025DF22F6B /* MommyChaoguApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9229AFDEC809B43440A823E /* MommyChaoguApp.swift */; };
+		ABCDAB480237C9025DF22F6B /* MojiangChaoguApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9229AFDEC809B43440A823E /* MojiangChaoguApp.swift */; };
 		C7A16EEBE51AEB9E68CEF25F /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0E5F2BA4F429238B1D1BD /* APIClient.swift */; };
 		CC23740B1EFE7A9F9CBCAF9B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6CD4CD8EA6B8F0D231219AD9 /* PrivacyInfo.xcprivacy */; };
 		D116417EF4318A7C42772152 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A626BC4626440DBDC5BDDC89 /* ProfileView.swift */; };
@@ -32,14 +32,14 @@
 			containerPortal = 87E9C8CECFA33D989CCA4F4F /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8DAC183015040D11A45D170C;
-			remoteInfo = MommyChaogu;
+			remoteInfo = MojiangChaogu;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		032A2F59F7ECC5302EA86AED /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		0A5C0CFB9B150AF0E63720FA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		1133C0BBA3DDA0BDD76E5AFB /* MommyChaogu.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MommyChaogu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1133C0BBA3DDA0BDD76E5AFB /* MojiangChaogu.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MojiangChaogu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B3B53AE0AE7D939B2AEC092 /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
 		31D4A22979C6AF18558F7EE3 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		410CF41B292632F4322C9675 /* MarketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketView.swift; sourceTree = "<group>"; };
@@ -48,9 +48,9 @@
 		855FA505376EA84A2991EF18 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		88B3CF2599BE95E823AE7536 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9D00F3DF5F8398508BAE0E8B /* PortfolioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioView.swift; sourceTree = "<group>"; };
-		9D4D9408C90AA5AFF7726A0B /* MommyChaoguTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MommyChaoguTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D4D9408C90AA5AFF7726A0B /* MojiangChaoguTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MojiangChaoguTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A626BC4626440DBDC5BDDC89 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		B9229AFDEC809B43440A823E /* MommyChaoguApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MommyChaoguApp.swift; sourceTree = "<group>"; };
+		B9229AFDEC809B43440A823E /* MojiangChaoguApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MojiangChaoguApp.swift; sourceTree = "<group>"; };
 		B925CF03D767C2DE83B864B2 /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
 		C0783E0A5AA737AE037D2B5F /* ConversationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsView.swift; sourceTree = "<group>"; };
 		C59D697FFFF40846216A9B15 /* BasketsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketsView.swift; sourceTree = "<group>"; };
@@ -67,12 +67,12 @@
 			path = UI;
 			sourceTree = "<group>";
 		};
-		3825839219A84BC7498CC616 /* MommyChaoguTests */ = {
+		3825839219A84BC7498CC616 /* MojiangChaoguTests */ = {
 			isa = PBXGroup;
 			children = (
 				1B3B53AE0AE7D939B2AEC092 /* APIClientTests.swift */,
 			);
-			path = MommyChaoguTests;
+			path = MojiangChaoguTests;
 			sourceTree = "<group>";
 		};
 		3B94AD5F64CFB6E7611DBB8F /* Core */ = {
@@ -98,22 +98,22 @@
 		527C6BB5521E6C1BC6A9DC24 = {
 			isa = PBXGroup;
 			children = (
-				629C7134349274D8C78AAE35 /* MommyChaogu */,
-				3825839219A84BC7498CC616 /* MommyChaoguTests */,
+				629C7134349274D8C78AAE35 /* MojiangChaogu */,
+				3825839219A84BC7498CC616 /* MojiangChaoguTests */,
 				C04B667576203C3792042DD0 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		629C7134349274D8C78AAE35 /* MommyChaogu */ = {
+		629C7134349274D8C78AAE35 /* MojiangChaogu */ = {
 			isa = PBXGroup;
 			children = (
-				B9229AFDEC809B43440A823E /* MommyChaoguApp.swift */,
+				B9229AFDEC809B43440A823E /* MojiangChaoguApp.swift */,
 				3B94AD5F64CFB6E7611DBB8F /* Core */,
 				98923B7B1E337558FA6C3763 /* Features */,
 				4BFD2F4555B8355DDADEB0DC /* Resources */,
 				137847CC7F5548757E9BCE95 /* UI */,
 			);
-			path = MommyChaogu;
+			path = MojiangChaogu;
 			sourceTree = "<group>";
 		};
 		98923B7B1E337558FA6C3763 /* Features */ = {
@@ -134,8 +134,8 @@
 		C04B667576203C3792042DD0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1133C0BBA3DDA0BDD76E5AFB /* MommyChaogu.app */,
-				9D4D9408C90AA5AFF7726A0B /* MommyChaoguTests.xctest */,
+				1133C0BBA3DDA0BDD76E5AFB /* MojiangChaogu.app */,
+				9D4D9408C90AA5AFF7726A0B /* MojiangChaoguTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -143,9 +143,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8DAC183015040D11A45D170C /* MommyChaogu */ = {
+		8DAC183015040D11A45D170C /* MojiangChaogu */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 82C7C79E9A631CD7623A6A40 /* Build configuration list for PBXNativeTarget "MommyChaogu" */;
+			buildConfigurationList = 82C7C79E9A631CD7623A6A40 /* Build configuration list for PBXNativeTarget "MojiangChaogu" */;
 			buildPhases = (
 				41359060D0CDBEC61923209A /* Sources */,
 				221109550F1296539ACBF650 /* Resources */,
@@ -154,16 +154,16 @@
 			);
 			dependencies = (
 			);
-			name = MommyChaogu;
+			name = MojiangChaogu;
 			packageProductDependencies = (
 			);
-			productName = MommyChaogu;
-			productReference = 1133C0BBA3DDA0BDD76E5AFB /* MommyChaogu.app */;
+			productName = MojiangChaogu;
+			productReference = 1133C0BBA3DDA0BDD76E5AFB /* MojiangChaogu.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F57AB59982494E688690A54F /* MommyChaoguTests */ = {
+		F57AB59982494E688690A54F /* MojiangChaoguTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D45EFF40B21D6FF4C837D616 /* Build configuration list for PBXNativeTarget "MommyChaoguTests" */;
+			buildConfigurationList = D45EFF40B21D6FF4C837D616 /* Build configuration list for PBXNativeTarget "MojiangChaoguTests" */;
 			buildPhases = (
 				AA359F893C5D11D5795DBDE6 /* Sources */,
 			);
@@ -172,11 +172,11 @@
 			dependencies = (
 				E9A614EE071B943800A56CDE /* PBXTargetDependency */,
 			);
-			name = MommyChaoguTests;
+			name = MojiangChaoguTests;
 			packageProductDependencies = (
 			);
-			productName = MommyChaoguTests;
-			productReference = 9D4D9408C90AA5AFF7726A0B /* MommyChaoguTests.xctest */;
+			productName = MojiangChaoguTests;
+			productReference = 9D4D9408C90AA5AFF7726A0B /* MojiangChaoguTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -196,7 +196,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 07EC8FAC626CE593A5F610F1 /* Build configuration list for PBXProject "MommyChaogu" */;
+			buildConfigurationList = 07EC8FAC626CE593A5F610F1 /* Build configuration list for PBXProject "MojiangChaogu" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -210,8 +210,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8DAC183015040D11A45D170C /* MommyChaogu */,
-				F57AB59982494E688690A54F /* MommyChaoguTests */,
+				8DAC183015040D11A45D170C /* MojiangChaogu */,
+				F57AB59982494E688690A54F /* MojiangChaoguTests */,
 			);
 		};
 /* End PBXProject section */
@@ -241,7 +241,7 @@
 				AB20D627ADF36A7C0B4A05F5 /* DashboardView.swift in Sources */,
 				11704FB935BF9A63FE59B7F6 /* MarketView.swift in Sources */,
 				D921A127FBBDEAA126531089 /* Models.swift in Sources */,
-				ABCDAB480237C9025DF22F6B /* MommyChaoguApp.swift in Sources */,
+				ABCDAB480237C9025DF22F6B /* MojiangChaoguApp.swift in Sources */,
 				312DE0AA68074457D4814A9D /* PortfolioView.swift in Sources */,
 				D116417EF4318A7C42772152 /* ProfileView.swift in Sources */,
 				FD999F7AA67DBCBD0244F258 /* RootView.swift in Sources */,
@@ -263,7 +263,7 @@
 /* Begin PBXTargetDependency section */
 		E9A614EE071B943800A56CDE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8DAC183015040D11A45D170C /* MommyChaogu */;
+			target = 8DAC183015040D11A45D170C /* MojiangChaogu */;
 			targetProxy = 6D27D9866C53227A1CA42153 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -275,10 +275,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "妈咪炒股";
+				INFOPLIST_KEY_CFBundleDisplayName = "墨匠工坊";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "连接你的妈咪炒股数据服务与实时行情。";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "连接你的墨匠工坊数据服务与实时行情。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "用于语音指挥 AI 助手。";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "将你的语音指令转成文字并交给 AI 助手。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -288,7 +288,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coffeeman.mommychaogu;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.cjs5725.mojiangchaogu;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -300,10 +300,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "妈咪炒股";
+				INFOPLIST_KEY_CFBundleDisplayName = "墨匠工坊";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "连接你的妈咪炒股数据服务与实时行情。";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "连接你的墨匠工坊数据服务与实时行情。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "用于语音指挥 AI 助手。";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "将你的语音指令转成文字并交给 AI 助手。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -313,7 +313,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coffeeman.mommychaogu;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.cjs5725.mojiangchaogu;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -329,10 +329,10 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coffeeman.mommychaogu.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.cjs5725.mojiangchaogu.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MommyChaogu.app/MommyChaogu";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MojiangChaogu.app/MojiangChaogu";
 			};
 			name = Debug;
 		};
@@ -346,10 +346,10 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coffeeman.mommychaogu.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.cjs5725.mojiangchaogu.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MommyChaogu.app/MommyChaogu";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MojiangChaogu.app/MojiangChaogu";
 			};
 			name = Release;
 		};
@@ -481,7 +481,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		07EC8FAC626CE593A5F610F1 /* Build configuration list for PBXProject "MommyChaogu" */ = {
+		07EC8FAC626CE593A5F610F1 /* Build configuration list for PBXProject "MojiangChaogu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B0BA0B77681A42C136F04663 /* Debug */,
@@ -490,7 +490,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		82C7C79E9A631CD7623A6A40 /* Build configuration list for PBXNativeTarget "MommyChaogu" */ = {
+		82C7C79E9A631CD7623A6A40 /* Build configuration list for PBXNativeTarget "MojiangChaogu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				44FD17FAF4240BCA962C0304 /* Debug */,
@@ -499,7 +499,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		D45EFF40B21D6FF4C837D616 /* Build configuration list for PBXNativeTarget "MommyChaoguTests" */ = {
+		D45EFF40B21D6FF4C837D616 /* Build configuration list for PBXNativeTarget "MojiangChaoguTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7EE15788A14CF2F6914D7B62 /* Debug */,

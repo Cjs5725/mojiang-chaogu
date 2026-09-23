@@ -1,6 +1,6 @@
-name: MommyChaogu
+name: MojiangChaogu
 options:
-  bundleIdPrefix: com.coffeeman
+  bundleIdPrefix: io.github.cjs5725
   deploymentTarget:
     iOS: "17.0"
   xcodeVersion: "16.0"
@@ -11,18 +11,18 @@ settings:
     MARKETING_VERSION: 0.1.0
     DEVELOPMENT_TEAM: ""
 targets:
-  MommyChaogu:
+  MojiangChaogu:
     type: application
     platform: iOS
     sources:
-      - MommyChaogu
+      - MojiangChaogu
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.coffeeman.mommychaogu
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.cjs5725.mojiangchaogu
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: 妈咪炒股
+        INFOPLIST_KEY_CFBundleDisplayName: 墨匠工坊
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.finance
-        INFOPLIST_KEY_NSLocalNetworkUsageDescription: 连接你的妈咪炒股数据服务与实时行情。
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: 连接你的墨匠工坊数据服务与实时行情。
         INFOPLIST_KEY_NSMicrophoneUsageDescription: 用于语音指挥 AI 助手。
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: 将你的语音指令转成文字并交给 AI 助手。
         INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking: YES
@@ -34,15 +34,15 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
     scheme:
       testTargets:
-        - MommyChaoguTests
-  MommyChaoguTests:
+        - MojiangChaoguTests
+  MojiangChaoguTests:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - MommyChaoguTests
+      - MojiangChaoguTests
     dependencies:
-      - target: MommyChaogu
+      - target: MojiangChaogu
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.coffeeman.mommychaogu.tests
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.cjs5725.mojiangchaogu.tests

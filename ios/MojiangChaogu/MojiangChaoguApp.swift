@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MommyChaoguApp: App {
+struct MojiangChaoguApp: App {
     @StateObject private var store = AppStore()
 
     var body: some Scene {

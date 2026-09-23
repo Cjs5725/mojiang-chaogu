@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8DAC183015040D11A45D170C"
-               BuildableName = "MommyChaogu.app"
-               BlueprintName = "MommyChaogu"
-               ReferencedContainer = "container:MommyChaogu.xcodeproj">
+               BuildableName = "MojiangChaogu.app"
+               BlueprintName = "MojiangChaogu"
+               ReferencedContainer = "container:MojiangChaogu.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8DAC183015040D11A45D170C"
-            BuildableName = "MommyChaogu.app"
-            BlueprintName = "MommyChaogu"
-            ReferencedContainer = "container:MommyChaogu.xcodeproj">
+            BuildableName = "MojiangChaogu.app"
+            BlueprintName = "MojiangChaogu"
+            ReferencedContainer = "container:MojiangChaogu.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -45,9 +45,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F57AB59982494E688690A54F"
-               BuildableName = "MommyChaoguTests.xctest"
-               BlueprintName = "MommyChaoguTests"
-               ReferencedContainer = "container:MommyChaogu.xcodeproj">
+               BuildableName = "MojiangChaoguTests.xctest"
+               BlueprintName = "MojiangChaoguTests"
+               ReferencedContainer = "container:MojiangChaogu.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8DAC183015040D11A45D170C"
-            BuildableName = "MommyChaogu.app"
-            BlueprintName = "MommyChaogu"
-            ReferencedContainer = "container:MommyChaogu.xcodeproj">
+            BuildableName = "MojiangChaogu.app"
+            BlueprintName = "MojiangChaogu"
+            ReferencedContainer = "container:MojiangChaogu.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -88,9 +88,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8DAC183015040D11A45D170C"
-            BuildableName = "MommyChaogu.app"
-            BlueprintName = "MommyChaogu"
-            ReferencedContainer = "container:MommyChaogu.xcodeproj">
+            BuildableName = "MojiangChaogu.app"
+            BlueprintName = "MojiangChaogu"
+            ReferencedContainer = "container:MojiangChaogu.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
