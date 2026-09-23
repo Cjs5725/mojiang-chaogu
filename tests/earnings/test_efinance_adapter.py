@@ -16,7 +16,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from mommy_chaogu.earnings.efinance_adapter import (
+from mojiang_chaogu.earnings.efinance_adapter import (
     EfinanceEarningsAdapter,
     _period_to_date,
 )
@@ -94,7 +94,7 @@ def test_period_to_date_invalid():
 # ---------- fetch_actual (mock) ----------
 
 
-@patch("mommy_chaogu.earnings.efinance_adapter._fetch_full_market", create=True)
+@patch("mojiang_chaogu.earnings.efinance_adapter._fetch_full_market", create=True)
 def test_fetch_actual_returns_parsed_data(_mock_fetch):
     """正常情况：返回 EarningsActual 列表。"""
     adapter = EfinanceEarningsAdapter()
@@ -219,59 +219,59 @@ def test_fetch_calendar_filter_since(mock_fetch, mock_periods):
 
 def test_to_date_timestamp():
     """pandas Timestamp 应转 date。"""
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     ts = pd.Timestamp("2026-07-25")
     assert E._to_date(ts) == date(2026, 7, 25)
 
 
 def test_to_date_datetime():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     dt = datetime(2026, 7, 25, 12, 0)
     assert E._to_date(dt) == date(2026, 7, 25)
 
 
 def test_to_date_string():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_date("2026-07-25") == date(2026, 7, 25)
 
 
 def test_to_date_none():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_date(None) is None
 
 
 def test_to_date_invalid_string():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_date("not a date") is None
 
 
 def test_to_decimal_number():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_decimal(215.5) == Decimal("215.5")
     assert E._to_decimal(100) == Decimal("100")
 
 
 def test_to_decimal_nan():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_decimal(float("nan")) is None
     assert E._to_decimal(None) is None
 
 
 def test_to_decimal_string():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._to_decimal("215.5") == Decimal("215.5")
 
 
 def test_iso_to_period():
-    from mommy_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
+    from mojiang_chaogu.earnings.efinance_adapter import EfinanceEarningsAdapter as E
 
     assert E._iso_to_period("2026-06-30") == "H1 2026"
     assert E._iso_to_period("2026-09-30") == "Q3 2026"
@@ -287,7 +287,7 @@ def test_iso_to_period():
 
 def test_efinance_adapter_implements_protocol():
     """EfinanceEarningsAdapter 应满足 EarningsAdapter Protocol。"""
-    from mommy_chaogu.earnings import EarningsAdapter
+    from mojiang_chaogu.earnings import EarningsAdapter
 
     adapter = EfinanceEarningsAdapter()
     assert isinstance(adapter, EarningsAdapter)

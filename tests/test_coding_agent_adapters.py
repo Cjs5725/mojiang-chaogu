@@ -10,10 +10,10 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.agent.research_tools import allowed_base_tool_names, allowed_research_tool_names
-from mommy_chaogu.cli_commands.connect import _bundled_skill_dir, _bundled_skill_dirs
-from mommy_chaogu.coding_agents import adapter_for
-from mommy_chaogu.coding_agents.base import ConnectionSpec, directory_hash, install_skill
+from mojiang_chaogu.agent.research_tools import allowed_base_tool_names, allowed_research_tool_names
+from mojiang_chaogu.cli_commands.connect import _bundled_skill_dir, _bundled_skill_dirs
+from mojiang_chaogu.coding_agents import adapter_for
+from mojiang_chaogu.coding_agents.base import ConnectionSpec, directory_hash, install_skill
 
 TARGETS = ("claude", "kimi", "cline", "codex", "dsh")
 
@@ -30,10 +30,10 @@ def adapter_case(
     monkeypatch.setenv("DSH_HOME", str(tmp_path / "dsh"))
     spec = ConnectionSpec(
         command="/usr/bin/python3",
-        args=["-m", "mommy_chaogu.agent.mcp_server", "--profile", "personal"],
+        args=["-m", "mojiang_chaogu.agent.mcp_server", "--profile", "personal"],
         env={
-            "MOMMY_AGENT_DB": str(tmp_path / "agent.db"),
-            "MOMMY_PORTFOLIO_DB": str(tmp_path / "portfolio.db"),
+            "MOJIANG_AGENT_DB": str(tmp_path / "agent.db"),
+            "MOJIANG_PORTFOLIO_DB": str(tmp_path / "portfolio.db"),
         },
         cwd=str(Path.cwd()),
         profile="personal",
@@ -42,7 +42,7 @@ def adapter_case(
 
     def fake_run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
         if target == "codex":
-            if command[2:4] == ["get", "mommy-chaogu"]:
+            if command[2:4] == ["get", "mojiang-chaogu"]:
                 return subprocess.CompletedProcess(
                     command, 0 if codex_state else 1, json.dumps(codex_state), ""
                 )
@@ -64,7 +64,7 @@ def adapter_case(
             path = Path(os.environ["CLAUDE_CONFIG_DIR"]) / ".claude.json"
             value = json.loads(path.read_text()) if path.is_file() else {"mcpServers": {}}
             if "remove" in command:
-                value["mcpServers"].pop("mommy-chaogu", None)
+                value["mcpServers"].pop("mojiang-chaogu", None)
             else:
                 divider = command.index("--")
                 env = {}
@@ -72,7 +72,7 @@ def adapter_case(
                     if item == "--env":
                         key, value_item = command[index + 1].split("=", 1)
                         env[key] = value_item
-                value["mcpServers"]["mommy-chaogu"] = {
+                value["mcpServers"]["mojiang-chaogu"] = {
                     "command": command[divider + 1],
                     "args": command[divider + 2 :],
                     "env": env,
@@ -107,12 +107,12 @@ def test_unified_adapter_connection_contract(adapter_case: dict[str, Any]) -> No
     adapter = adapter_case["adapter"]
     spec: ConnectionSpec = adapter_case["spec"]
     skills = [adapter.install_skill(source) for source in _bundled_skill_dirs()]
-    skill = next(item for item in skills if item.name == "mommy-research")
+    skill = next(item for item in skills if item.name == "mojiang-research")
     adapter.register_mcp(spec)
     assert skill.is_dir()
     assert spec.profile == "personal"
     assert spec.args[-2:] == ["--profile", "personal"]
-    assert {"MOMMY_AGENT_DB", "MOMMY_PORTFOLIO_DB"} <= set(spec.env)
+    assert {"MOJIANG_AGENT_DB", "MOJIANG_PORTFOLIO_DB"} <= set(spec.env)
 
     previous = {
         "profile": "personal",
@@ -149,7 +149,7 @@ def test_managed_skill_upgrade_removes_obsolete_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("KIMI_CODE_HOME", str(tmp_path / "kimi"))
-    source = tmp_path / "source" / "mommy-research"
+    source = tmp_path / "source" / "mojiang-research"
     source.mkdir(parents=True)
     (source / "SKILL.md").write_text("version one", encoding="utf-8")
     (source / "obsolete.md").write_text("old instruction", encoding="utf-8")
@@ -157,7 +157,7 @@ def test_managed_skill_upgrade_removes_obsolete_files(
     installed = install_skill("kimi", source, None, force=False)
     previous = {
         "skills": {
-            "mommy-research": {
+            "mojiang-research": {
                 "path": str(installed),
                 "hash": directory_hash(installed),
             }
@@ -185,7 +185,7 @@ def test_disconnect_preserves_modified_skill_and_external_servers(
         "skill_hash": directory_hash(skill),
     }
     (skill / "SKILL.md").write_text("user modification")
-    # Existing adapters only remove mommy's own entry; their config loaders keep other servers.
+    # Existing adapters only remove mojiang's own entry; their config loaders keep other servers.
     adapter_for(
         adapter_case["target"],
         previous=previous,
@@ -213,21 +213,21 @@ def test_unmanaged_same_name_is_not_overwritten(adapter_case: dict[str, Any]) ->
     if path is not None:
         path.parent.mkdir(parents=True, exist_ok=True)
         if target == "cline":
-            value = {"mcpServers": {"mommy-chaogu": {"transport": {"command": "user-managed"}}}}
+            value = {"mcpServers": {"mojiang-chaogu": {"transport": {"command": "user-managed"}}}}
         elif target == "dsh":
             path.write_text(
                 "- insert:\n"
                 "    - id: user-row\n"
                 "      name: '@deepseek-ai/dsh-mcp-client'\n"
                 "      config:\n"
-                "        serverName: mommy-chaogu\n"
+                "        serverName: mojiang-chaogu\n"
                 "        transport: stdio\n"
                 "        command: user-managed\n",
                 encoding="utf-8",
             )
             value = None
         else:
-            value = {"mcpServers": {"mommy-chaogu": {"command": "user-managed"}}}
+            value = {"mcpServers": {"mojiang-chaogu": {"command": "user-managed"}}}
         if value is not None:
             path.write_text(json.dumps(value))
     with pytest.raises(RuntimeError, match=r"非本工具管理|修改"):

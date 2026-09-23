@@ -15,7 +15,7 @@ from decimal import Decimal
 
 import pytest
 
-from mommy_chaogu.market_data import (
+from mojiang_chaogu.market_data import (
     AdjustmentType,
     Bar,
     BarInterval,

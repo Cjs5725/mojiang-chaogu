@@ -24,7 +24,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from mommy_chaogu.db_paths import (
+from mojiang_chaogu.db_paths import (
     AGENT_DB,
     LEGACY_BACKTEST_DB,
     LEGACY_EARNINGS_ACTUAL_DB,

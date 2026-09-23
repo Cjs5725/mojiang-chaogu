@@ -134,12 +134,12 @@ onMounted(() => {
       >
         <RouterLink
           to="/"
-          aria-label="返回妈妈炒股首页"
+          aria-label="返回墨匠工坊首页"
           class="mb-6 flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-semibold transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <BrandMark alt="" size="md" />
           <span class="min-w-0">
-            <span class="block truncate">妈妈炒股</span>
+            <span class="block truncate">墨匠工坊</span>
             <span class="block truncate text-[10px] font-normal text-muted-foreground">AI 投研 Agent</span>
           </span>
         </RouterLink>

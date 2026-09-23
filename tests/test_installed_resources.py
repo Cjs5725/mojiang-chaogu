@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.db_paths import default_data_dir
-from mommy_chaogu.services.theme_service import ThemeService
+from mojiang_chaogu.db_paths import default_data_dir
+from mojiang_chaogu.services.theme_service import ThemeService
 
 
 def test_installed_tool_uses_user_data_directory(
@@ -19,14 +19,14 @@ def test_installed_tool_uses_user_data_directory(
     monkeypatch.chdir(workdir)
     monkeypatch.setenv("HOME", str(tmp_path / "home"))
     monkeypatch.delenv("XDG_DATA_HOME", raising=False)
-    monkeypatch.delenv("MOMMY_DATA_DIR", raising=False)
+    monkeypatch.delenv("MOJIANG_DATA_DIR", raising=False)
 
-    assert default_data_dir() == tmp_path / "home" / ".local" / "share" / "mommy-chaogu"
+    assert default_data_dir() == tmp_path / "home" / ".local" / "share" / "mojiang-chaogu"
 
 
 def test_data_directory_can_be_overridden(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     selected = tmp_path / "private-data"
-    monkeypatch.setenv("MOMMY_DATA_DIR", str(selected))
+    monkeypatch.setenv("MOJIANG_DATA_DIR", str(selected))
 
     assert default_data_dir() == selected
 
@@ -48,4 +48,4 @@ def test_release_artifacts_exclude_runtime_output_and_local_test_skills() -> Non
     excluded = set(config["tool"]["hatch"]["build"]["exclude"])
 
     assert "/output/**" in excluded
-    assert "/src/mommy_chaogu/bundled_skills/market-monitoring-test/**" in excluded
+    assert "/src/mojiang_chaogu/bundled_skills/market-monitoring-test/**" in excluded

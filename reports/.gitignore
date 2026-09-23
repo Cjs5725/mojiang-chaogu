@@ -1,7 +1,7 @@
 # reports/.gitignore — 实战产物入仓规则
 
-# 临时索引（每次 mommy-report index 重写）
-# 想看：跑 `uv run mommy-report index --out reports/`
+# 临时索引（每次 mojiang-report index 重写）
+# 想看：跑 `uv run mojiang-report index --out reports/`
 index.html
 
 # 开发期临时文件

@@ -22,9 +22,9 @@ body:
       label: 复现步骤
       description: |
         请提供能稳定复现的操作步骤。
-        命令示例：`uv run mommy 今天怎么样`、`uv run mommy --raw watchlist list`、`uv run mommy-web`
+        命令示例：`uv run mojiang 今天怎么样`、`uv run mojiang --raw watchlist list`、`uv run mojiang-web`
       placeholder: |
-        1. 运行 `uv run mommy ...`
+        1. 运行 `uv run mojiang ...`
         2. 输入 `...`
         3. 看到 `...`
         4. 期望应该是 `...`

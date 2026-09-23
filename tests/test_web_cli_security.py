@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mommy_chaogu.cli import build_web_parser, cmd_web_serve
+from mojiang_chaogu.cli import build_web_parser, cmd_web_serve
 
 
 def test_web_defaults_to_loopback() -> None:
@@ -33,15 +33,15 @@ def test_explicit_web_port_overrides_environment(monkeypatch: pytest.MonkeyPatch
 def test_remote_binding_requires_token(capsys: object) -> None:
     args = build_web_parser().parse_args(["--host", "0.0.0.0"])
     assert cmd_web_serve(args) == 2
-    assert "MOMMY_API_TOKEN" in capsys.readouterr().err  # type: ignore[attr-defined]
+    assert "MOJIANG_API_TOKEN" in capsys.readouterr().err  # type: ignore[attr-defined]
 
 
 def test_remote_bind_disables_local_setup(monkeypatch: pytest.MonkeyPatch) -> None:
     """A non-loopback bind must never expose setup endpoints without a token."""
     captured: dict[str, object] = {}
-    monkeypatch.setenv("MOMMY_API_TOKEN", "owner-secret")
+    monkeypatch.setenv("MOJIANG_API_TOKEN", "owner-secret")
     monkeypatch.setattr(
-        "mommy_chaogu.web.create_app",
+        "mojiang_chaogu.web.create_app",
         lambda **kwargs: captured.update(kwargs) or object(),
     )
     monkeypatch.setattr("uvicorn.run", lambda *_args, **_kwargs: None)
@@ -57,7 +57,7 @@ def test_allow_unauthenticated_remote_still_disables_setup(
     """--allow-unauthenticated-remote must NOT make setup reachable over the wire."""
     captured: dict[str, object] = {}
     monkeypatch.setattr(
-        "mommy_chaogu.web.create_app",
+        "mojiang_chaogu.web.create_app",
         lambda **kwargs: captured.update(kwargs) or object(),
     )
     monkeypatch.setattr("uvicorn.run", lambda *_args, **_kwargs: None)
@@ -72,9 +72,9 @@ def test_loopback_ignores_configured_token_by_default(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     captured: dict[str, object] = {}
-    monkeypatch.setenv("MOMMY_API_TOKEN", "configured-for-remote")
+    monkeypatch.setenv("MOJIANG_API_TOKEN", "configured-for-remote")
     monkeypatch.setattr(
-        "mommy_chaogu.web.create_app",
+        "mojiang_chaogu.web.create_app",
         lambda **kwargs: captured.update(kwargs) or object(),
     )
     monkeypatch.setattr("uvicorn.run", lambda *_args, **_kwargs: None)
@@ -90,9 +90,9 @@ def test_loopback_can_explicitly_require_auth(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     captured: dict[str, object] = {}
-    monkeypatch.setenv("MOMMY_API_TOKEN", "configured-for-remote")
+    monkeypatch.setenv("MOJIANG_API_TOKEN", "configured-for-remote")
     monkeypatch.setattr(
-        "mommy_chaogu.web.create_app",
+        "mojiang_chaogu.web.create_app",
         lambda **kwargs: captured.update(kwargs) or object(),
     )
     monkeypatch.setattr("uvicorn.run", lambda *_args, **_kwargs: None)

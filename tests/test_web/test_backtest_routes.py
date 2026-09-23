@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.backtest.engine import BacktestResult
-from mommy_chaogu.web.deps import get_backtest_engine
+from mojiang_chaogu.backtest.engine import BacktestResult
+from mojiang_chaogu.web.deps import get_backtest_engine
 
 
 def _make_result(total_signals: int = 12) -> BacktestResult:

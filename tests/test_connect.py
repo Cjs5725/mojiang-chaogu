@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import pytest
 
-from mommy_chaogu.cli_commands.connect import (
+from mojiang_chaogu.cli_commands.connect import (
     ConnectionSpec,
     _connection_spec,
     _mcp_read_timeout,
@@ -35,11 +35,11 @@ def _which_with_fake_cline(name: str) -> str | None:
 
 @pytest.fixture
 def isolated_homes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path]:
-    config = tmp_path / "mommy"
+    config = tmp_path / "mojiang"
     kimi = tmp_path / "kimi"
     claude = tmp_path / "claude"
     cline = tmp_path / "clinedata"
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(config))
     monkeypatch.setenv("KIMI_CODE_HOME", str(kimi))
     monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(claude))
     monkeypatch.setenv("CLINE_DATA_DIR", str(cline))
@@ -61,19 +61,19 @@ def test_resolve_profile_honors_explicit() -> None:
 
 
 def test_resolve_profile_defaults_to_market_only_non_tty() -> None:
-    with patch("mommy_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=False):
+    with patch("mojiang_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=False):
         assert _resolve_profile(None) == "market-only"
 
 
 def test_resolve_profile_preserves_existing_market_only_non_tty() -> None:
-    with patch("mommy_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=False):
+    with patch("mojiang_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=False):
         assert _resolve_profile(None, "market-only") == "market-only"
         assert _resolve_profile("personal", "market-only") == "personal"
 
 
 def test_resolve_profile_interactive_choice() -> None:
     with (
-        patch("mommy_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=True),
+        patch("mojiang_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=True),
         patch("builtins.input", return_value="2"),
     ):
         assert _resolve_profile(None) == "personal"
@@ -81,7 +81,7 @@ def test_resolve_profile_interactive_choice() -> None:
 
 def test_resolve_profile_interactive_defaults_to_market_only() -> None:
     with (
-        patch("mommy_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=True),
+        patch("mojiang_chaogu.cli_commands.connect.sys.stdin.isatty", return_value=True),
         patch("builtins.input", return_value="   "),
     ):
         assert _resolve_profile(None) == "market-only"
@@ -89,21 +89,21 @@ def test_resolve_profile_interactive_defaults_to_market_only() -> None:
 
 def test_connection_spec_pins_current_python_even_when_other_mcp_is_on_path() -> None:
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which",
-        return_value="/some/older/global/mommy-mcp",
+        "mojiang_chaogu.cli_commands.connect.shutil.which",
+        return_value="/some/older/global/mojiang-mcp",
     ):
         spec = _connection_spec("market-only")
     assert spec.command == sys.executable
-    assert spec.args[:2] == ["-m", "mommy_chaogu.agent.mcp_server"]
+    assert spec.args[:2] == ["-m", "mojiang_chaogu.agent.mcp_server"]
 
 
 def test_probe_timeout_matches_mcp_sdk_major_version() -> None:
     with patch(
-        "mommy_chaogu.cli_commands.connect.importlib.metadata.version", return_value="1.28.1"
+        "mojiang_chaogu.cli_commands.connect.importlib.metadata.version", return_value="1.28.1"
     ):
         assert _mcp_read_timeout() == timedelta(seconds=15)
     with patch(
-        "mommy_chaogu.cli_commands.connect.importlib.metadata.version", return_value="2.0.0"
+        "mojiang_chaogu.cli_commands.connect.importlib.metadata.version", return_value="2.0.0"
     ):
         assert _mcp_read_timeout() == 15.0
 
@@ -118,17 +118,17 @@ def test_kimi_connect_preserves_other_servers_and_installs_skill(
         encoding="utf-8",
     )
     args = build_connect_parser().parse_args(["kimi", "--skip-test"])
-    with patch("mommy_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
+    with patch("mojiang_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
         assert cmd_connect(args) == 0
 
     mcp = json.loads((kimi_home / "mcp.json").read_text(encoding="utf-8"))
     assert "github" in mcp["mcpServers"]
-    mommy = mcp["mcpServers"]["mommy-chaogu"]
-    assert mommy["args"][-2:] == ["--profile", "market-only"]
-    assert "MOMMY_AGENT_DB" in mommy["env"]
-    assert (kimi_home / "skills" / "mommy-research" / "SKILL.md").is_file()
-    assert (kimi_home / "skills" / "mommy-onboard" / "SKILL.md").is_file()
-    assert (kimi_home / "skills" / "mommy-strategy" / "SKILL.md").is_file()
+    mojiang = mcp["mcpServers"]["mojiang-chaogu"]
+    assert mojiang["args"][-2:] == ["--profile", "market-only"]
+    assert "MOJIANG_AGENT_DB" in mojiang["env"]
+    assert (kimi_home / "skills" / "mojiang-research" / "SKILL.md").is_file()
+    assert (kimi_home / "skills" / "mojiang-onboard" / "SKILL.md").is_file()
+    assert (kimi_home / "skills" / "mojiang-strategy" / "SKILL.md").is_file()
     assert (kimi_home / "skills" / "market-watch-loop" / "SKILL.md").is_file()
     assert (kimi_home / "skills" / "basket-analysis" / "SKILL.md").is_file()
     assert (kimi_home / "skills" / "food-security-analysis" / "SKILL.md").is_file()
@@ -137,9 +137,9 @@ def test_kimi_connect_preserves_other_servers_and_installs_skill(
     assert state["version"] == 2
     assert state["connections"]["kimi"]["profile"] == "market-only"
     assert set(state["connections"]["kimi"]["skills"]) == {
-        "mommy-onboard",
-        "mommy-research",
-        "mommy-strategy",
+        "mojiang-onboard",
+        "mojiang-research",
+        "mojiang-strategy",
         "market-watch-loop",
         "basket-analysis",
         "food-security-analysis",
@@ -154,17 +154,17 @@ def test_cline_connect_installs_skill_and_mcp(
     cline_settings = Path(os.environ["CLINE_DATA_DIR"]) / "settings"
     args = build_connect_parser().parse_args(["cline", "--skip-test"])
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_cline
+        "mojiang_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_cline
     ):
         assert cmd_connect(args) == 0
 
     mcp = json.loads((cline_settings / "cline_mcp_settings.json").read_text(encoding="utf-8"))
-    assert "mommy-chaogu" in mcp["mcpServers"]
-    transport = mcp["mcpServers"]["mommy-chaogu"]["transport"]
+    assert "mojiang-chaogu" in mcp["mcpServers"]
+    transport = mcp["mcpServers"]["mojiang-chaogu"]["transport"]
     assert transport["type"] == "stdio"
     assert transport["args"][-2:] == ["--profile", "market-only"]
-    assert "MOMMY_AGENT_DB" in transport["env"]
-    assert (cline_settings / "skills" / "mommy-research" / "SKILL.md").is_file()
+    assert "MOJIANG_AGENT_DB" in transport["env"]
+    assert (cline_settings / "skills" / "mojiang-research" / "SKILL.md").is_file()
 
     state = json.loads((config_home / "connections.json").read_text(encoding="utf-8"))
     assert state["connections"]["cline"]["profile"] == "market-only"
@@ -173,7 +173,7 @@ def test_cline_connect_installs_skill_and_mcp(
 def test_cline_disconnect_removes_managed_entry(isolated_homes: tuple[Path, Path]) -> None:
     connect = build_connect_parser().parse_args(["cline", "--skip-test"])
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_cline
+        "mojiang_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_cline
     ):
         assert cmd_connect(connect) == 0
 
@@ -182,8 +182,8 @@ def test_cline_disconnect_removes_managed_entry(isolated_homes: tuple[Path, Path
 
     cline_settings = Path(os.environ["CLINE_DATA_DIR"]) / "settings"
     after = json.loads((cline_settings / "cline_mcp_settings.json").read_text(encoding="utf-8"))
-    assert "mommy-chaogu" not in after["mcpServers"]
-    assert not (cline_settings / "skills" / "mommy-research").exists()
+    assert "mojiang-chaogu" not in after["mcpServers"]
+    assert not (cline_settings / "skills" / "mojiang-research").exists()
 
 
 def test_kimi_connect_does_not_overwrite_unmanaged_server_without_force(
@@ -192,11 +192,11 @@ def test_kimi_connect_does_not_overwrite_unmanaged_server_without_force(
     _, kimi_home = isolated_homes
     kimi_home.mkdir(parents=True)
     (kimi_home / "mcp.json").write_text(
-        json.dumps({"mcpServers": {"mommy-chaogu": {"command": "custom"}}}),
+        json.dumps({"mcpServers": {"mojiang-chaogu": {"command": "custom"}}}),
         encoding="utf-8",
     )
     args = build_connect_parser().parse_args(["kimi", "--skip-test"])
-    with patch("mommy_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
+    with patch("mojiang_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
         assert cmd_connect(args) == 2
     assert "非本工具管理" in capsys.readouterr().err
 
@@ -204,7 +204,7 @@ def test_kimi_connect_does_not_overwrite_unmanaged_server_without_force(
 def test_disconnect_removes_only_managed_kimi_entries(isolated_homes: tuple[Path, Path]) -> None:
     _, kimi_home = isolated_homes
     connect = build_connect_parser().parse_args(["kimi", "--skip-test"])
-    with patch("mommy_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
+    with patch("mojiang_chaogu.cli_commands.connect.shutil.which", side_effect=_which_with_fake_kimi):
         assert cmd_connect(connect) == 0
     config = json.loads((kimi_home / "mcp.json").read_text(encoding="utf-8"))
     config["mcpServers"]["github"] = {"url": "https://example.test/mcp"}
@@ -214,9 +214,9 @@ def test_disconnect_removes_only_managed_kimi_entries(isolated_homes: tuple[Path
     assert cmd_connect(disconnect) == 0
 
     after = json.loads((kimi_home / "mcp.json").read_text(encoding="utf-8"))
-    assert "mommy-chaogu" not in after["mcpServers"]
+    assert "mojiang-chaogu" not in after["mcpServers"]
     assert "github" in after["mcpServers"]
-    assert not (kimi_home / "skills" / "mommy-research").exists()
+    assert not (kimi_home / "skills" / "mojiang-research").exists()
 
 
 def test_disconnect_preserves_unmanaged_kimi_entry(
@@ -226,13 +226,13 @@ def test_disconnect_preserves_unmanaged_kimi_entry(
     kimi_home.mkdir(parents=True)
     path = kimi_home / "mcp.json"
     path.write_text(
-        json.dumps({"mcpServers": {"mommy-chaogu": {"command": "custom"}}}),
+        json.dumps({"mcpServers": {"mojiang-chaogu": {"command": "custom"}}}),
         encoding="utf-8",
     )
     disconnect = build_connect_parser().parse_args(["disconnect", "kimi"])
     assert cmd_connect(disconnect) == 0
     after = json.loads(path.read_text(encoding="utf-8"))
-    assert after["mcpServers"]["mommy-chaogu"]["command"] == "custom"
+    assert after["mcpServers"]["mojiang-chaogu"]["command"] == "custom"
     assert "未修改外部配置" in capsys.readouterr().out
 
 
@@ -262,7 +262,7 @@ def test_disconnect_keeps_managed_state_when_cli_is_unavailable(
             json.dumps(
                 {
                     "mcpServers": {
-                        "mommy-chaogu": {
+                        "mojiang-chaogu": {
                             "command": spec.command,
                             "args": spec.args,
                             "env": spec.env,
@@ -274,7 +274,7 @@ def test_disconnect_keeps_managed_state_when_cli_is_unavailable(
         )
 
     disconnect = build_connect_parser().parse_args(["disconnect", target])
-    with patch("mommy_chaogu.cli_commands.connect.shutil.which", return_value=None):
+    with patch("mojiang_chaogu.cli_commands.connect.shutil.which", return_value=None):
         assert cmd_connect(disconnect) == 2
 
     saved = json.loads(state_path.read_text(encoding="utf-8"))
@@ -285,13 +285,13 @@ def test_disconnect_keeps_managed_state_when_cli_is_unavailable(
 def test_probe_lists_profile_scoped_tools(tmp_path: Path) -> None:
     spec = ConnectionSpec(
         command=sys.executable,
-        args=["-m", "mommy_chaogu.agent.mcp_server", "--profile", "market-only"],
+        args=["-m", "mojiang_chaogu.agent.mcp_server", "--profile", "market-only"],
         env={
-            "MOMMY_CONFIG_DIR": str(tmp_path / "config"),
-            "MOMMY_MARKET_DB": str(tmp_path / "market.db"),
-            "MOMMY_PORTFOLIO_DB": str(tmp_path / "portfolio.db"),
-            "MOMMY_AGENT_DB": str(tmp_path / "agent.db"),
-            "MOMMY_REFERENCE_DB": str(tmp_path / "reference.db"),
+            "MOJIANG_CONFIG_DIR": str(tmp_path / "config"),
+            "MOJIANG_MARKET_DB": str(tmp_path / "market.db"),
+            "MOJIANG_PORTFOLIO_DB": str(tmp_path / "portfolio.db"),
+            "MOJIANG_AGENT_DB": str(tmp_path / "agent.db"),
+            "MOJIANG_REFERENCE_DB": str(tmp_path / "reference.db"),
             "AGENT_PROVIDER": "",
             "AGENT_MODEL": "",
             "DEEPSEEK_API_KEY": "",
@@ -313,26 +313,26 @@ def test_probe_lists_profile_scoped_tools(tmp_path: Path) -> None:
 def test_codex_registration_uses_official_mcp_cli(monkeypatch: pytest.MonkeyPatch) -> None:
     spec = ConnectionSpec(
         command=sys.executable,
-        args=["-m", "mommy_chaogu.agent.mcp_server", "--profile", "personal"],
-        env={"MOMMY_AGENT_DB": "/tmp/agent.db"},
+        args=["-m", "mojiang_chaogu.agent.mcp_server", "--profile", "personal"],
+        env={"MOJIANG_AGENT_DB": "/tmp/agent.db"},
         cwd=str(Path.cwd()),
         profile="personal",
     )
     calls: list[list[str]] = []
-    monkeypatch.setattr("mommy_chaogu.cli_commands.connect.shutil.which", lambda name: "/bin/codex")
-    monkeypatch.setattr("mommy_chaogu.cli_commands.connect._codex_entry", lambda: None)
+    monkeypatch.setattr("mojiang_chaogu.cli_commands.connect.shutil.which", lambda name: "/bin/codex")
+    monkeypatch.setattr("mojiang_chaogu.cli_commands.connect._codex_entry", lambda: None)
     monkeypatch.setattr(
-        "mommy_chaogu.cli_commands.connect._run_command",
+        "mojiang_chaogu.cli_commands.connect._run_command",
         lambda command, check=True: calls.append(command),
     )
 
     _register_codex(spec, None, force=False)
 
-    assert calls[0][:4] == ["/bin/codex", "mcp", "add", "mommy-chaogu"]
+    assert calls[0][:4] == ["/bin/codex", "mcp", "add", "mojiang-chaogu"]
     assert "--env" in calls[0]
     assert calls[0][-len(spec.args) :] == spec.args
 
 
 def test_codex_skill_uses_agents_skills(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setenv("CODEX_SKILLS_DIR", str(tmp_path))
-    assert _skill_dir("codex") == tmp_path / "mommy-research"
+    assert _skill_dir("codex") == tmp_path / "mojiang-research"

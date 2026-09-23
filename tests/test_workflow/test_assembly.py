@@ -15,9 +15,9 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.workflow.assembly import AgentSummarizer, build_nl_runtime
-from mommy_chaogu.workflow.spec import StepSpec, WorkflowSpec
-from mommy_chaogu.workflow.store import WorkflowStore
+from mojiang_chaogu.workflow.assembly import AgentSummarizer, build_nl_runtime
+from mojiang_chaogu.workflow.spec import StepSpec, WorkflowSpec
+from mojiang_chaogu.workflow.store import WorkflowStore
 
 
 def _good_spec(
@@ -43,9 +43,9 @@ def _store_with(tmp_path: Path, *specs: WorkflowSpec) -> WorkflowStore:
 @pytest.fixture
 def isolated_dbs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """三库指向 tmp，避免读到仓库 data/ 里的真实数据。"""
-    monkeypatch.setattr("mommy_chaogu.db_paths.AGENT_DB", tmp_path / "agent.db")
-    monkeypatch.setattr("mommy_chaogu.db_paths.MARKET_DB", tmp_path / "market.db")
-    monkeypatch.setattr("mommy_chaogu.db_paths.PORTFOLIO_DB", tmp_path / "portfolio.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.AGENT_DB", tmp_path / "agent.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.MARKET_DB", tmp_path / "market.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.PORTFOLIO_DB", tmp_path / "portfolio.db")
     return tmp_path
 
 
@@ -112,7 +112,7 @@ class TestBuildNLRuntime:
         前置：显式清掉 shell / 早期测试可能留下的 provider key 环境变量
         （清单从 SUPPORTED_PROVIDERS 真相源派生），测试自身封闭。
         """
-        from mommy_chaogu.agent.llm import SUPPORTED_PROVIDERS
+        from mojiang_chaogu.agent.llm import SUPPORTED_PROVIDERS
 
         for info in SUPPORTED_PROVIDERS.values():
             monkeypatch.delenv(str(info["env_key"]), raising=False)
@@ -166,7 +166,7 @@ class TestAgentSummarizerShared:
             agent_service=agent,  # type: ignore[arg-type]
         )
 
-        from mommy_chaogu.workflow.engine import WorkflowExecutor
+        from mojiang_chaogu.workflow.engine import WorkflowExecutor
 
         assert isinstance(runtime.executor, WorkflowExecutor)
         assert isinstance(runtime.executor._llm, AgentSummarizer)

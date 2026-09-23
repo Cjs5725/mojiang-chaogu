@@ -10,16 +10,16 @@ import argparse
 import json
 from typing import Any
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.cache import CachedMarketDataAdapter, CacheStore
-from mommy_chaogu.cli_commands.agent import _build_llm_client
-from mommy_chaogu.db_paths import MARKET_DB
-from mommy_chaogu.market_data import EfinanceAdapter, FallbackAdapter, TencentAdapter
-from mommy_chaogu.workflow.compiler import WorkflowCompiler
-from mommy_chaogu.workflow.definitions import get_default_registry
-from mommy_chaogu.workflow.spec import WorkflowSpec
-from mommy_chaogu.workflow.spec_runtime import spec_to_workflow
-from mommy_chaogu.workflow.validator import blocking_issues, validate_spec
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.cache import CachedMarketDataAdapter, CacheStore
+from mojiang_chaogu.cli_commands.agent import _build_llm_client
+from mojiang_chaogu.db_paths import MARKET_DB
+from mojiang_chaogu.market_data import EfinanceAdapter, FallbackAdapter, TencentAdapter
+from mojiang_chaogu.workflow.compiler import WorkflowCompiler
+from mojiang_chaogu.workflow.definitions import get_default_registry
+from mojiang_chaogu.workflow.spec import WorkflowSpec
+from mojiang_chaogu.workflow.spec_runtime import spec_to_workflow
+from mojiang_chaogu.workflow.validator import blocking_issues, validate_spec
 
 GOLDEN_SAMPLES = (
     (

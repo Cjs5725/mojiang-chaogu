@@ -14,7 +14,7 @@
 |---|---|---|---|
 | **HTTP + WebSocket API** | 浏览器 / 手机 / 远程 | FastAPI（默认 `127.0.0.1:8000`） | 有鉴权、限流、降级约定；跨进程 |
 | **Python 服务层（in-proc）** | TUI / CLI / 脚本 | 各模块 Store/Service 直接 import | 无鉴权；类型是 dataclass/Decimal；本项目 TUI 就是这么做的（`tui/services/bootstrap.py`） |
-| **CLI 子命令** |  shell / cron / 人类 | `mommy <cmd>` + 14 个入口 | 非程序化接口，仅供参考能力边界 |
+| **CLI 子命令** |  shell / cron / 人类 | `mojiang <cmd>` + 14 个入口 | 非程序化接口，仅供参考能力边界 |
 
 API 与服务层是**同一批能力**的两层皮：web routes 调用模块 Store/Service，agent tools 也是。
 `services/` 目录目前只有 `ThemeService` 一个统一服务，其余能力由模块级 Store/Service 直接提供。
@@ -58,7 +58,7 @@ API 与服务层是**同一批能力**的两层皮：web routes 调用模块 Sto
 
 ### 2.6 安全边界（远程访问时）
 
-- 默认只监听 `127.0.0.1`；非本机监听必须配置 `MOMMY_API_TOKEN`（否则拒绝启动）。
+- 默认只监听 `127.0.0.1`；非本机监听必须配置 `MOJIANG_API_TOKEN`（否则拒绝启动）。
 - 所有 `/api/*` 受 Bearer 保护（唯一公开：`GET /api/health`）。token 未配置 = 全部放行（本机模式）。
 - WebSocket 用短期 ticket：`POST /api/auth/ws-ticket`（本身需 Bearer）→ `{ticket, expires_at}`，TTL 默认 60s；WS URL 带 `?ticket=`；**ticket 一次性握手用，重连需重新取**。
 - Agent 并发槽位默认 2，占满返回 429——前端要排队或提示"助手忙"。
@@ -163,7 +163,7 @@ CLI 对照见 §7；完整 REST 契约见 §4；Python 签名见 §6。
 **能力**：对话历史、情景事件、预测跟踪（含验证状态机）、语义知识、向量检索。
 
 - REST：仅 `GET /api/agent/history`（对话）和 `GET /api/agent/predictions`（⚠️ 恒空 bug，见 §9）；其余走 CLI/Python
-- Python/CLI（`mommy memory` 背后）：`ConversationMemory.recent()` / `EpisodicMemory.recent(days, scope, limit)` / `PredictionTracker.all(status)` / `SemanticMemory.get_active()`
+- Python/CLI（`mojiang memory` 背后）：`ConversationMemory.recent()` / `EpisodicMemory.recent(days, scope, limit)` / `PredictionTracker.all(status)` / `SemanticMemory.get_active()`
 - 预测状态枚举：`pending / hit / missed / expired / unverifiable`；timeframe ∈ `1d/3d/5d/10d/20d/60d`
 - predictions 关键字段：`prediction, direction, rationale, target_price, entry_price, stop_loss, timeframe, verify_after, status, actual_price, actual_change_pct, accuracy_score`
 - **设计建议**：预测卡片的重点视觉是 direction（看多/看空）+ status 徽章 + 到期日 verify_after；hit/missed 用红/绿以外的颜色（避免与涨跌混淆，如蓝/橙）。
@@ -172,15 +172,15 @@ CLI 对照见 §7；完整 REST 契约见 §4；Python 签名见 §6。
 
 **能力**：规则/LLM 回测、统一评分、成本模型、组合回测、walk-forward、regime 分析。
 
-- 无 REST API；入口是 CLI/脚本（`scripts/backtest_*.py`、`uv run mommy ...` 相关工作流）
+- 无 REST API；入口是 CLI/脚本（`scripts/backtest_*.py`、`uv run mojiang ...` 相关工作流）
 - 前端若要做回测页：目前只能展示**已生成的报告产物**（`reports/` 下的 html/md），不适合做交互式回测。
 
 ---
 
 ## 4. HTTP API 速查表
 
-服务：`uv run mommy-web`（默认 `127.0.0.1:8000`；`$PORT` 可覆盖）。基路径 `/api`。
-除 `GET /api/health` 外全部需要 `Authorization: Bearer <MOMMY_API_TOKEN>`。
+服务：`uv run mojiang-web`（默认 `127.0.0.1:8000`；`$PORT` 可覆盖）。基路径 `/api`。
+除 `GET /api/health` 外全部需要 `Authorization: Bearer <MOJIANG_API_TOKEN>`。
 
 | 方法 路径 | 用途 | 注意 |
 |---|---|---|
@@ -251,7 +251,7 @@ CLI 对照见 §7；完整 REST 契约见 §4；Python 签名见 §6。
 
 ### 6.1 装配（照抄 TUI 的 bootstrap）
 
-`src/mommy_chaogu/tui/services/bootstrap.py:Services.bootstrap()`：
+`src/mojiang_chaogu/tui/services/bootstrap.py:Services.bootstrap()`：
 
 ```python
 base = FallbackAdapter([EfinanceAdapter(), TencentAdapter()])
@@ -263,7 +263,7 @@ portfolio_store = PortfolioStore(PORTFOLIO_DB)
 # router: NLRouter(get_default_registry(), WorkflowExecutor(ToolRegistry(ctx), llm_summarizer))
 ```
 
-数据库路径统一从 `mommy_chaogu.db_paths` 取（`MARKET_DB / PORTFOLIO_DB / AGENT_DB / REFERENCE_DB`，可用环境变量覆盖），**不要硬编码**。
+数据库路径统一从 `mojiang_chaogu.db_paths` 取（`MARKET_DB / PORTFOLIO_DB / AGENT_DB / REFERENCE_DB`，可用环境变量覆盖），**不要硬编码**。
 
 ### 6.2 各 Store/Service 方法
 
@@ -338,11 +338,11 @@ def on_tool_result(fn_name: str, ok: bool, elapsed_ms: int, result: str) -> None
 
 | 入口 | 用途 |
 |---|---|
-| `mommy` | 自然语言主入口（REPL/单发/--setup/--verbose） |
-| `mommy-tui` / `mommy-web` | 两个前端 |
-| `mommy watchlist/monitor/cache/semicon/flows/report/agent/memory/earnings/...` | 透传子命令 |
-| `mommy connect claude/kimi/cline/codex/dsh` | 注册本地 MCP、安装投研 Skill、测试与断开 |
-| `mommy-mcp` | MCP server（25 个底层工具 + 6 个研究工作流，按 privacy profile 发布） |
+| `mojiang` | 自然语言主入口（REPL/单发/--setup/--verbose） |
+| `mojiang-tui` / `mojiang-web` | 两个前端 |
+| `mojiang watchlist/monitor/cache/semicon/flows/report/agent/memory/earnings/...` | 透传子命令 |
+| `mojiang connect claude/kimi/cline/codex/dsh` | 注册本地 MCP、安装投研 Skill、测试与断开 |
+| `mojiang-mcp` | MCP server（25 个底层工具 + 6 个研究工作流，按 privacy profile 发布） |
 
 `--verbose` 输出路由决策 + 工具调用过程，是调试前端路由展示的参考输出。
 
@@ -353,7 +353,7 @@ def on_tool_result(fn_name: str, ok: bool, elapsed_ms: int, result: str) -> None
 | 场景 | 后端表现 | 前端应该 |
 |---|---|---|
 | 未配置 LLM key | `/chat` 返回降级文案；TUI 提示"未配置 AI agent" | 引导配 key；行情/工作流仍可用 |
-| 自选股为空 | `quotes` 快照空 / watchlist `[]` | 空态 + `mommy watchlist add` 引导 |
+| 自选股为空 | `quotes` 快照空 / watchlist `[]` | 空态 + `mojiang watchlist add` 引导 |
 | 持仓为空 | positions `[]`，汇总字段为 0/null | 空态 + 添加持仓引导 |
 | 行情接口全崩 | fallback 失败 → stale_cache / `data_age_seconds` 增大 | 展示来源标签"本地缓存" + 数据年龄 |
 | 快照未生成 | `/api/quotes` 503 | 启动加载态，自动重试 |
@@ -385,7 +385,7 @@ def on_tool_result(fn_name: str, ok: bool, elapsed_ms: int, result: str) -> None
 ## 10. 现有两个前端
 
 - **Web**（`web/src`，Vue 3 + shadcn/vue + Tailwind v4，hash 路由）：4 个主入口——对话/行情/持仓/我的；个股、预测、信号、主题保留深链。对话页聚合自选、预测与信号上下文，消费 REST + `/ws/agent`；token 存浏览器会话（「我的」页输入）。
-- **TUI**（`src/mommy_chaogu/tui`，Textual）：单屏对话流，工作流路由、工具事件、slash 命令、`@` 股票联想与数据富卡片全部内联显示。全部走 Python in-proc 服务层（§6）。
+- **TUI**（`src/mojiang_chaogu/tui`，Textual）：单屏对话流，工作流路由、工具事件、slash 命令、`@` 股票联想与数据富卡片全部内联显示。全部走 Python in-proc 服务层（§6）。
 
 **新前端最小功能集建议**：① 自选股快照 + 来源标签 ② AI 对话（route → chat，展示 `[匹配: X]` 与工具调用）③ 持仓盈亏 ④ 空态/降级处理（§8）。其余能力按 §3 目录逐步叠加。
 

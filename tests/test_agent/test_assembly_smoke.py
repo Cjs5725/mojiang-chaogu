@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent import llm as llm_provider
+from mojiang_chaogu.agent import llm as llm_provider
 
 _ALL_PROVIDER_ENVS = [cfg["env_key"] for cfg in llm_provider.SUPPORTED_PROVIDERS.values()]
 
@@ -36,9 +36,9 @@ def isolated_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch 对"原本不存在"的 delenv 不记录 undo，teardown 无法还原
     load_dotenv 注入的值，会污染后续测试）。
     """
-    monkeypatch.setattr("mommy_chaogu.db_paths.AGENT_DB", tmp_path / "agent.db")
-    monkeypatch.setattr("mommy_chaogu.db_paths.MARKET_DB", tmp_path / "market.db")
-    monkeypatch.setattr("mommy_chaogu.db_paths.PORTFOLIO_DB", tmp_path / "portfolio.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.AGENT_DB", tmp_path / "agent.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.MARKET_DB", tmp_path / "market.db")
+    monkeypatch.setattr("mojiang_chaogu.db_paths.PORTFOLIO_DB", tmp_path / "portfolio.db")
     monkeypatch.setenv("AGENT_PROVIDER", "")
     monkeypatch.setenv("AGENT_MODEL", "")
     for env in _ALL_PROVIDER_ENVS:
@@ -63,7 +63,7 @@ class TestTuiBootstrapSmoke:
         （AGENT_PROVIDER 默认 deepseek）不一致——探测通过、初始化读
         DEEPSEEK_API_KEY 失败、agent 静默不可用。
         """
-        from mommy_chaogu.tui.services.bootstrap import Services
+        from mojiang_chaogu.tui.services.bootstrap import Services
 
         _set_only_key(monkeypatch, "OPENAI_API_KEY")
         with patch("openai.OpenAI"):
@@ -88,7 +88,7 @@ class TestTuiBootstrapSmoke:
 
         P4 回归：不能把聊天模型名当 embedding 模型传（必然失败且静默）。
         """
-        from mommy_chaogu.tui.services.bootstrap import Services
+        from mojiang_chaogu.tui.services.bootstrap import Services
 
         _set_only_key(monkeypatch, "DEEPSEEK_API_KEY")
         with patch("openai.OpenAI"):
@@ -104,7 +104,7 @@ class TestTuiBootstrapSmoke:
         self, isolated_env: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """无任何 key → agent 不可用（显式降级），bootstrap 本身不崩。"""
-        from mommy_chaogu.tui.services.bootstrap import Services
+        from mojiang_chaogu.tui.services.bootstrap import Services
 
         with patch("openai.OpenAI"):
             services = Services.bootstrap()
@@ -116,12 +116,12 @@ class TestTuiBootstrapSmoke:
     ) -> None:
         """TUI bootstrap 后 router 能路由 AGENT_DB 里的自定义工作流（F4）。
 
-        修复前 TUI 只挂 ``get_default_registry()``，``mommy workflow add``
+        修复前 TUI 只挂 ``get_default_registry()``，``mojiang workflow add``
         保存的自定义工作流在 TUI 不可见——与 CLI 行为不一致。
         """
-        from mommy_chaogu.tui.services.bootstrap import Services
-        from mommy_chaogu.workflow.spec import StepSpec, WorkflowSpec
-        from mommy_chaogu.workflow.store import WorkflowStore
+        from mojiang_chaogu.tui.services.bootstrap import Services
+        from mojiang_chaogu.workflow.spec import StepSpec, WorkflowSpec
+        from mojiang_chaogu.workflow.store import WorkflowStore
 
         spec = WorkflowSpec(
             id="user_tui_visible",
@@ -153,7 +153,7 @@ class TestMcpServerSmoke:
         self, isolated_env: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """有 key 时 _build_context 接 client/model/embedding_model（T4）。"""
-        from mommy_chaogu.agent.mcp_server import _build_context
+        from mojiang_chaogu.agent.mcp_server import _build_context
 
         _set_only_key(monkeypatch, "OPENAI_API_KEY")
         with patch("openai.OpenAI"):
@@ -170,7 +170,7 @@ class TestMcpServerSmoke:
         self, isolated_env: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """无 key → client None，但 context 仍完整可用（降级模式）。"""
-        from mommy_chaogu.agent.mcp_server import _build_context
+        from mojiang_chaogu.agent.mcp_server import _build_context
 
         with patch("openai.OpenAI"):
             ctx = _build_context()
@@ -185,8 +185,8 @@ class TestMcpServerSmoke:
         """list_tools 与注册表一致；call_tool 经 to_thread 执行（T5）。"""
         from mcp.types import CallToolRequest, CallToolRequestParams, ListToolsRequest
 
-        from mommy_chaogu.agent.mcp_server import create_mcp_server
-        from mommy_chaogu.agent.tools.base import ToolContext
+        from mojiang_chaogu.agent.mcp_server import create_mcp_server
+        from mojiang_chaogu.agent.tools.base import ToolContext
 
         ctx = ToolContext(adapter=None, agent_db=isolated_env / "agent.db")  # type: ignore[arg-type]
         server = create_mcp_server(ctx)
@@ -224,8 +224,8 @@ class TestMcpServerSmoke:
     def test_personal_profile_lists_private_and_write_tools(self, isolated_env: Path) -> None:
         from mcp.types import ListToolsRequest
 
-        from mommy_chaogu.agent.mcp_server import create_mcp_server
-        from mommy_chaogu.agent.tools.base import ToolContext
+        from mojiang_chaogu.agent.mcp_server import create_mcp_server
+        from mojiang_chaogu.agent.tools.base import ToolContext
 
         ctx = ToolContext(adapter=None, agent_db=isolated_env / "agent.db")  # type: ignore[arg-type]
         server = create_mcp_server(ctx, profile="personal")
@@ -265,11 +265,11 @@ class TestMcpServerSmoke:
     def test_discovery_is_read_only_and_context_build_is_lazy(self, isolated_env: Path) -> None:
         from mcp.types import CallToolRequest, CallToolRequestParams, ListToolsRequest
 
-        from mommy_chaogu.agent.mcp_server import create_mcp_server
-        from mommy_chaogu.agent.tools.base import ToolContext
+        from mojiang_chaogu.agent.mcp_server import create_mcp_server
+        from mojiang_chaogu.agent.tools.base import ToolContext
 
         lazy_ctx = ToolContext(adapter=MagicMock(), agent_db=isolated_env / "agent.db")
-        with patch("mommy_chaogu.agent.mcp_server._build_context", return_value=lazy_ctx) as build:
+        with patch("mojiang_chaogu.agent.mcp_server._build_context", return_value=lazy_ctx) as build:
             server = create_mcp_server(profile="market-only")
 
             async def _list() -> Any:
@@ -291,8 +291,8 @@ class TestMcpServerSmoke:
 
     def test_mcp_v2_registers_constructor_callbacks(self, isolated_env: Path) -> None:
         """MCP 2.x 删除装饰器后，工具仍通过构造函数 callback 注册。"""
-        from mommy_chaogu.agent.mcp_server import create_mcp_server
-        from mommy_chaogu.agent.tools.base import ToolContext
+        from mojiang_chaogu.agent.mcp_server import create_mcp_server
+        from mojiang_chaogu.agent.tools.base import ToolContext
 
         class FakeMcp2Server:
             def __init__(self, name: str, **handlers: Any) -> None:
@@ -300,7 +300,7 @@ class TestMcpServerSmoke:
                 self.handlers = handlers
 
         ctx = ToolContext(adapter=None, agent_db=isolated_env / "agent.db")  # type: ignore[arg-type]
-        with patch("mommy_chaogu.agent.mcp_server.Server", FakeMcp2Server):
+        with patch("mojiang_chaogu.agent.mcp_server.Server", FakeMcp2Server):
             server = create_mcp_server(ctx)
 
         assert "instructions" in server.handlers  # type: ignore[attr-defined]

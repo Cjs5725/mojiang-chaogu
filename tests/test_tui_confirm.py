@@ -16,9 +16,9 @@ from collections.abc import Coroutine
 from types import SimpleNamespace
 from typing import Any
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.services.bootstrap import FakeServices
-from mommy_chaogu.tui.views.chat import ChatView
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.services.bootstrap import FakeServices
+from mojiang_chaogu.tui.views.chat import ChatView
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -68,13 +68,13 @@ class _ReplayAgent:
         )
 
 
-def _make_app(agent: _ReplayAgent) -> MommyTuiApp:
+def _make_app(agent: _ReplayAgent) -> MojiangTuiApp:
     services = FakeServices.create()
     services.agent = agent  # type: ignore[assignment]
-    return MommyTuiApp(services=services)  # type: ignore[arg-type]
+    return MojiangTuiApp(services=services)  # type: ignore[arg-type]
 
 
-async def _submit(pilot: Any, app: MommyTuiApp, text: str) -> None:
+async def _submit(pilot: Any, app: MojiangTuiApp, text: str) -> None:
     prompt = app.query_one("ChatInput")
     prompt.value = text
     await pilot.press("enter")
@@ -90,7 +90,7 @@ async def _wait_until(pilot: Any, predicate: Any, timeout_s: float = 4.0) -> boo
 
 
 class TestInlineConfirm:
-    def _chat_view(self, app: MommyTuiApp) -> ChatView:
+    def _chat_view(self, app: MojiangTuiApp) -> ChatView:
         return app.query_one(ChatView)
 
     def test_deny(self) -> None:
@@ -181,7 +181,7 @@ class TestInlineConfirm:
         app = _make_app(agent)
 
         async def scenario() -> None:
-            from mommy_chaogu.tui.widgets.hint_bar import HintBar
+            from mojiang_chaogu.tui.widgets.hint_bar import HintBar
 
             async with app.run_test(size=(100, 30)) as pilot:
                 await _submit(pilot, app, "存策略卡")

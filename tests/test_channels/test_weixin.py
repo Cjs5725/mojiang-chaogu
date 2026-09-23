@@ -4,9 +4,9 @@ import json
 import stat
 from pathlib import Path
 
-from mommy_chaogu.channels.gateway import WeixinGateway
-from mommy_chaogu.channels.store import WeixinCredentials, WeixinStore
-from mommy_chaogu.channels.weixin import WeixinClient
+from mojiang_chaogu.channels.gateway import WeixinGateway
+from mojiang_chaogu.channels.store import WeixinCredentials, WeixinStore
+from mojiang_chaogu.channels.weixin import WeixinClient
 
 
 class FakeResponse:

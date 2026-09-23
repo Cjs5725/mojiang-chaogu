@@ -6,7 +6,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any
 
-from mommy_chaogu.services.watchlist_quote_service import WatchlistQuoteService
+from mojiang_chaogu.services.watchlist_quote_service import WatchlistQuoteService
 
 
 def _flow(main_net_yuan: str) -> Any:
@@ -113,6 +113,6 @@ def test_none_adapter_or_empty_codes_returns_empty() -> None:
 
 def test_flow_worker_cap_is_four() -> None:
     """并发上限常量与设计一致（防打爆上游）。"""
-    from mommy_chaogu.services.watchlist_quote_service import FLOW_MAX_WORKERS
+    from mojiang_chaogu.services.watchlist_quote_service import FLOW_MAX_WORKERS
 
     assert FLOW_MAX_WORKERS == 4

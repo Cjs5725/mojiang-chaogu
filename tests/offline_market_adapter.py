@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     Bar,
     BarInterval,

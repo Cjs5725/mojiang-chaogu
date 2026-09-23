@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mojiang Strategy"
+  short_description: "Distill, save, and reuse investment methods"
+  default_prompt: "Use $mojiang-strategy to turn this investment method into a clear strategy card I can review and reuse."

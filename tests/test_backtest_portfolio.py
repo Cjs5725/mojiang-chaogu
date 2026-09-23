@@ -1,9 +1,9 @@
-"""组合回测 ``mommy_chaogu.backtest.portfolio`` 的端到端测试。"""
+"""组合回测 ``mojiang_chaogu.backtest.portfolio`` 的端到端测试。"""
 
 from __future__ import annotations
 
-from mommy_chaogu.backtest.costs import DEFAULT_COSTS, apply_costs
-from mommy_chaogu.backtest.portfolio import PortfolioBacktester, PortfolioResult
+from mojiang_chaogu.backtest.costs import DEFAULT_COSTS, apply_costs
+from mojiang_chaogu.backtest.portfolio import PortfolioBacktester, PortfolioResult
 
 # ---------- 工具 ----------
 

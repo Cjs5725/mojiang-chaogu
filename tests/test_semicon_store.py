@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.semicon.models import SemiconStock
-from mommy_chaogu.semicon.store import (
+from mojiang_chaogu.semicon.models import SemiconStock
+from mojiang_chaogu.semicon.store import (
     Board,
     ChainPosition,
     SemiconError,

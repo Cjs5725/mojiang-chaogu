@@ -13,11 +13,11 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.cache import CacheStore
-from mommy_chaogu.flows.pool import CustomPool, PoolSource
-from mommy_chaogu.flows.report import FlowReport, _fmt_bp, _fmt_pct, _fmt_yi
-from mommy_chaogu.flows.service import FlowService
-from mommy_chaogu.market_data.types import Quote
+from mojiang_chaogu.cache import CacheStore
+from mojiang_chaogu.flows.pool import CustomPool, PoolSource
+from mojiang_chaogu.flows.report import FlowReport, _fmt_bp, _fmt_pct, _fmt_yi
+from mojiang_chaogu.flows.service import FlowService
+from mojiang_chaogu.market_data.types import Quote
 
 # ---------- Helpers（与 test_service 共享风格） ----------
 

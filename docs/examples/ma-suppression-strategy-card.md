@@ -16,7 +16,7 @@
 - 用 `IDLE → ARMED → ENGAGED → CONFIRMED` 表达一次反弹被压制的过程；
 - 结合枢轴/回归通道和 0–100 的底部形态评分；
 - 以 `CROSS > RALLY_FADE > BOTTOM_WATCH > TREND_LONG / FREE_FALL` 作为单一警报优先级；
-- 方法作者声称全链路无未来函数；这张卡只记录该声明，不代表 mommy-chaogu 主程序已独立验证。
+- 方法作者声称全链路无未来函数；这张卡只记录该声明，不代表 mojiang-chaogu 主程序已独立验证。
 
 ## 原始目标
 

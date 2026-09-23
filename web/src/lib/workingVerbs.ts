@@ -1,5 +1,5 @@
 // A 股语境的"工作中"动词表 + braille spinner
-// 移植自 src/mommy_chaogu/tui/widgets/working_indicator.py
+// 移植自 src/mojiang_chaogu/tui/widgets/working_indicator.py
 
 export const THINKING_VERBS: readonly string[] = [
   '盯盘中',

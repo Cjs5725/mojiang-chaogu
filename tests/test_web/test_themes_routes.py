@@ -49,7 +49,7 @@ class _FakeThemeService:
 def patch_theme_service(monkeypatch: pytest.MonkeyPatch) -> _FakeThemeService:
     """注入 _FakeThemeService，拦截 ThemeService 构造。"""
     fake = _FakeThemeService()
-    monkeypatch.setattr("mommy_chaogu.web.routes.themes.ThemeService", fake)
+    monkeypatch.setattr("mojiang_chaogu.web.routes.themes.ThemeService", fake)
     return fake
 
 
@@ -341,7 +341,7 @@ class TestGetThemeQuotes:
             theme_detail={"id": "test", "name": "测试"},
             quotes=[],
         )
-        monkeypatch.setattr("mommy_chaogu.web.routes.themes.ThemeService", fake)
-        monkeypatch.setattr("mommy_chaogu.web.deps.get_adapter", lambda: mock_adapter)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.themes.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.web.deps.get_adapter", lambda: mock_adapter)
         client.get("/api/themes/test/quotes")
         assert fake.last_adapter is mock_adapter

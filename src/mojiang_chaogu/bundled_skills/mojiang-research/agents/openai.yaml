@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mojiang Research"
+  short_description: "Use local A-share research tools and workflows"
+  default_prompt: "Use $mojiang-research to analyze today’s A-share market with evidence and risks."

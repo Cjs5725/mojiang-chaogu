@@ -8,16 +8,16 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.cli import (
+from mojiang_chaogu.cli import (
     _REPL_SPARKLINE,
     _build_dispatch,
     _dispatch_passthrough_subcommand,
     _render_logo,
-    _run_mommy_repl,
+    _run_mojiang_repl,
     _run_single_query,
 )
-from mommy_chaogu.cli_prompt import ReplPrompt
-from mommy_chaogu.errors import friendly_error
+from mojiang_chaogu.cli_prompt import ReplPrompt
+from mojiang_chaogu.errors import friendly_error
 
 
 class _FallbackRouter:
@@ -54,11 +54,11 @@ def test_repl_renders_rich_answer_and_quits(
     monkeypatch.setattr(ReplPrompt, "read", lambda _self: next(answers))
 
     with pytest.raises(SystemExit) as exc:
-        _run_mommy_repl(_FallbackRouter(), object(), _FakeAgent())
+        _run_mojiang_repl(_FallbackRouter(), object(), _FakeAgent())
 
     assert exc.value.code == 0
     output = capsys.readouterr().out
-    assert "mommy-chaogu" in output
+    assert "mojiang-chaogu" in output
     assert "███" in output
     assert "▂" in output
     assert "结论" in output
@@ -102,7 +102,7 @@ def test_dispatch_table_covers_documented_subcommands() -> None:
     ):
         assert name in dispatch
         prog_name, func = dispatch[name]
-        assert prog_name == f"mommy-{name}"
+        assert prog_name == f"mojiang-{name}"
         # tui 延迟导入（None），其余都必须有可调 main
         if name != "tui":
             assert callable(func)
@@ -116,11 +116,11 @@ def test_dispatch_direct_subcommand_rewrites_argv(
     def fake_main() -> None:
         calls.append(list(sys.argv))
 
-    dispatch = {"fake": ("mommy-fake", fake_main)}
-    monkeypatch.setattr(sys, "argv", ["mommy", "fake", "list", "--all"])
+    dispatch = {"fake": ("mojiang-fake", fake_main)}
+    monkeypatch.setattr(sys, "argv", ["mojiang", "fake", "list", "--all"])
 
     assert _dispatch_passthrough_subcommand(dispatch) is True
-    assert calls == [["mommy-fake", "list", "--all"]]
+    assert calls == [["mojiang-fake", "list", "--all"]]
 
 
 def test_dispatch_raw_subcommand_passes_through(
@@ -131,23 +131,23 @@ def test_dispatch_raw_subcommand_passes_through(
     def fake_main() -> None:
         calls.append(list(sys.argv))
 
-    dispatch = {"fake": ("mommy-fake", fake_main)}
-    monkeypatch.setattr(sys, "argv", ["mommy", "--raw", "fake", "add"])
+    dispatch = {"fake": ("mojiang-fake", fake_main)}
+    monkeypatch.setattr(sys, "argv", ["mojiang", "--raw", "fake", "add"])
 
     assert _dispatch_passthrough_subcommand(dispatch) is True
-    assert calls == [["mommy-fake", "add"]]
+    assert calls == [["mojiang-fake", "add"]]
 
 
 def test_dispatch_raw_unknown_subcommand_exits(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(sys, "argv", ["mommy", "--raw", "nope"])
+    monkeypatch.setattr(sys, "argv", ["mojiang", "--raw", "nope"])
     with pytest.raises(SystemExit) as exc:
-        _dispatch_passthrough_subcommand({"fake": ("mommy-fake", lambda: None)})
+        _dispatch_passthrough_subcommand({"fake": ("mojiang-fake", lambda: None)})
     assert exc.value.code == 1
 
 
 def test_dispatch_no_match_returns_false(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(sys, "argv", ["mommy", "今天怎么样"])
-    assert _dispatch_passthrough_subcommand({"fake": ("mommy-fake", lambda: None)}) is False
+    monkeypatch.setattr(sys, "argv", ["mojiang", "今天怎么样"])
+    assert _dispatch_passthrough_subcommand({"fake": ("mojiang-fake", lambda: None)}) is False
 
 
 # ---------- 单次查询模式 ----------
@@ -225,7 +225,7 @@ def test_single_query_without_agent_prints_setup_hint(
         _run_single_query("随便聊聊", runtime=runtime, workflow_store=store, verbose=False)
 
     assert exc.value.code == 0
-    assert "mommy setup" in capsys.readouterr().out
+    assert "mojiang setup" in capsys.readouterr().out
 
 
 # ---------- 错误文案映射（CLI/TUI 共享） ----------

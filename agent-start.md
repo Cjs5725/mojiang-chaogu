@@ -1,10 +1,10 @@
-# Give your Agent mommy-chaogu
+# Give your Agent mojiang-chaogu
 
 ## Explain the product before the installation
 
-mommy-chaogu is a **bounded, Agent-first local investing toolbox**. It is not another chat model and
+mojiang-chaogu is a **bounded, Agent-first local investing toolbox**. It is not another chat model and
 it is not primarily a dashboard the user must learn. The current host Agent understands the user's
-goal and composes the toolbox; mommy-chaogu supplies market data, deterministic calculations, local
+goal and composes the toolbox; mojiang-chaogu supplies market data, deterministic calculations, local
 records, and supported monitoring. Its value comes from composing reliable building blocks, not
 from pretending every possible trading idea is already implemented.
 
@@ -30,8 +30,8 @@ what to ask for at any time, change direction, or just look around.
 
 Keep two senses of "complete" separate:
 
-- **Integration is available** once configuration, all six bundled Skills (`mommy-onboard`, `mommy-research`,
-  `mommy-strategy`, `market-watch-loop`, `basket-analysis`, and `food-security-analysis`), a real MCP initialize/tools-list,
+- **Integration is available** once configuration, all six bundled Skills (`mojiang-onboard`, `mojiang-research`,
+  `mojiang-strategy`, `market-watch-loop`, `basket-analysis`, and `food-security-analysis`), a real MCP initialize/tools-list,
   and the privacy boundary check all pass. At that point the toolbox is reachable and the user can
   explore freely; you should not force a workflow to run.
 - **An investing or research goal is complete** only when the user sees and understands a useful
@@ -42,7 +42,7 @@ Keep two senses of "complete" separate:
 ## Confirm that this host has a real connection path
 
 The managed lifecycle currently knows how to modify **Claude Code, Kimi Code, Cline, and Codex**.
-`mommy agent detect --json` only detects those hosts. OpenClaw, Hermes, and other MCP hosts are not
+`mojiang agent detect --json` only detects those hosts. OpenClaw, Hermes, and other MCP hosts are not
 valid values for `--host` today.
 
 If the current host is not one of the four managed hosts, do not invent a host value, configuration
@@ -72,13 +72,13 @@ corresponding user approval.
 Try this first:
 
 ```text
-mommy agent detect --json
+mojiang agent detect --json
 ```
 
-Inside a source checkout, use `uv run mommy agent detect --json` instead. If the command works,
+Inside a source checkout, use `uv run mojiang agent detect --json` instead. If the command works,
 continue to step 2.
 
-If `mommy` is missing, prefer the newest stable release that documents `mommy agent detect`. When
+If `mojiang` is missing, prefer the newest stable release that documents `mojiang agent detect`. When
 using the Git repository before that release exists, resolve `refs/heads/main` to a commit SHA and
 pin the package archive to that SHA. Never silently install a floating branch. If `uv` itself is
 missing, download its official installer to a temporary file and inspect it before running; do not
@@ -87,25 +87,25 @@ pipe remote code straight into a shell.
 For a stable release containing the Agent-managed commands, the command is:
 
 ```text
-uv tool install --upgrade mommy-chaogu
+uv tool install --upgrade mojiang-chaogu
 ```
 
 The pinned package requirement has this shape:
 
 ```text
-mommy-chaogu @ https://github.com/coffee-man666/mommy-chaogu/archive/<COMMIT_SHA>.tar.gz
+mojiang-chaogu @ https://github.com/Cjs5725/mojiang-chaogu/archive/<COMMIT_SHA>.tar.gz
 ```
 
 Install that unreleased, immutable source with:
 
 ```text
-uv tool install --force "mommy-chaogu @ https://github.com/coffee-man666/mommy-chaogu/archive/<COMMIT_SHA>.tar.gz"
+uv tool install --force "mojiang-chaogu @ https://github.com/Cjs5725/mojiang-chaogu/archive/<COMMIT_SHA>.tar.gz"
 ```
 
 `--force` matters while the Git build still shares a package version with an older release. Show
 this exact command and resolved SHA to the user before running it.
 
-After installation, rerun `mommy agent detect --json`. If that command is unavailable, stop and say
+After installation, rerun `mojiang agent detect --json`. If that command is unavailable, stop and say
 the installed build predates this Agent-managed contract.
 
 ## 2. Detect and show the plan
@@ -113,7 +113,7 @@ the installed build predates this Agent-managed contract.
 Run:
 
 ```text
-mommy agent detect --json
+mojiang agent detect --json
 ```
 
 If no managed host is detected, follow the compatibility rule above. If the user is clearly running
@@ -130,7 +130,7 @@ task-relevant local holdings, memory, and Strategy Cards. Default to public mark
 Create a read-only plan:
 
 ```text
-mommy agent plan --host <HOST> --profile <market-only|personal> --json
+mojiang agent plan --host <HOST> --profile <market-only|personal> --json
 ```
 
 Translate its `changes` and `privacy` fields for the user. Wait for approval. Avoid re-confirming
@@ -142,7 +142,7 @@ paths, host, or privacy materially change.
 After approval:
 
 ```text
-mommy agent connect --host <HOST> --profile <PROFILE> --timeout 20 --json
+mojiang agent connect --host <HOST> --profile <PROFILE> --timeout 20 --json
 ```
 
 Success requires the embedded doctor checks for configuration, all six bundled Skills, real MCP
@@ -150,7 +150,7 @@ initialize/tools-list, and privacy boundary to pass. `live_market_data=not_check
 this stage. If a blocking check fails, show the failure and inspect a safe repair proposal:
 
 ```text
-mommy agent repair --host <HOST> --json
+mojiang agent repair --host <HOST> --json
 ```
 
 Do not force-overwrite user-modified configuration or Skills. Restart the host Agent when requested.
@@ -165,10 +165,10 @@ done, and do not push the user to run a workflow before they have asked for one.
 The toolbox is now reachable. Offer optional directions the user can take whenever they like — these
 are examples, not a mandatory menu, and the user may ask for something else entirely:
 
-- **行情或研究**: use `mommy-research` and the matching high-level `research_*` tool. Give a direct
+- **行情或研究**: use `mojiang-research` and the matching high-level `research_*` tool. Give a direct
   answer, successful evidence with timestamps, missing/stale data, fact-versus-inference boundaries,
   and one useful next step.
-- **投资方法或策略蒸馏**: use `mommy-strategy` to show a faithful, readable Strategy Card the user
+- **投资方法或策略蒸馏**: use `mojiang-strategy` to show a faithful, readable Strategy Card the user
   can correct. Confirmation of meaning and permission to save are separate questions.
 - **自定义指标或流程**: restate the exact formula, inputs, schedule, universe, and desired output;
   map each part to current tools; run one supported pass. Clearly mark anything manual or

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
 
 @pytest.fixture

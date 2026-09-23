@@ -11,7 +11,7 @@
 
 如果你发现安全问题，请**不要**在公开 Issue 中报告。
 
-请通过 GitHub 的 [私有漏洞报告](https://github.com/coffee-man666/mommy-chaogu/security/advisories/new) 提交。
+请通过 GitHub 的 [私有漏洞报告](https://github.com/Cjs5725/mojiang-chaogu/security/advisories/new) 提交。
 
 **响应时间**：7 天内回复确认，30 天内修复或给出时间表。
 
@@ -24,7 +24,7 @@
    - 数据库连接字符串用 env var
 
 2. **限制网络暴露**
-   - 默认 `mommy-web --host 127.0.0.1`（仅本机）
+   - 默认 `mojiang-web --host 127.0.0.1`（仅本机）
    - 如需远程访问，用反向代理 + HTTPS（nginx / caddy）
 
 3. **数据备份**

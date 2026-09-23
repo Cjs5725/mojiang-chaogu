@@ -2,7 +2,7 @@
 
 回归背景：market-watch-loop 曾被误加入 ``[tool.hatch.build] exclude``，导致
 安装版（wheel）里 ``bundled_skills/`` 缺目录，而 ``connect.py`` 的
-``_bundled_skill_dirs()`` 仍然硬编码引用它 —— ``mommy agent connect`` 在
+``_bundled_skill_dirs()`` 仍然硬编码引用它 —— ``mojiang agent connect`` 在
 安装环境下对不存在的路径算 hash / 复制，集成在任何真实探针之前就断了。
 这里同时锁定两个方向：
 
@@ -18,12 +18,12 @@ import re
 import tomllib
 from pathlib import Path
 
-from mommy_chaogu.cli_commands.connect import _bundled_skill_dirs
-from mommy_chaogu.plugins import BUNDLED_PLUGINS
+from mojiang_chaogu.cli_commands.connect import _bundled_skill_dirs
+from mojiang_chaogu.plugins import BUNDLED_PLUGINS
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_BUNDLED_SKILLS_DIR = _REPO_ROOT / "src" / "mommy_chaogu" / "bundled_skills"
-_SKILL_EXCLUDE_RE = re.compile(r"^/src/mommy_chaogu/bundled_skills/(?P<name>[^/]+)/\*\*$")
+_BUNDLED_SKILLS_DIR = _REPO_ROOT / "src" / "mojiang_chaogu" / "bundled_skills"
+_SKILL_EXCLUDE_RE = re.compile(r"^/src/mojiang_chaogu/bundled_skills/(?P<name>[^/]+)/\*\*$")
 
 # 本地实验性 Skill 目录：确实不应进入发布产物（白名单）。
 _EXCLUDED_SKILL_WHITELIST = frozenset({"market-monitoring-test"})
@@ -61,7 +61,7 @@ def test_sdist_force_includes_all_shipping_plugins() -> None:
     force_include = config["tool"]["hatch"]["build"]["targets"]["sdist"]["force-include"]
 
     for plugin in BUNDLED_PLUGINS:
-        relative = f"src/mommy_chaogu/bundled_skills/{plugin.name}"
+        relative = f"src/mojiang_chaogu/bundled_skills/{plugin.name}"
         assert force_include[relative] == relative
 
 
@@ -79,7 +79,7 @@ def test_every_shipping_bundled_skill_is_not_excluded() -> None:
     missing = shipping & excluded
     assert not missing, (
         f"捆绑 Skill {sorted(missing)} 被打进了 exclude 列表：安装版 wheel 会缺这些目录，"
-        "mommy agent connect 将引用不存在的路径（2026-08-15 审计的 wheel 空指针问题）"
+        "mojiang agent connect 将引用不存在的路径（2026-08-15 审计的 wheel 空指针问题）"
     )
 
 

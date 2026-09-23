@@ -12,15 +12,15 @@ describe('BrandMark', () => {
     const host = document.createElement('div')
     document.body.append(host)
     const app = createApp(BrandMark, {
-      alt: '妈妈炒股老奶奶 Logo',
+      alt: '墨匠工坊老奶奶 Logo',
       size: 'sm',
     })
 
     app.mount(host)
 
     const image = host.querySelector('img')
-    expect(image?.getAttribute('src')).toBe('/mommy-chaogu-logo.jpg')
-    expect(image?.getAttribute('alt')).toBe('妈妈炒股老奶奶 Logo')
+    expect(image?.getAttribute('src')).toBe('/mojiang-chaogu-logo.jpg')
+    expect(image?.getAttribute('alt')).toBe('墨匠工坊老奶奶 Logo')
     expect(host.querySelector('span')?.className).toContain('size-9')
     app.unmount()
   })

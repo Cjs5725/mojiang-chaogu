@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from mommy_chaogu.workflow.spec import ArgSource, StepSpec, WorkflowSpec
-from mommy_chaogu.workflow.spec_runtime import spec_to_workflow
+from mojiang_chaogu.workflow.spec import ArgSource, StepSpec, WorkflowSpec
+from mojiang_chaogu.workflow.spec_runtime import spec_to_workflow
 
 
 def _spec() -> WorkflowSpec:

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from mommy_chaogu.setup import (
+from mojiang_chaogu.setup import (
     _PROVIDERS,
     _write_env_file,
     build_setup_parser,
@@ -30,9 +30,9 @@ def _isolate_setup_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         monkeypatch.setenv(info["env_key"], "")
     monkeypatch.setenv("AGENT_PROVIDER", "")
     monkeypatch.setenv("AGENT_MODEL", "")
-    monkeypatch.setenv("MOMMY_INTERFACE", "")
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(tmp_path / "user-config"))
-    monkeypatch.setenv("MOMMY_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
+    monkeypatch.setenv("MOJIANG_INTERFACE", "")
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(tmp_path / "user-config"))
+    monkeypatch.setenv("MOJIANG_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
 
 
 def make_input(answers: Sequence[str]):
@@ -157,7 +157,7 @@ def test_wizard_saves_selected_interface(tmp_path: Path):
         offer_interface=True,
     )
     assert result is True
-    assert "MOMMY_INTERFACE=web" in env.read_text(encoding="utf-8")
+    assert "MOJIANG_INTERFACE=web" in env.read_text(encoding="utf-8")
 
 
 def test_choose_interface_defaults_to_cli():
@@ -169,9 +169,9 @@ def test_choose_interface_retries_invalid_choice():
 
 
 def test_configured_interface_keeps_legacy_default(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("MOMMY_INTERFACE", "unknown")
+    monkeypatch.setenv("MOJIANG_INTERFACE", "unknown")
     assert configured_interface() == "cli"
-    monkeypatch.setenv("MOMMY_INTERFACE", "TUI")
+    monkeypatch.setenv("MOJIANG_INTERFACE", "TUI")
     assert configured_interface() == "tui"
 
 
@@ -265,8 +265,8 @@ def test_write_env_file_preserves_unmanaged_and_supported_provider_keys(
 
     _write_env_file(env, "zai", "newer-zai", model="glm-5")
     rewritten = env.read_text(encoding="utf-8")
-    assert rewritten.count("mommy-chaogu managed configuration") == 2
-    assert rewritten.count("# mommy-chaogu 密钥配置") == 1
+    assert rewritten.count("mojiang-chaogu managed configuration") == 2
+    assert rewritten.count("# mojiang-chaogu 密钥配置") == 1
     assert "ZAI_API_KEY=newer-zai" in rewritten
     assert "new-zai" not in rewritten
 
@@ -289,7 +289,7 @@ def test_reconfiguration_removes_deprecated_secrets_and_versions_profile(tmp_pat
     assert "DEEPSEEK_API_KEY=old-deepseek-secret" in content
     assert "obsolete-secret" not in content
     assert "NOVA_API_KEY" not in content
-    assert "MOMMY_CONFIG_VERSION=2" in content
+    assert "MOJIANG_CONFIG_VERSION=2" in content
     assert "AGENT_PROVIDER=zai" in content
     assert "AGENT_MODEL=glm-4.7" in content
 
@@ -329,10 +329,10 @@ def test_setup_check_reports_effective_sources_without_exposing_secret(
     )
     (user_config / ".env").chmod(0o600)
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(user_config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(user_config))
     for key in ("AGENT_PROVIDER", "AGENT_MODEL", "ZAI_API_KEY"):
         monkeypatch.delenv(key)
-    monkeypatch.setattr(sys, "argv", ["mommy-setup", "--check"])
+    monkeypatch.setattr(sys, "argv", ["mojiang-setup", "--check"])
 
     with pytest.raises(SystemExit) as exc_info:
         main_setup()
@@ -411,7 +411,7 @@ def test_check_and_run_setup_skips_when_env_exists(tmp_path: Path, monkeypatch: 
     for key in ("DEEPSEEK_API_KEY", "AGENT_PROVIDER", "AGENT_MODEL"):
         monkeypatch.delenv(key)
 
-    from mommy_chaogu import setup
+    from mojiang_chaogu import setup
 
     # 向导不应该被调用——用会失败的 mock 验证
     monkeypatch.setattr(
@@ -424,7 +424,7 @@ def test_check_and_run_setup_skips_when_env_exists(tmp_path: Path, monkeypatch: 
 def test_check_and_run_setup_runs_wizard(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.chdir(tmp_path)
 
-    from mommy_chaogu import setup
+    from mojiang_chaogu import setup
 
     monkeypatch.setattr(setup, "run_setup_wizard", lambda *a, **kw: True)
     assert setup.check_and_run_setup() is True
@@ -439,7 +439,7 @@ def test_check_and_run_setup_repairs_provider_key_mismatch(
     )
     monkeypatch.chdir(tmp_path)
 
-    from mommy_chaogu import setup
+    from mojiang_chaogu import setup
 
     calls: list[bool] = []
     monkeypatch.setattr(
@@ -459,7 +459,7 @@ def test_check_and_run_setup_accepts_shell_configuration(
     monkeypatch.setenv("AGENT_PROVIDER", "zai")
     monkeypatch.setenv("ZAI_API_KEY", "shell-key")
 
-    from mommy_chaogu import setup
+    from mojiang_chaogu import setup
 
     monkeypatch.setattr(
         setup, "run_setup_wizard", lambda *a, **kw: pytest.fail("wizard should not run")
@@ -470,7 +470,7 @@ def test_check_and_run_setup_accepts_shell_configuration(
 def test_check_and_run_setup_declined(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.chdir(tmp_path)
 
-    from mommy_chaogu import setup
+    from mojiang_chaogu import setup
 
     monkeypatch.setattr(setup, "run_setup_wizard", lambda *a, **kw: False)
     assert setup.check_and_run_setup() is False

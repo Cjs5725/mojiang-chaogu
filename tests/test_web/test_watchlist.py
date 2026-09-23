@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.watchlist.models import Group, StockEntry
-from mommy_chaogu.watchlist.store import (
+from mojiang_chaogu.watchlist.models import Group, StockEntry
+from mojiang_chaogu.watchlist.store import (
     GroupAlreadyExistsError,
     GroupNotFoundError,
     StockEntryNotFoundError,
@@ -38,7 +38,7 @@ class TestListStocks:
     """GET /api/watchlist — 列出自选股。"""
 
     def test_list(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store  # type: ignore[attr-defined]
@@ -54,7 +54,7 @@ class TestListGroups:
     """GET /api/watchlist/groups — 列出分组。"""
 
     def test_list(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store  # type: ignore[attr-defined]
@@ -71,7 +71,7 @@ class TestAddGroup:
     """POST /api/watchlist/groups — 新建分组。"""
 
     def test_add_success(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store
@@ -81,7 +81,7 @@ class TestAddGroup:
         assert resp.json()["name"] == "持仓"  # mock 返回默认 group
 
     def test_duplicate_409(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         store.add_group.side_effect = GroupAlreadyExistsError("已存在")
@@ -95,7 +95,7 @@ class TestRemoveGroup:
     """DELETE /api/watchlist/groups/{name} — 删除分组。"""
 
     def test_remove_success(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store
@@ -104,7 +104,7 @@ class TestRemoveGroup:
         assert resp.status_code == 204
 
     def test_not_found_404(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         store.remove_group.side_effect = GroupNotFoundError("不存在")
@@ -118,7 +118,7 @@ class TestAddStock:
     """POST /api/watchlist/stocks — 添加自选股。"""
 
     def test_add_success(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store
@@ -130,7 +130,7 @@ class TestAddStock:
         assert resp.status_code == 201
 
     def test_group_not_found(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         store.add_entry.side_effect = GroupNotFoundError("分组不存在")
@@ -147,7 +147,7 @@ class TestRemoveStock:
     """DELETE /api/watchlist/stocks/{code}?group=xxx — 删除自选股。"""
 
     def test_remove_success(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         client.app.dependency_overrides[get_watchlist_store] = lambda: store
@@ -156,7 +156,7 @@ class TestRemoveStock:
         assert resp.status_code == 204
 
     def test_not_found_404(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_watchlist_store
+        from mojiang_chaogu.web.deps import get_watchlist_store
 
         store = make_mock_store()
         store.remove_entry.side_effect = StockEntryNotFoundError("不存在")

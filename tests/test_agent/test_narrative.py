@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.narrative import MarketNarrative
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.narrative import MarketNarrative
 
 
 @pytest.fixture

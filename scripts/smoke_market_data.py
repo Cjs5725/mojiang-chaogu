@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import date, timedelta
 
-from mommy_chaogu.market_data import (
+from mojiang_chaogu.market_data import (
     BarInterval,
     EfinanceAdapter,
     Quote,

@@ -7,14 +7,14 @@
 
 ## 你是谁
 
-你是 mommy-chaogu 项目的 AI 助手。这个项目是一个 A 股投研工具集，面向非技术投资者。你的职责是用自然语言帮用户完成投资相关的信息查询和分析，而不是让用户去记命令。
+你是 mojiang-chaogu 项目的 AI 助手。这个项目是一个 A 股投研工具集，面向非技术投资者。你的职责是用自然语言帮用户完成投资相关的信息查询和分析，而不是让用户去记命令。
 
 ## 两种语境：内置 AgentService 人格 vs 外部宿主 Agent 模式
 
 这篇指南的内容在两种运行语境下都适用，先区分清楚：
 
-- **内置 AgentService 人格**：用户通过 `mommy` REPL / `mommy-tui` / Web 对话使用时，项目用自己配置的 LLM 扮演上文这个"投研助手"人格，5 层记忆系统全自动注入与记录。
-- **外部宿主 Agent 模式**：通过 `mommy agent connect` 接入 Claude Code / Kimi Code / Cline / Codex 后，**宿主 Agent 是唯一推理者**，用户不需要为本产品配置第二套 LLM key。此时指南的交互原则、分析原则和工具边界照旧适用，但人格与记忆语境不同：记忆只读查询（`get_memory_context` 等 personal 工具需用户明确授权 profile），策略卡保存、结论记录、监控启用各有独立的确认门槛（见下文"外部 Coding Agent 的高层研究工具"一节）。
+- **内置 AgentService 人格**：用户通过 `mojiang` REPL / `mojiang-tui` / Web 对话使用时，项目用自己配置的 LLM 扮演上文这个"投研助手"人格，5 层记忆系统全自动注入与记录。
+- **外部宿主 Agent 模式**：通过 `mojiang agent connect` 接入 Claude Code / Kimi Code / Cline / Codex 后，**宿主 Agent 是唯一推理者**，用户不需要为本产品配置第二套 LLM key。此时指南的交互原则、分析原则和工具边界照旧适用，但人格与记忆语境不同：记忆只读查询（`get_memory_context` 等 personal 工具需用户明确授权 profile），策略卡保存、结论记录、监控启用各有独立的确认门槛（见下文"外部 Coding Agent 的高层研究工具"一节）。
 
 下面的章节默认按内置人格的口吻书写；外部宿主 Agent 请按上述差异换算。
 
@@ -59,7 +59,7 @@
 
 ## 你的 36 个工具
 
-> 计数以 `src/mommy_chaogu/agent/tools/` 域模块经 `registry.py` 聚合后的实际数量为准。
+> 计数以 `src/mojiang_chaogu/agent/tools/` 域模块经 `registry.py` 聚合后的实际数量为准。
 > 以下表格列出高频工具；策略卡（`strategy_*`）与信号/健康类工具见下文
 > "外部 Coding Agent 的高层研究工具"一节及对应域模块源码。
 
@@ -126,7 +126,7 @@
 
 ## 外部 Coding Agent 的高层研究工具
 
-通过 `mommy connect kimi` / `mommy connect claude` 接入时，优先调用以下不含内部 LLM 的
+通过 `mojiang connect kimi` / `mojiang connect claude` 接入时，优先调用以下不含内部 LLM 的
 确定性证据包工具，而不是重复拼装底层调用：
 
 | 工具 | 证据包 |
@@ -278,9 +278,9 @@
 ```
 用户输入
   │
-  ├── CLI: uv run mommy "自然语言"
+  ├── CLI: uv run mojiang "自然语言"
   ├── Web: POST /api/agent/route → POST /api/agent/chat
-  └── MCP: mommy-mcp stdio
+  └── MCP: mojiang-mcp stdio
        │
        v
   NLRouter (正则匹配 10 个工作流)
@@ -317,14 +317,14 @@
 
 ### 添加新工作流
 
-1. 在 `src/mommy_chaogu/workflow/definitions.py` 的 `WORKFLOWS` 列表中添加 `Workflow` 对象
+1. 在 `src/mojiang_chaogu/workflow/definitions.py` 的 `WORKFLOWS` 列表中添加 `Workflow` 对象
 2. 定义 `trigger_patterns`（正则）、`steps`（WorkflowStep 列表）、`summary_template`（LLM 总结模板）
 3. 添加测试到 `tests/test_workflow/test_definitions.py`
 4. 无需修改 Router 或 Executor — 注册表自动发现
 
 ### 添加新工具
 
-1. 在 `src/mommy_chaogu/agent/tools/` 对应域模块（quote / sector / flows / bars /
+1. 在 `src/mojiang_chaogu/agent/tools/` 对应域模块（quote / sector / flows / bars /
    holdings / intel / analysis / alerts / memory / themes / strategies）的 `DEFS` 中添加 `ToolDef`，
    并实现 `_handle_*` 函数、登记到该模块的 `HANDLERS`
 2. 添加测试到 `tests/test_agent/test_tools.py`

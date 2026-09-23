@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
-from mommy_chaogu.agent.tools import ToolContext, analysis
-from mommy_chaogu.market_data.types import AdjustmentType, Bar, BarInterval, Money, MoneyFlow
+from mojiang_chaogu.agent.tools import ToolContext, analysis
+from mojiang_chaogu.market_data.types import AdjustmentType, Bar, BarInterval, Money, MoneyFlow
 
 
 def _flow(code: str, ratio: str | None) -> MoneyFlow:

@@ -10,15 +10,15 @@ import sys
 from datetime import datetime
 from decimal import Decimal
 
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     MoneyFlow,
     Quote,
     QuoteType,
 )
-from mommy_chaogu.monitor import Snapshot, SnapshotRow
-from mommy_chaogu.signals import Alerter
+from mojiang_chaogu.monitor import Snapshot, SnapshotRow
+from mojiang_chaogu.signals import Alerter
 
 
 def mk_quote(code: str, price: str, pct: str, **kw: object) -> Quote:

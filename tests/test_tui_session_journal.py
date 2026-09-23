@@ -1,6 +1,6 @@
 """SessionJournal — TUI 会话恢复（切片 1：recover_latest 冷启动与存量恢复）。
 
-产品行为：重启 mommy-tui 后，对话流自动恢复「上次会话」的文字历史，
+产品行为：重启 mojiang-tui 后，对话流自动恢复「上次会话」的文字历史，
 用户无需任何按键即可接着聊。数据源是 agent_memory（每轮 user/assistant
 文本已在持久化），本模块只读派生，不新增写路径。
 """
@@ -14,8 +14,8 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.agent.memory import ConversationMemory
-from mommy_chaogu.tui.services.session_journal import SessionJournal
+from mojiang_chaogu.agent.memory import ConversationMemory
+from mojiang_chaogu.tui.services.session_journal import SessionJournal
 
 
 def _memory(tmp_path: Path) -> ConversationMemory:
@@ -176,8 +176,8 @@ class TestAgentBinding:
         """端到端语义：resume 后跑一轮 agent，正文与上下文都落回该会话。"""
         from unittest.mock import MagicMock, patch
 
-        from mommy_chaogu.agent.service import AgentService
-        from mommy_chaogu.agent.tools import ToolContext
+        from mojiang_chaogu.agent.service import AgentService
+        from mojiang_chaogu.agent.tools import ToolContext
 
         monkeypatch.setenv("AGENT_MODEL", "")
         mem = _memory(tmp_path)
@@ -221,13 +221,13 @@ class TestChatViewReplay:
     def test_replay_entries_renders_transcript(self) -> None:
         from datetime import UTC, datetime
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.services.session_journal import JournalEntry
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.services.session_journal import JournalEntry
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 ts = datetime.now(UTC)
@@ -249,12 +249,12 @@ class TestChatViewReplay:
         _run(_test())
 
     def test_show_resume_banner(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.show_resume_banner("tui-20260827-120000-ab12", 5)
@@ -274,7 +274,7 @@ class TestAppSessionWiring:
 
     @staticmethod
     def _services_with_memory(tmp_path: Path, *, seed: int = 0) -> Any:
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
 
         services = FakeServices.create()
         mem = ConversationMemory(tmp_path / "agent.db")
@@ -294,13 +294,13 @@ class TestAppSessionWiring:
         return predicate()
 
     def test_startup_auto_resumes_last_session(self, tmp_path: Path) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         services, _mem = self._services_with_memory(tmp_path, seed=2)
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 ok = await self._wait_until(pilot, lambda: len(chat.query(".resume-banner")) == 1)
@@ -313,15 +313,15 @@ class TestAppSessionWiring:
         _run(_test())
 
     def test_resume_env_off_skips_auto_recovery(self, tmp_path: Path, monkeypatch: Any) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.views.chat import ChatView
 
-        monkeypatch.setenv("MOMMY_TUI_RESUME", "off")
+        monkeypatch.setenv("MOJIANG_TUI_RESUME", "off")
         services, _mem = self._services_with_memory(tmp_path, seed=1)
         original = services.agent._memory
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 await pilot.pause(0.5)
                 chat = app.query_one(ChatView)
@@ -331,12 +331,12 @@ class TestAppSessionWiring:
         _run(_test())
 
     def test_new_command_starts_fresh_session(self, tmp_path: Path) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
+        from mojiang_chaogu.tui.app import MojiangTuiApp
 
         services, mem = self._services_with_memory(tmp_path, seed=1)
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 prompt = app.query_one("ChatInput")
                 prompt.value = "/new"
@@ -354,14 +354,14 @@ class TestAppSessionWiring:
         _run(_test())
 
     def test_resume_command_lists_and_switches(self, tmp_path: Path) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         services, mem = self._services_with_memory(tmp_path, seed=1)
         mem.add("user", "另一个会话的问题", session_id="tui-20260820-090000-cafe")
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 prompt = app.query_one("ChatInput")
                 # 无参：列表卡

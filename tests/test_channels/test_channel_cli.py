@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from mommy_chaogu.channels.store import WeixinCredentials, WeixinStore
-from mommy_chaogu.cli_commands.channel import build_channel_parser, cmd_channel
+from mojiang_chaogu.channels.store import WeixinCredentials, WeixinStore
+from mojiang_chaogu.cli_commands.channel import build_channel_parser, cmd_channel
 
 
 def test_channel_parser_supports_local_state_override(tmp_path: Path) -> None:
@@ -33,7 +33,7 @@ def test_status_and_logout_are_local_only(tmp_path: Path, capsys: object) -> Non
     parser = build_channel_parser()
 
     status = parser.parse_args(["--state-dir", str(tmp_path), "weixin", "status"])
-    with patch("mommy_chaogu.cli_commands.channel.gateway_process_pid", return_value=None):
+    with patch("mojiang_chaogu.cli_commands.channel.gateway_process_pid", return_value=None):
         assert cmd_channel(status) == 0
     output = capsys.readouterr().out  # type: ignore[attr-defined]
     assert "已授权但助手离线" in output
@@ -41,7 +41,7 @@ def test_status_and_logout_are_local_only(tmp_path: Path, capsys: object) -> Non
     assert "must-not-print" not in output
 
     logout = parser.parse_args(["--state-dir", str(tmp_path), "weixin", "logout"])
-    with patch("mommy_chaogu.cli_commands.channel.stop_gateway_process", return_value=False):
+    with patch("mojiang_chaogu.cli_commands.channel.stop_gateway_process", return_value=False):
         assert cmd_channel(logout) == 0
     assert store.load_credentials() is None
 
@@ -57,6 +57,6 @@ def test_status_reports_live_gateway(tmp_path: Path, capsys: object) -> None:
         )
     )
     args = build_channel_parser().parse_args(["--state-dir", str(tmp_path), "weixin", "status"])
-    with patch("mommy_chaogu.cli_commands.channel.gateway_process_pid", return_value=4321):
+    with patch("mojiang_chaogu.cli_commands.channel.gateway_process_pid", return_value=4321):
         assert cmd_channel(args) == 0
     assert "微信助手在线：bot@im.bot（PID 4321）" in capsys.readouterr().out  # type: ignore[attr-defined]

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mommy_chaogu.workflow.definitions import (
+from mojiang_chaogu.workflow.definitions import (
     WORKFLOWS,
     _extract_codes_from_portfolio,
     _extract_codes_from_watchlist,
@@ -280,7 +280,7 @@ class TestFlowCheckDefinition:
         修复前 get_money_flow_today 只认单数 code，_extract_codes_from_watchlist
         返回的 {"codes": [...]} 让该步每次必败（且被记为成功）。
         """
-        from mommy_chaogu.workflow.engine import WorkflowExecutor
+        from mojiang_chaogu.workflow.engine import WorkflowExecutor
 
         tools = _FakeTools(
             {
@@ -313,9 +313,9 @@ class TestAddWatchlistDefinition:
         """端到端：'加自选 600519' 真正把股票写进 portfolio.db 自选股。"""
         from unittest.mock import MagicMock
 
-        from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-        from mommy_chaogu.watchlist.store import WatchlistStore
-        from mommy_chaogu.workflow.engine import WorkflowExecutor
+        from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+        from mojiang_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.workflow.engine import WorkflowExecutor
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)
@@ -333,9 +333,9 @@ class TestAddWatchlistDefinition:
         """抠不到 6 位代码时步骤失败但 optional 不中断（由 LLM 总结引导用户）。"""
         from unittest.mock import MagicMock
 
-        from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-        from mommy_chaogu.watchlist.store import WatchlistStore
-        from mommy_chaogu.workflow.engine import WorkflowExecutor
+        from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+        from mojiang_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.workflow.engine import WorkflowExecutor
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)

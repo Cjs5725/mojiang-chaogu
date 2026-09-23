@@ -10,7 +10,7 @@ from typing import Any
 from textual.app import App, ComposeResult
 from textual.containers import Vertical
 
-from mommy_chaogu.tui.widgets.tool_indicator import (
+from mojiang_chaogu.tui.widgets.tool_indicator import (
     ToolIndicator,
     format_digest,
     format_result_digest,

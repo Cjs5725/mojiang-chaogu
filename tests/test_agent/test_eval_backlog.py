@@ -18,10 +18,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.extractor import extract_from_conversation
-from mommy_chaogu.agent.service import AgentService, ChatCallbacks
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.extractor import extract_from_conversation
+from mojiang_chaogu.agent.service import AgentService, ChatCallbacks
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
 
 
 @pytest.fixture
@@ -179,7 +179,7 @@ class TestRegistryTruncation:
     """T5/L2：registry.call 对工具结果统一截断。"""
 
     def test_oversized_result_truncated_with_marker(self) -> None:
-        from mommy_chaogu.agent.tools import registry as reg
+        from mojiang_chaogu.agent.tools import registry as reg
 
         big = '{"data": "' + "x" * 20000 + '"}'
         original = reg._HANDLERS["get_quote"]
@@ -203,7 +203,7 @@ class TestPredictionPriceDecimal:
     """次要项：predictions 价格字段 Decimal 往返（REAL 列不泄漏浮点噪声）。"""
 
     def test_decimal_price_roundtrip(self, tmp_path: Path) -> None:
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "t.db")
         pid = tracker.create(
@@ -226,7 +226,7 @@ class TestPredictionPriceDecimal:
         assert pred["actual_price"] == Decimal("85.00")  # type: ignore[index]
 
     def test_float_input_accepted_and_quantized(self, tmp_path: Path) -> None:
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "t.db")
         pid = tracker.create(

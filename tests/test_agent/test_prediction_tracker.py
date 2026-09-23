@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
 
 @pytest.fixture
@@ -549,13 +549,13 @@ class TestTimeframeUnification:
 
     def test_timeframe_mapping_is_unified(self) -> None:
         """两个模块引用同一个 _TIMEFRAME_DAYS 常量。"""
-        from mommy_chaogu.agent import prediction_tracker, verify_engine
+        from mojiang_chaogu.agent import prediction_tracker, verify_engine
 
         assert prediction_tracker._TIMEFRAME_DAYS is verify_engine._TIMEFRAME_DAYS
 
     def test_timeframe_mapping_values(self) -> None:
         """统一映射为日历天。"""
-        from mommy_chaogu.agent.prediction_tracker import _TIMEFRAME_DAYS
+        from mojiang_chaogu.agent.prediction_tracker import _TIMEFRAME_DAYS
 
         assert _TIMEFRAME_DAYS["1d"] == 1
         assert _TIMEFRAME_DAYS["3d"] == 3
@@ -572,8 +572,8 @@ class TestTimeframeUnification:
         """
         from datetime import UTC, datetime, timedelta
 
-        from mommy_chaogu.agent.prediction_tracker import _compute_verify_after
-        from mommy_chaogu.agent.verify_engine import _is_expired
+        from mojiang_chaogu.agent.prediction_tracker import _compute_verify_after
+        from mojiang_chaogu.agent.verify_engine import _is_expired
 
         # 模拟 created_at = now，timeframe="5d"
         now = datetime.now(UTC)

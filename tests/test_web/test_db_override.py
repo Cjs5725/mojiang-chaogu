@@ -1,15 +1,15 @@
 """create_app(--db) 的路径覆盖传播回归测试。
 
 旧实现直接替换 deps.get_db_path 模块属性并清缓存，但 store 工厂重建时
-读的是 get_portfolio_db() 默认值——mommy-web --db 对自选/持仓静默失效。
+读的是 get_portfolio_db() 默认值——mojiang-web --db 对自选/持仓静默失效。
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from mommy_chaogu.db_paths import PORTFOLIO_DB
-from mommy_chaogu.web import create_app, deps
+from mojiang_chaogu.db_paths import PORTFOLIO_DB
+from mojiang_chaogu.web import create_app, deps
 
 
 def test_create_app_db_path_propagates_to_user_stores(tmp_path: Path) -> None:

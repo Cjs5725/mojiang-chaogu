@@ -19,11 +19,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools.alerts import HANDLERS as ALERTS_HANDLERS
-from mommy_chaogu.agent.tools.bars import HANDLERS as BARS_HANDLERS
-from mommy_chaogu.agent.tools.base import ToolContext
-from mommy_chaogu.agent.tools.memory import HANDLERS as MEMORY_HANDLERS
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.agent.tools.alerts import HANDLERS as ALERTS_HANDLERS
+from mojiang_chaogu.agent.tools.bars import HANDLERS as BARS_HANDLERS
+from mojiang_chaogu.agent.tools.base import ToolContext
+from mojiang_chaogu.agent.tools.memory import HANDLERS as MEMORY_HANDLERS
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     Bar,
     BarInterval,
@@ -111,7 +111,7 @@ class TestAlertUsesPortfolioDb:
         )
         assert "error" not in json.loads(result)
 
-        from mommy_chaogu.signals.custom_alerts import CustomAlertStore
+        from mojiang_chaogu.signals.custom_alerts import CustomAlertStore
 
         assert len(CustomAlertStore(three_dbs["portfolio"]).list_all()) == 1
         # agent.db 里不应出现告警表
@@ -127,7 +127,7 @@ class TestBackfillUsesMarketDb:
         data = json.loads(result)
         assert data["bars_written"] == 1
 
-        from mommy_chaogu.cache.store import CacheStore
+        from mojiang_chaogu.cache.store import CacheStore
 
         bars = CacheStore(three_dbs["market"]).get_bars("600519", "1d", "forward")
         assert bars is not None and len(bars) == 1
@@ -140,7 +140,7 @@ class TestMemoryToolsUseAgentDb:
         self, split_ctx: ToolContext, three_dbs: dict[str, Path]
     ) -> None:
         """记忆工具读 agent.db。"""
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(three_dbs["agent"])
         tracker.create(

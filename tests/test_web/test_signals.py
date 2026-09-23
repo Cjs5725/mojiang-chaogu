@@ -29,7 +29,7 @@ class TestHistorySignals:
     """GET /api/signals/history — 从 signals.log 解析。"""
 
     def test_empty_when_no_log(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_alerter
+        from mojiang_chaogu.web.deps import get_alerter
 
         alerter = MagicMock()
         alerter.log_path = None
@@ -42,7 +42,7 @@ class TestHistorySignals:
     def test_parses_log_line(self, client: TestClient, tmp_path: object) -> None:
         import pathlib
 
-        from mommy_chaogu.web.deps import get_alerter
+        from mojiang_chaogu.web.deps import get_alerter
 
         log_file = pathlib.Path("/tmp/test_signals.log")
         log_file.write_text(
@@ -67,7 +67,7 @@ class TestHistorySignals:
     def test_filter_by_rule_id(self, client: TestClient) -> None:
         import pathlib
 
-        from mommy_chaogu.web.deps import get_alerter
+        from mojiang_chaogu.web.deps import get_alerter
 
         log_file = pathlib.Path("/tmp/test_signals_2.log")
         log_file.write_text(
@@ -90,7 +90,7 @@ class TestHistorySignals:
     def test_malformed_lines_skipped(self, client: TestClient) -> None:
         import pathlib
 
-        from mommy_chaogu.web.deps import get_alerter
+        from mojiang_chaogu.web.deps import get_alerter
 
         log_file = pathlib.Path("/tmp/test_signals_3.log")
         log_file.write_text(
@@ -118,9 +118,9 @@ class TestHistoryFromStore:
         from datetime import datetime
         from decimal import Decimal
 
-        from mommy_chaogu.signals import SignalStore
-        from mommy_chaogu.signals.types import Signal, SignalSeverity
-        from mommy_chaogu.web.deps import get_alerter, get_signal_store
+        from mojiang_chaogu.signals import SignalStore
+        from mojiang_chaogu.signals.types import Signal, SignalSeverity
+        from mojiang_chaogu.web.deps import get_alerter, get_signal_store
 
         db_path = pathlib.Path("/tmp/test_signals_store.db")
         db_path.unlink(missing_ok=True)
@@ -162,8 +162,8 @@ class TestHistoryFromStore:
         """库为空时回退日志解析。"""
         import pathlib
 
-        from mommy_chaogu.signals import SignalStore
-        from mommy_chaogu.web.deps import get_alerter, get_signal_store
+        from mojiang_chaogu.signals import SignalStore
+        from mojiang_chaogu.web.deps import get_alerter, get_signal_store
 
         # 空 store
         db_path = pathlib.Path("/tmp/test_signals_empty.db")

@@ -7,15 +7,15 @@ from pathlib import Path
 
 from textual.widgets import Input
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.services.bootstrap import FakeServices
-from mommy_chaogu.tui.views.chat import ChatView
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.services.bootstrap import FakeServices
+from mojiang_chaogu.tui.views.chat import ChatView
 
 
 async def generate() -> None:
     output_dir = Path("docs/images")
     output_dir.mkdir(parents=True, exist_ok=True)
-    app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+    app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
     async with app.run_test(size=(120, 38)) as pilot:
         chat = app.query_one(ChatView)
         prompt = chat.query_one("#prompt", Input)

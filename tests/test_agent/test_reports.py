@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.reports import AgentReportService
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.reports import AgentReportService
 
 # ---------- helpers ----------
 

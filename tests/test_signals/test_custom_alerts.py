@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
-from mommy_chaogu.signals.custom_alerts import (
+from mojiang_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
+from mojiang_chaogu.signals.custom_alerts import (
     CustomAlert,
     CustomAlertNotFoundError,
     CustomAlertStore,

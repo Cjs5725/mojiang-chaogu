@@ -33,8 +33,8 @@ from typing import Any
 
 from backtest_stats import compute_buyhold_baseline, format_hit_rate
 
-from mommy_chaogu.backtest.scoring import score_direction
-from mommy_chaogu.db_paths import MARKET_DB
+from mojiang_chaogu.backtest.scoring import score_direction
+from mojiang_chaogu.db_paths import MARKET_DB
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s %(message)s")
 _log = logging.getLogger("backtest_llm")
@@ -363,7 +363,7 @@ def run(args: argparse.Namespace) -> int:
     conn = sqlite3.connect(str(market_db))
 
     # 解析 provider / model（单一真相源：agent/llm.py，与 AgentService 一致）
-    from mommy_chaogu.agent import llm as llm_provider
+    from mojiang_chaogu.agent import llm as llm_provider
 
     provider = llm_provider.resolve_provider(args.provider)
     provider_cfg = llm_provider.provider_config(provider)
@@ -439,7 +439,7 @@ def run(args: argparse.Namespace) -> int:
     print(f"\n  回测日 {len(backtest_dates)} 天：{backtest_dates[0]} → {backtest_dates[-1]}")
 
     # 准备 PredictionTracker（独立 db，不污染 agent.db）
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
     db_path = Path(args.db)
     if db_path.exists():
@@ -453,9 +453,9 @@ def run(args: argparse.Namespace) -> int:
     pipeline: Any = None
     memory_db: Path | None = None
     if pipeline_enabled:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
-        from mommy_chaogu.agent.semantic_memory import SemanticMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
+        from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
         memory_db = Path(args.memory_db)
         if memory_db.exists():

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mommy_chaogu.backtest.walk_forward import walk_forward_test
+from mojiang_chaogu.backtest.walk_forward import walk_forward_test
 
 
 def _make_pred(

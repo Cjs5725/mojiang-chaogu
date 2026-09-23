@@ -19,7 +19,7 @@
 | **3 量化工具箱** | 5 项：冒烟 / 日线 / 30min / 回测 / 合理性 | ✅ 全通过 |
 | **4 编译器 V2** | 4 项：离线编译 / 真实 LLM / ToolRegistry dry-run / 端到端 | ✅ 全通过 |
 
-测试环境：provider=zai / 无 `MASSIVE_API_KEY` / 美股走 Yahoo 免 key 源 / 全程临时数据库隔离（`MOMMY_DATA_DIR=/tmp/...`），不碰真实数据。
+测试环境：provider=zai / 无 `MASSIVE_API_KEY` / 美股走 Yahoo 免 key 源 / 全程临时数据库隔离（`MOJIANG_DATA_DIR=/tmp/...`），不碰真实数据。
 
 ---
 
@@ -83,7 +83,7 @@ UX 小瑕疵（非 bug）：无 Key 降级时直接显示原始数据表，缺�
 
 ## 发现并修复的 3 个真实 Bug
 
-全部在 `src/mommy_chaogu/cache/adapter.py`，都影响美股数据链路：
+全部在 `src/mojiang_chaogu/cache/adapter.py`，都影响美股数据链路：
 
 | # | Bug | 影响 | 修复 |
 |---|---|---|---|
@@ -137,10 +137,10 @@ maintain 时 ZAI 的 consolidation 报同样的 `modelCode: does not exist`，�
 
 | 系统 | 测试方式 | 隔离手段 |
 |---|---|---|
-| 记忆系统 | Python 脚本直接调 `ResearchToolCatalog._record_conclusion` + `ResearchContextService.get` | `MOMMY_DATA_DIR=/tmp/...` 临时库 |
-| 预测验证 | 写预测 → SQL 改 `verify_after` 到过去 → `mommy memory maintain`（真实 Yahoo adapter） | 临时库 |
-| UX | `uv run mommy "..."` 单次查询 + `-v` 详细模式 + 无 key env 覆盖 | `MOMMY_DATA_DIR=/tmp/...` |
+| 记忆系统 | Python 脚本直接调 `ResearchToolCatalog._record_conclusion` + `ResearchContextService.get` | `MOJIANG_DATA_DIR=/tmp/...` 临时库 |
+| 预测验证 | 写预测 → SQL 改 `verify_after` 到过去 → `mojiang memory maintain`（真实 Yahoo adapter） | 临时库 |
+| UX | `uv run mojiang "..."` 单次查询 + `-v` 详细模式 + 无 key env 覆盖 | `MOJIANG_DATA_DIR=/tmp/...` |
 | 量化工具箱 | Yahoo 拉 SOXX 日线/30min → CSV → `DualEngine.run()` + `score_events` + `forward_returns` | 工具箱与主程序解耦，独立临时 CSV |
-| 编译器 V2 | stub LLM 注入 + 真实 `mommy workflow create --dry-run` + `scripts/smoke_workflow.py` + `create→list→run` | 临时库 |
+| 编译器 V2 | stub LLM 注入 + 真实 `mojiang workflow create --dry-run` + `scripts/smoke_workflow.py` + `create→list→run` | 临时库 |
 
 美股数据源：Yahoo Finance（免 key），通过主项目 `YahooAdapter.get_bars` 拉取 SOXX 真实行情，转换成工具箱 CSV 格式喂入。

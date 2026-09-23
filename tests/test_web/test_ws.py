@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.preferences import default_preferences
-from mommy_chaogu.web.background import BackgroundService, set_service
+from mojiang_chaogu.preferences import default_preferences
+from mojiang_chaogu.web.background import BackgroundService, set_service
 
 from .conftest import make_signal, make_snapshot
 
@@ -135,7 +135,7 @@ class TestAgentWebSocket:
     def test_invalid_json_and_unconfigured_agent(
         self, client: TestClient, monkeypatch: object
     ) -> None:
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         monkeypatch.setattr(deps, "get_agent_service", lambda: None)  # type: ignore[attr-defined]
         monkeypatch.setattr(deps, "get_agent_memory", MagicMock())  # type: ignore[attr-defined]
@@ -170,7 +170,7 @@ class TestAgentWebSocket:
     def test_streams_configured_agent_response(
         self, client: TestClient, monkeypatch: object
     ) -> None:
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         agent = MagicMock()
 
@@ -195,7 +195,7 @@ class TestAgentWebSocket:
         monkeypatch.setattr(deps, "get_agent_memory", lambda: memory)  # type: ignore[attr-defined]
         monkeypatch.setattr(deps, "get_watchlist_store", _fake_watchlist_store)  # type: ignore[attr-defined]
         monkeypatch.setattr(  # type: ignore[attr-defined]
-            "mommy_chaogu.web.routes.ws.page_context_addendum",
+            "mojiang_chaogu.web.routes.ws.page_context_addendum",
             lambda context, _portfolio, _watchlist: (
                 f"<page_context>{context.stock_code}:{context.tab}</page_context>"
                 if context is not None
@@ -236,7 +236,7 @@ class TestAgentWebSocket:
         self, client: TestClient, monkeypatch: object
     ) -> None:
         """WS 与 REST 一致：风格从服务端偏好读取，客户端 style_preset 被忽略。"""
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         agent = MagicMock()
         agent.chat.return_value = SimpleNamespace(text="ok", tool_calls=[], rounds=1)
@@ -264,7 +264,7 @@ class TestAgentWebSocket:
 
     def test_streams_tool_call_events(self, client: TestClient, monkeypatch: object) -> None:
         """验证 on_tool_call/on_tool_result 回调被桥接成 tool_call_started/finished WS 帧。"""
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         agent = MagicMock()
 
@@ -325,7 +325,7 @@ class TestAgentWebSocket:
         回归：此前真流式改造删掉了切片转发逻辑，流式不可用时前端会收到
         空回答——这里钉死兜底行为。
         """
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         agent = MagicMock()
         agent.chat.return_value = SimpleNamespace(
@@ -352,7 +352,7 @@ class TestAgentWebSocket:
             }
 
     def test_rejects_invalid_session_id(self, client: TestClient, monkeypatch: object) -> None:
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         agent = MagicMock()
         memory = MagicMock()
@@ -369,7 +369,7 @@ class TestAgentWebSocketPredictionsCreated:
     """后台记忆提取新建预测后，WS 推送 predictions_created 事件。"""
 
     def _patch_agent(self, monkeypatch: object, agent: MagicMock) -> None:
-        from mommy_chaogu.web import deps
+        from mojiang_chaogu.web import deps
 
         memory = MagicMock()
         memory.for_session.return_value = MagicMock()

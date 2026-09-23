@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.market_data import MarketDataAdapter, Quote
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data import MarketDataAdapter, Quote
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     MoneyFlow,
     QuoteType,
 )
-from mommy_chaogu.monitor import Monitor
-from mommy_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.monitor import Monitor
+from mojiang_chaogu.watchlist import WatchlistStore
 
 # ---------- Mock Adapter ----------
 
@@ -217,12 +217,12 @@ def test_format_table_empty_pool(store: WatchlistStore) -> None:
         # 直接 SQL 删除绕过 ORM detach 问题
         from sqlalchemy import delete
 
-        from mommy_chaogu.watchlist.models import StockEntry
+        from mojiang_chaogu.watchlist.models import StockEntry
 
         with store.engine.begin() as conn:
             conn.execute(delete(StockEntry))
             conn.execute(
-                delete(__import__("mommy_chaogu.watchlist.models", fromlist=["Group"]).Group)
+                delete(__import__("mojiang_chaogu.watchlist.models", fromlist=["Group"]).Group)
             )
 
     adapter = MockMarketDataAdapter()
@@ -274,7 +274,7 @@ def test_run_poller_writes_log(tmp_path: Path) -> None:
 
 def test_run_poller_with_alerter(tmp_path: Path) -> None:
     """带 alerter 的 run_forever 正常运行（信号评估路径）。"""
-    from mommy_chaogu.signals import Alerter
+    from mojiang_chaogu.signals import Alerter
 
     adapter = MockMarketDataAdapter(quotes={"600519": _make_quote("600519", "100", "0")})
     store = WatchlistStore(tmp_path / "test.db")

@@ -8,7 +8,7 @@ cd "$ROOT_DIR"
 uv run ruff format --check .
 uv run ruff check .
 uv run mypy --strict src
-uv run pytest -m "not network" --cov=mommy_chaogu --cov-report=term --cov-fail-under=70
+uv run pytest -m "not network" --cov=mojiang_chaogu --cov-report=term --cov-fail-under=70
 
 cd web
 npm test

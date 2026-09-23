@@ -1,17 +1,17 @@
-# mommy-chaogu
+# mojiang-chaogu
 
 <div align="center">
 
 **一套边界明确、可由 Agent 接管和编排的本地投研工具箱：行情、指标、监测、策略蒸馏，都按你的方法组合。**
 
-[![CI](https://github.com/coffee-man666/mommy-chaogu/actions/workflows/ci.yml/badge.svg)](https://github.com/coffee-man666/mommy-chaogu/actions/workflows/ci.yml)
+[![CI](https://github.com/Cjs5725/mojiang-chaogu/actions/workflows/ci.yml/badge.svg)](https://github.com/Cjs5725/mojiang-chaogu/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Release: v1.5.0](https://img.shields.io/badge/release-v1.5.0-blue.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
 </div>
 
-mommy-chaogu 不是要求用户先学习复杂界面的“又一个投研软件”，而是给现有 Agent 使用的本地
+mojiang-chaogu 不是要求用户先学习复杂界面的“又一个投研软件”，而是给现有 Agent 使用的本地
 能力层。你用自然语言说明目标、规则和流程，Agent 负责组合行情获取、研究工具、技术信号、策略卡
 和自动监测；后端负责确定性计算、本地保存和权限边界。CLI / TUI / Web 仍是可选入口，不是产品
 成立的前提。
@@ -22,22 +22,22 @@ mommy-chaogu 不是要求用户先学习复杂界面的“又一个投研软件�
 的就运行，暂时不能实现的就标为需人工判断或当前不可用。它不是任意代码执行器，也不承诺自动下单
 或“策略一定有效”，更不会为了显得可用而把用户的定义偷换成相似指标。
 
-宣传站与 `mommy-chaogu plugins store` 源码在 [`site/`](site/)，包含六个并列项目插件、`2026-08-19` 可下载测试样例、版本时间线和可实际运行的 `install-skill.py`。GitHub Pages 发布与本地检查方式见 [`docs/GITHUB-PAGES.md`](docs/GITHUB-PAGES.md)。
+宣传站与 `mojiang-chaogu plugins store` 源码在 [`site/`](site/)，包含六个并列项目插件、`2026-08-19` 可下载测试样例、版本时间线和可实际运行的 `install-skill.py`。GitHub Pages 发布与本地检查方式见 [`docs/GITHUB-PAGES.md`](docs/GITHUB-PAGES.md)。
 
 ## 让你的 Agent 接管
 
 把下面这句话发给你的 Agent：
 
 > 请阅读
-> `https://raw.githubusercontent.com/coffee-man666/mommy-chaogu/main/agent-start.md`。先用几句话告诉我
-> mommy-chaogu 是什么、能怎样把行情、指标、策略和监测组合成我的流程，并问我第一件想完成的事。
+> `https://raw.githubusercontent.com/Cjs5725/mojiang-chaogu/main/agent-start.md`。先用几句话告诉我
+> mojiang-chaogu 是什么、能怎样把行情、指标、策略和监测组合成我的流程，并问我第一件想完成的事。
 > 先确认你这个 Agent 有真实受支持的接入路径；如果没有，不要假装支持。确认后再展示安装、文件修改
 > 和权限计划，得到我同意后执行并做真实检查，直到让我看到所选流程的第一次有用结果。
 
 Agent 会先以公共市场数据开始，不要求再配置一套项目内 LLM Key。安装成功或 MCP 工具可见不算
 完成；用户看到并理解自己所选研究、策略整理、指标检查或监测流程的第一次真实结果才算。
 
-## 为什么是 mommy-chaogu
+## 为什么是 mojiang-chaogu
 
 - **Agent 负责编排**：说清目标、规则和频率，Agent 用当前能力拼出最短可行流程，不要求用户先学命令。
 - **行情与证据是积木**：从市场概览到个股、板块、资金流和持仓，可组合使用并说明时间与数据缺口。
@@ -55,18 +55,18 @@ Agent 会先以公共市场数据开始，不要求再配置一套项目内 LLM 
 macOS / Linux：
 
 ```bash
-curl -LsSf https://raw.githubusercontent.com/coffee-man666/mommy-chaogu/v1.5.0/install.sh | sh
-mommy
+curl -LsSf https://raw.githubusercontent.com/Cjs5725/mojiang-chaogu/v1.5.0/install.sh | sh
+mojiang
 ```
 
-安装脚本会自动准备独立的 Python 环境并安装完整应用。第一次运行 `mommy` 会引导你选择
+安装脚本会自动准备独立的 Python 环境并安装完整应用。第一次运行 `mojiang` 会引导你选择
 模型、隐藏输入并验证 API Key；配置只保存在当前设备。没有 Key 也可以跳过，继续使用
 行情、资金流和预定义工作流。
 
 不喜欢直接执行远程脚本？可以先下载并检查：
 
 ```bash
-curl -LO https://raw.githubusercontent.com/coffee-man666/mommy-chaogu/v1.5.0/install.sh
+curl -LO https://raw.githubusercontent.com/Cjs5725/mojiang-chaogu/v1.5.0/install.sh
 less install.sh
 sh install.sh
 ```
@@ -76,27 +76,27 @@ sh install.sh
 
 ## 配置模型与微信
 
-首次运行 `mommy` 会自动进入配置，也可以随时重新运行：
+首次运行 `mojiang` 会自动进入配置，也可以随时重新运行：
 
 ```bash
-mommy setup
+mojiang setup
 ```
 
 向导会让你选择 Provider 和模型、隐藏输入并验证 API Key，然后询问是否连接微信。当前支持
 DeepSeek、OpenAI、Kimi、z.ai 和 MiniMax。配置默认以 `0600` 权限保存到
-`~/.config/mommy-chaogu/.env`。只有项目 `.env` 已包含有效模型配置时才会继续更新它；
-空白模板不会改变配置作用域。可用 `mommy setup --local` 强制写项目配置，或用
-`mommy setup --user` 强制写用户级配置。
+`~/.config/mojiang-chaogu/.env`。只有项目 `.env` 已包含有效模型配置时才会继续更新它；
+空白模板不会改变配置作用域。可用 `mojiang setup --local` 强制写项目配置，或用
+`mojiang setup --user` 强制写用户级配置。
 
-排查配置时运行 `mommy setup --check`。它会显示实际生效的 Provider、模型、密钥变量
+排查配置时运行 `mojiang setup --check`。它会显示实际生效的 Provider、模型、密钥变量
 及来源和文件权限，但绝不显示密钥内容。
 
 如果首次配置时跳过了微信，之后可以单独扫码连接：
 
 ```bash
-mommy channel weixin connect   # 显示二维码，扫码后在后台上线
-mommy channel weixin status    # 查看授权和运行状态
-mommy channel weixin stop      # 停止网关，但保留本机授权
+mojiang channel weixin connect   # 显示二维码，扫码后在后台上线
+mojiang channel weixin status    # 查看授权和运行状态
+mojiang channel weixin stop      # 停止网关，但保留本机授权
 ```
 
 微信模式不需要公网 IP、域名或开放端口，只接受扫码账号的私聊。消息会经过微信服务，投研
@@ -107,39 +107,39 @@ mommy channel weixin stop      # 停止网关，但保留本机授权
 
 | 你想要的体验 | 启动命令 | 说明 |
 |---|---|---|
-| 连续自然语言对话 | `mommy` | 最轻量的交互式入口 |
-| Coding Agent 风格终端 | `mommy tui` | 富卡片、slash 命令、`@` 股票联想、流式状态 |
-| 本机网页 | `mommy web` | 打开 `http://127.0.0.1:8000`，本机默认免登录 |
-| Claude Code | `mommy agent plan --host claude --json` | 先看修改与权限计划，再由 Agent 连接 |
-| Kimi Code | `mommy agent plan --host kimi --json` | 安装六个内置 Skill，含主题分析与持续监测能力 |
-| Cline | `mommy agent plan --host cline --json` | 计划确认后写入本地 MCP 配置 |
-| Codex | `mommy agent plan --host codex --json` | 复用 Codex 登录，不再配置一套 LLM Key |
-| 微信远程对话 | `mommy channel weixin connect` | 扫码连接本地网关，不开放公网端口 |
+| 连续自然语言对话 | `mojiang` | 最轻量的交互式入口 |
+| Coding Agent 风格终端 | `mojiang tui` | 富卡片、slash 命令、`@` 股票联想、流式状态 |
+| 本机网页 | `mojiang web` | 打开 `http://127.0.0.1:8000`，本机默认免登录 |
+| Claude Code | `mojiang agent plan --host claude --json` | 先看修改与权限计划，再由 Agent 连接 |
+| Kimi Code | `mojiang agent plan --host kimi --json` | 安装六个内置 Skill，含主题分析与持续监测能力 |
+| Cline | `mojiang agent plan --host cline --json` | 计划确认后写入本地 MCP 配置 |
+| Codex | `mojiang agent plan --host codex --json` | 复用 Codex 登录，不再配置一套 LLM Key |
+| 微信远程对话 | `mojiang channel weixin connect` | 扫码连接本地网关，不开放公网端口 |
 
 Agent-managed 自动连接目前只覆盖表中的 Claude Code、Kimi Code、Cline 和 Codex。其他支持
 stdio MCP 的宿主可以使用同一个 MCP Server，但它们的配置与 Skill 安装尚未纳入这套自动计划；
 入口 Agent 必须先说明这一点，不能把 OpenClaw、Hermes 等宿主伪装成已被自动检测和验证。
 
-连接任一受支持宿主会安装六个内置 Skill：`mommy-onboard`、`mommy-research`、
-`mommy-strategy`、`market-watch-loop`、`basket-analysis` 和 `food-security-analysis`。
+连接任一受支持宿主会安装六个内置 Skill：`mojiang-onboard`、`mojiang-research`、
+`mojiang-strategy`、`market-watch-loop`、`basket-analysis` 和 `food-security-analysis`。
 其中主题分析 Skill 负责篮子研究交付，`market-watch-loop` 用于按市场、主题、股票范围和轮询频率组织
 有边界的盘中观察；它会保留数据来源、时间戳、覆盖范围和停止条件，不会把一次查询伪装成无限后台任务。
 
-开发者如果不想安装全局命令，可以在源码仓库中把 `mommy` 替换为 `uv run mommy`。
+开发者如果不想安装全局命令，可以在源码仓库中把 `mojiang` 替换为 `uv run mojiang`。
 
 ## 直接试试
 
 ```bash
-mommy "今天大盘怎么样"
-mommy "美股今天怎么样"
-mommy "分析一下比亚迪"
-mommy "分析一下 AAPL"
-mommy "半导体板块最近强不强"
-mommy "主力资金在买什么"
-mommy -v "分析 600519"       # 展开路由和工具调用
+mojiang "今天大盘怎么样"
+mojiang "美股今天怎么样"
+mojiang "分析一下比亚迪"
+mojiang "分析一下 AAPL"
+mojiang "半导体板块最近强不强"
+mojiang "主力资金在买什么"
+mojiang -v "分析 600519"       # 展开路由和工具调用
 ```
 
-命中固定工作流时，mommy 会直接获取结构化数据；需要开放式判断时，再交给 LLM Agent
+命中固定工作流时，mojiang 会直接获取结构化数据；需要开放式判断时，再交给 LLM Agent
 自主选择工具。事实、工具结果和模型推断保持可区分。
 
 连接 Agent 后，可以直接说：

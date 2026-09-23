@@ -16,8 +16,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.signals.store import SignalStore
-from mommy_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.signals.store import SignalStore
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
 
 
 def _make_signal(
@@ -143,7 +143,7 @@ class TestAlerterDoubleWrite:
     """Alerter 双写：SignalStore + 旧文本日志兼容。"""
 
     def test_write_to_store(self, tmp_path: Path) -> None:
-        from mommy_chaogu.signals import Alerter
+        from mojiang_chaogu.signals import Alerter
 
         store = SignalStore(tmp_path / "market.db")
         alerter = Alerter(rules=[], signal_store=store)
@@ -155,7 +155,7 @@ class TestAlerterDoubleWrite:
         store.close()
 
     def test_store_failure_falls_back_to_log(self, tmp_path: Path) -> None:
-        from mommy_chaogu.signals import Alerter
+        from mojiang_chaogu.signals import Alerter
 
         log_path = tmp_path / "signals.log"
         store = SignalStore(tmp_path / "market.db")
@@ -169,7 +169,7 @@ class TestAlerterDoubleWrite:
         assert "贵州茅台" in log_path.read_text(encoding="utf-8")
 
     def test_empty_signals_noop(self, tmp_path: Path) -> None:
-        from mommy_chaogu.signals import Alerter
+        from mojiang_chaogu.signals import Alerter
 
         store = SignalStore(tmp_path / "market.db")
         alerter = Alerter(rules=[], signal_store=store)

@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from mommy_chaogu.market_data.fallback_adapter import FallbackAdapter
+from mojiang_chaogu.market_data.fallback_adapter import FallbackAdapter
 
 # ---------- helpers ----------
 

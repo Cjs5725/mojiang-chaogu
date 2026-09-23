@@ -10,8 +10,8 @@ import httpx
 import pytest
 from openai import APIConnectionError, BadRequestError, RateLimitError
 
-from mommy_chaogu.agent.service import AgentService, ChatCallbacks
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent.service import AgentService, ChatCallbacks
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture

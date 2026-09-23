@@ -16,9 +16,9 @@ from collections.abc import Coroutine
 from types import SimpleNamespace
 from typing import Any, ClassVar
 
-from mommy_chaogu.tui.views.chat import match_slash_commands, match_stocks
-from mommy_chaogu.tui.widgets.hint_bar import HintBar
-from mommy_chaogu.tui.widgets.tool_indicator import (
+from mojiang_chaogu.tui.views.chat import match_slash_commands, match_stocks
+from mojiang_chaogu.tui.widgets.hint_bar import HintBar
+from mojiang_chaogu.tui.widgets.tool_indicator import (
     ToolIndicator,
     format_elapsed,
     format_result_digest,
@@ -26,7 +26,7 @@ from mommy_chaogu.tui.widgets.tool_indicator import (
     tool_display_name,
     truncate_at_word,
 )
-from mommy_chaogu.tui.widgets.working_indicator import WorkingIndicator
+from mojiang_chaogu.tui.widgets.working_indicator import WorkingIndicator
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -45,7 +45,7 @@ class TestToolDisplayName:
         assert tool_display_name("search_similar_events") == "搜相似事件"
 
     def test_all_tools_mapped(self) -> None:
-        from mommy_chaogu.tui.widgets.tool_indicator import TOOL_DISPLAY_NAMES
+        from mojiang_chaogu.tui.widgets.tool_indicator import TOOL_DISPLAY_NAMES
 
         # 25 个行情/数据工具 + 7 个策略卡工具（写操作确认条需要中文名）
         assert len(TOOL_DISPLAY_NAMES) == 32
@@ -158,12 +158,12 @@ class TestMatchStocks:
 
 class TestToolIndicatorLifecycle:
     def test_start_then_complete(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.tool_call_started(1, "get_quote", {"code": "600519"})
@@ -188,12 +188,12 @@ class TestToolIndicatorLifecycle:
 
     def test_truncated_result_annotated(self) -> None:
         """结果含 [truncated 时工具行追加「（结果过大已截断）」。"""
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.tool_call_started(1, "get_bars", {"code": "688981"})
@@ -210,12 +210,12 @@ class TestToolIndicatorLifecycle:
         _run(_test())
 
     def test_error_path(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.tool_call_started(2, "get_bars", {"code": "688981"})
@@ -237,12 +237,12 @@ class TestToolIndicatorLifecycle:
 
 class TestBusyIndicators:
     def test_working_indicator_mount_remove(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.set_busy(True)
@@ -257,12 +257,12 @@ class TestBusyIndicators:
 
     def test_working_indicator_retry_and_queue(self) -> None:
         """重试态显示「正在重试 (1/3)」，排队数显示「已排队 N 条」。"""
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 chat.set_busy(True)
@@ -283,12 +283,12 @@ class TestBusyIndicators:
     def test_hint_bar_states(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 hint = chat.query_one(HintBar)
@@ -323,12 +323,12 @@ class TestBusyIndicators:
         """输入 6 位代码 → HintBar 提示 Enter 看报价。"""
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 hint = chat.query_one(HintBar)
@@ -377,15 +377,15 @@ class _FakeAgent:
 
 class TestAgentChatFlow:
     def test_full_turn_renders_tool_card_and_stats(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
             services = FakeServices.create()
             services.agent._agent = _FakeAgent()
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 app.handle_chat_message("茅台怎么样")
@@ -421,11 +421,11 @@ class TestAgentChatFlow:
 
 class TestThemeFix:
     def test_cycle_theme_sets_app_theme(self) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 app.ui_theme = "dark"
                 app.action_cycle_theme()
@@ -450,12 +450,12 @@ class TestSlashCycling:
     def test_up_down_cycles_candidates(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -485,12 +485,12 @@ class TestSlashCycling:
     def test_tab_completes_selected_candidate(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -509,12 +509,12 @@ class TestSlashCycling:
     def test_space_exits_slash_selection(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)

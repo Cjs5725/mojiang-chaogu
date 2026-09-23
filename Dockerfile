@@ -34,32 +34,32 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gosu \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 1000 mommy \
-    && useradd --uid 1000 --gid mommy --create-home mommy
+    && groupadd --gid 1000 mojiang \
+    && useradd --uid 1000 --gid mojiang --create-home mojiang
 
 COPY --from=python-builder /app/.venv /app/.venv
 COPY --from=web-builder /web/dist /app/web/dist
 COPY data/supply_chains/ /app/data-seed/supply_chains/
 COPY data/earnings_preview.json /app/data-seed/earnings_preview.json
-COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/mommy-entrypoint
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/mojiang-entrypoint
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
-    MOMMY_WEB_DIST=/app/web/dist
+    MOJIANG_WEB_DIST=/app/web/dist
 
 RUN mkdir -p \
         /app/data \
         /app/.venv/lib/python3.12/site-packages/efinance/data \
-    && chown -R mommy:mommy \
+    && chown -R mojiang:mojiang \
         /app/data \
         /app/.venv/lib/python3.12/site-packages/efinance/data
 
 EXPOSE 8000
 
-USER mommy
+USER mojiang
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD python -c "import os, urllib.request; urllib.request.urlopen(f\"http://localhost:{os.environ.get('PORT', '8000')}/api/health\", timeout=5)" || exit 1
 
-ENTRYPOINT ["mommy-entrypoint"]
-CMD ["mommy-web", "--host", "0.0.0.0"]
+ENTRYPOINT ["mojiang-entrypoint"]
+CMD ["mojiang-web", "--host", "0.0.0.0"]

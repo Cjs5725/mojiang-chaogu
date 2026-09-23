@@ -23,7 +23,7 @@ const sizeClass = computed(() => (props.size === 'sm' ? 'size-9 rounded-xl' : 's
     ]"
   >
     <img
-      src="/mommy-chaogu-logo.jpg"
+      src="/mojiang-chaogu-logo.jpg"
       :alt="alt"
       class="absolute left-1/2 top-[42%] w-[185%] max-w-none -translate-x-1/2 -translate-y-[38%]"
     />

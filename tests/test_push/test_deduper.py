@@ -6,8 +6,8 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from mommy_chaogu.push.deduper import JsonFileDeduper
-from mommy_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.push.deduper import JsonFileDeduper
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
 
 
 def make_signal(code: str = "600519", rule_id: str = "main_flow_threshold") -> Signal:

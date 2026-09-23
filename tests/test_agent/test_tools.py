@@ -9,8 +9,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     Bar,
     BarInterval,
@@ -220,7 +220,7 @@ class TestUnknownTool:
 
 class TestTruncationDetection:
     def test_is_truncated_result_matches_registry_marker(self) -> None:
-        from mommy_chaogu.agent.tools.registry import _truncate_result, is_truncated_result
+        from mojiang_chaogu.agent.tools.registry import _truncate_result, is_truncated_result
 
         long_json = json.dumps({"bars": [{"close": i} for i in range(500)]})
         truncated = _truncate_result(long_json, max_bytes=256)
@@ -268,7 +268,7 @@ class TestGetPredictionHistory:
     def test_returns_prediction_list(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
         from pathlib import Path
 
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         db = tmp_path / "agent.db"
         tracker = PredictionTracker(Path(db))
@@ -311,7 +311,7 @@ class TestGetPredictionHistory:
     def test_filter_by_code(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
         from pathlib import Path
 
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         db = tmp_path / "agent.db"
         tracker = PredictionTracker(Path(db))
@@ -334,7 +334,7 @@ class TestGetPredictionHistory:
         import time
         from pathlib import Path
 
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         db = tmp_path / "agent.db"
         tracker = PredictionTracker(Path(db))
@@ -370,7 +370,7 @@ class TestSearchSimilarEvents:
     def test_degrades_without_embedding_client(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
         from pathlib import Path
 
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
         db = tmp_path / "agent.db"
         em = EpisodicMemory(Path(db))
@@ -404,7 +404,7 @@ class TestSearchSimilarEvents:
     ) -> None:
         from pathlib import Path
 
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
         db = tmp_path / "agent.db"
         em = EpisodicMemory(Path(db))
@@ -427,7 +427,7 @@ class TestGetMarketNarrative:
     def test_degrades_without_llm(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
         from pathlib import Path
 
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
         db = tmp_path / "agent.db"
         em = EpisodicMemory(Path(db))

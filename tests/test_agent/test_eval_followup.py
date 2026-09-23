@@ -13,9 +13,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent import llm as llm_provider
-from mommy_chaogu.agent.service import AgentService, ChatCallbacks
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent import llm as llm_provider
+from mojiang_chaogu.agent.service import AgentService, ChatCallbacks
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture
@@ -84,7 +84,7 @@ class TestRetryDelay:
         """extractor 的本地重试也读 Retry-After（through behavior）。"""
         from openai import RateLimitError
 
-        from mommy_chaogu.agent.extractor import _create_with_retry
+        from mojiang_chaogu.agent.extractor import _create_with_retry
 
         client = MagicMock()
         response = MagicMock()
@@ -104,7 +104,7 @@ class TestRetryDelay:
         assert client.chat.completions.create.call_count == 2
 
     def test_extractor_non_retryable_raises_immediately(self) -> None:
-        from mommy_chaogu.agent.extractor import _create_with_retry
+        from mojiang_chaogu.agent.extractor import _create_with_retry
 
         client = MagicMock()
         client.chat.completions.create.side_effect = ValueError("bad request")
@@ -118,13 +118,13 @@ class TestEmbedPendingTrigger:
     """embed_pending_events：装配/降级/容错三条路径。"""
 
     def test_no_vector_search_skips(self) -> None:
-        from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
+        from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
 
         pipe = MemoryPipeline(episodic=None, tracker=None, semantic=None)
         pipe.embed_pending_events()  # 不抛异常即通过
 
     def test_exception_tolerated(self) -> None:
-        from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
+        from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
 
         vs = MagicMock()
         vs.embed_pending.side_effect = RuntimeError("vec 表不存在")
@@ -133,9 +133,9 @@ class TestEmbedPendingTrigger:
         vs.embed_pending.assert_called_once()
 
     def test_record_analysis_triggers_embed(self, tmp_path: Path) -> None:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         episodic = EpisodicMemory(tmp_path / "a.db")
         tracker = PredictionTracker(tmp_path / "a.db")
@@ -144,8 +144,8 @@ class TestEmbedPendingTrigger:
 
         pipe = MemoryPipeline(episodic, tracker, None, vector_search=vs, client=client, model="m")
         with (
-            patch("mommy_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
-            patch("mommy_chaogu.agent.memory_pipeline.store_extraction"),
+            patch("mojiang_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
+            patch("mojiang_chaogu.agent.memory_pipeline.store_extraction"),
         ):
             mock_extract.return_value = {"observations": [{"code": "603662"}], "predictions": []}
             pipe.record_analysis("u", "a")
@@ -153,10 +153,10 @@ class TestEmbedPendingTrigger:
         vs.embed_pending.assert_called_once()
 
     def test_consolidate_triggers_embed(self, tmp_path: Path) -> None:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-        from mommy_chaogu.agent.semantic_memory import SemanticMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
         db = tmp_path / "a.db"
         vs = MagicMock()
@@ -168,7 +168,7 @@ class TestEmbedPendingTrigger:
             client=MagicMock(),
             model="m",
         )
-        with patch("mommy_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons:
+        with patch("mojiang_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons:
             mock_cons.return_value.consolidate_all.return_value = {}
             pipe.consolidate()
 
@@ -205,8 +205,8 @@ class TestVectorSearchAutoWiring:
     def test_openai_provider_builds_vector_search(
         self, _mock_openai: MagicMock, tmp_path: Path
     ) -> None:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         ctx = ToolContext(adapter=MagicMock())
         svc = AgentService(
@@ -224,8 +224,8 @@ class TestVectorSearchAutoWiring:
     def test_deepseek_provider_stays_degraded(
         self, _mock_openai: MagicMock, tmp_path: Path
     ) -> None:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         ctx = ToolContext(adapter=MagicMock())
         svc = AgentService(
@@ -243,8 +243,8 @@ class TestVectorSearchAutoWiring:
     def test_explicit_vector_search_not_overridden(
         self, _mock_openai: MagicMock, tmp_path: Path
     ) -> None:
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         custom_vs = MagicMock()
         ctx = ToolContext(adapter=MagicMock())
@@ -364,7 +364,7 @@ class TestTruncateUtf8Boundary:
     """_truncate_result 切在 UTF-8 多字节边界上不产生乱码。"""
 
     def test_multibyte_cut_has_no_replacement_char(self) -> None:
-        from mommy_chaogu.agent.tools.registry import MAX_RESULT_BYTES, _truncate_result
+        from mojiang_chaogu.agent.tools.registry import MAX_RESULT_BYTES, _truncate_result
 
         # 前缀 + 大量 3 字节中文字符，截断点必落在某个中文字符中间
         s = "ab" + "汉" * 4000

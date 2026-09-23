@@ -11,10 +11,10 @@ import asyncio
 from collections.abc import Coroutine
 from typing import Any
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.services.bootstrap import FakeServices
-from mommy_chaogu.tui.views.chat import ChatView
-from mommy_chaogu.tui.widgets.thinking import ThinkingBlock
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.services.bootstrap import FakeServices
+from mojiang_chaogu.tui.views.chat import ChatView
+from mojiang_chaogu.tui.widgets.thinking import ThinkingBlock
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -23,8 +23,8 @@ def _run(coro: Coroutine[Any, Any, None]) -> None:
 
 class TestThinkingLifecycle:
     @staticmethod
-    def _app() -> MommyTuiApp:
-        return MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+    def _app() -> MojiangTuiApp:
+        return MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
 
     def test_active_then_auto_finalize_on_answer(self) -> None:
         async def _test() -> None:
@@ -142,7 +142,7 @@ class TestAppThinkingWiring:
         services.agent.watch_background = lambda on_done: False  # type: ignore[method-assign]
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test(size=(110, 30)) as pilot:
                 chat = app.query_one(ChatView)
                 prompt = app.query_one("ChatInput")
@@ -166,7 +166,7 @@ class TestKeyboardFocusCycle:
 
     def test_tab_moves_focus_to_thinking_block_and_enter_expands(self) -> None:
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test(size=(110, 30)) as pilot:
                 chat = app.query_one(ChatView)
                 chat.start_thinking()

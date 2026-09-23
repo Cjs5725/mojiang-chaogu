@@ -19,8 +19,8 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
-from mommy_chaogu.portfolio.store import PortfolioStore
+from mojiang_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
+from mojiang_chaogu.portfolio.store import PortfolioStore
 
 
 @pytest.fixture
@@ -60,9 +60,9 @@ def _make_quote(code: str = "600519", price: str = "1680.00") -> Quote:
 @pytest.fixture
 def client_with_store(store: PortfolioStore, mock_adapter: MagicMock) -> TestClient:
     """带真实临时 PortfolioStore 的 client。"""
-    from mommy_chaogu.web.app import create_app
-    from mommy_chaogu.web.background import set_service
-    from mommy_chaogu.web.deps import get_adapter, get_portfolio_store
+    from mojiang_chaogu.web.app import create_app
+    from mojiang_chaogu.web.background import set_service
+    from mojiang_chaogu.web.deps import get_adapter, get_portfolio_store
 
     set_service(MagicMock())
 

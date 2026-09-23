@@ -13,9 +13,9 @@ uv run mypy --strict src # type check
 
 ## 密钥配置
 
-推荐运行 `uv run mommy setup`，交互式选择 Provider / 模型、隐藏输入并验证 Key，
+推荐运行 `uv run mojiang setup`，交互式选择 Provider / 模型、隐藏输入并验证 Key，
 还可继续扫码连接微信。安装用户的配置默认保存到
-`~/.config/mommy-chaogu/.env`（`0600`，不入仓）；只有当前仓库的项目 `.env` 已包含
+`~/.config/mojiang-chaogu/.env`（`0600`，不入仓）；只有当前仓库的项目 `.env` 已包含
 有效 Provider 或 API key 时才会就地更新。可用 `--local` / `--user` 显式选择作用域，
 用 `--check` 脱敏检查生效来源：
 
@@ -40,7 +40,7 @@ cp .env.example .env       # 复制模板
 优先级：shell 环境变量 > 项目 `.env` > 用户级 `.env` > 代码默认值。Provider 与 model
 按来源成组解析，禁止跨层拼接；`config.toml` 仅用于可选高级 Web 参数。provider 配置表
 （base_url / 默认模型 / env key / 温度 / embedding 模型）的单一真相源是
-`src/mommy_chaogu/agent/llm.py`——改 provider 只动它，不要另起表。
+`src/mojiang_chaogu/agent/llm.py`——改 provider 只动它，不要另起表。
 
 ## 数据库布局（2026-07-03 重组）
 
@@ -60,16 +60,16 @@ uv run python scripts/migrate_db_layout.py            # 执行迁移
 | `data/agent.db` | Agent 个人数据（记忆 + 策略卡） | agent_memory, episodic_events, predictions, semantic_knowledge, strategy_cards |
 | `data/reference.db` | 参考库（半导体产业链 + 业绩） | semicon_stocks, earnings_* |
 
-数据根目录可通过 `MOMMY_DATA_DIR` 覆盖，单库路径可通过环境变量覆盖：
-`MOMMY_MARKET_DB` / `MOMMY_PORTFOLIO_DB` / `MOMMY_AGENT_DB` / `MOMMY_REFERENCE_DB`。
-源码仓库默认使用 `data/`；全局安装默认使用 `~/.local/share/mommy-chaogu/`。
+数据根目录可通过 `MOJIANG_DATA_DIR` 覆盖，单库路径可通过环境变量覆盖：
+`MOJIANG_MARKET_DB` / `MOJIANG_PORTFOLIO_DB` / `MOJIANG_AGENT_DB` / `MOJIANG_REFERENCE_DB`。
+源码仓库默认使用 `data/`；全局安装默认使用 `~/.local/share/mojiang-chaogu/`。
 
-定义在 `src/mommy_chaogu/db_paths.py`。
+定义在 `src/mojiang_chaogu/db_paths.py`。
 
 ## 项目结构
 
 ```
-src/mommy_chaogu/
+src/mojiang_chaogu/
 ├── market_data/     # 数据源适配层（massive + yahoo 美股 + efinance + tencent fallback）
 ├── cache/           # SQLite 缓存（5 张表 + 节流 + freshness）
 ├── watchlist/       # 自选股（SQLite + SQLAlchemy 2.0）
@@ -89,30 +89,30 @@ src/mommy_chaogu/
 ├── push/            # Server酱微信推送
 ├── channels/        # 本地消息网关（微信二维码授权 + 私聊长轮询）
 ├── db_paths.py      # 统一数据库路径管理
-└── cli.py           # argparse 入口（含 mommy 自然语言入口 + 13 个透传子命令）
+└── cli.py           # argparse 入口（含 mojiang 自然语言入口 + 13 个透传子命令）
 ```
 
 ## 自然语言入口
 
 项目有两层 CLI 入口：
 
-1. **`mommy` — 面向用户的自然语言入口**（主要入口）
+1. **`mojiang` — 面向用户的自然语言入口**（主要入口）
    - 输入自然语言，系统自动匹配预定义工作流或 fallback 到 LLM agent
-   - `uv run mommy` → 交互式 REPL
-   - `uv run mommy 今天怎么样` → 单次查询
-   - `uv run mommy watchlist list` → 结构化子命令（直接透传，不需要 --raw）
-   - `uv run mommy setup` → Provider / 模型 / Key / 微信统一配置引导
-   - `uv run mommy -v "今天怎么样"` → 显示详细路由 + 工具调用信息
+   - `uv run mojiang` → 交互式 REPL
+   - `uv run mojiang 今天怎么样` → 单次查询
+   - `uv run mojiang watchlist list` → 结构化子命令（直接透传，不需要 --raw）
+   - `uv run mojiang setup` → Provider / 模型 / Key / 微信统一配置引导
+   - `uv run mojiang -v "今天怎么样"` → 显示详细路由 + 工具调用信息
 
 2. **底层 CLI 子命令**（向后兼容，高级用户 + CI）
-   - `mommy-watchlist` / `mommy-monitor` / `mommy-cache` / `mommy-flows` 等
-   - 这些命令保留向后兼容，推荐使用 `mommy <子命令>` 风格
-   - `mommy agent detect|plan|connect|doctor|repair --json` → Agent-managed 安装/诊断契约；plan
+   - `mojiang-watchlist` / `mojiang-monitor` / `mojiang-cache` / `mojiang-flows` 等
+   - 这些命令保留向后兼容，推荐使用 `mojiang <子命令>` 风格
+   - `mojiang agent detect|plan|connect|doctor|repair --json` → Agent-managed 安装/诊断契约；plan
      先展示文件和权限，真实 MCP 探针通过也不等于首次价值完成
-   - `mommy connect claude|kimi|cline|codex|dsh` → 兼容入口，安装 onboard/research/strategy 三个
+   - `mojiang connect claude|kimi|cline|codex|dsh` → 兼容入口，安装 onboard/research/strategy 三个
      Skill + 注册本地 MCP；新连接默认 market-only，显式 `--profile personal` 才开放个人能力
 
-工作流引擎见 `src/mommy_chaogu/workflow/`：
+工作流引擎见 `src/mojiang_chaogu/workflow/`：
 - `engine.py` — Workflow / WorkflowRegistry / WorkflowExecutor
 - `definitions.py` — 9 个预定义工作流（morning_brief / stock_analysis / sector_scan 等）
 - `router.py` — NLRouter（正则匹配优先，fallback 到 AgentService）
@@ -121,14 +121,14 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 
 ## TUI 终端界面
 
-`uv run mommy-tui` → 单屏对话即界面的投研 Coding Agent CLI（类似 Claude Code CLI），
+`uv run mojiang-tui` → 单屏对话即界面的投研 Coding Agent CLI（类似 Claude Code CLI），
 无模式切换：TopBar（指数 + AI 状态 + 时钟）+ 对话流 + 输入框，启动焦点在输入框。
 
 - 对话流内渲染富卡片（不跳屏）：slash 命令 `/today` `/watch` `/portfolio`
   `/flows [code]` `/quote <code>` `/predictions` `/signals` `/memory` `/status`
   `/resume [id]` `/new` `/help` `/clear` `/theme` `/quit`
 - 会话恢复（`tui/services/session_journal.py`）：启动自动恢复上次会话
-  （`MOMMY_TUI_RESUME=off` 关闭）；`/resume` 列出历史会话、`/resume <id>` 切换、
+  （`MOJIANG_TUI_RESUME=off` 关闭）；`/resume` 列出历史会话、`/resume <id>` 切换、
   `/new` 开新会话。数据源是 agent_memory 既有持久化（事件溯源派生，零新表、
   模块对表严格只读）；续聊经 `AgentBridge.bind_conversation_memory` 换绑
   SessionMemory 视图，写路径仍是 agent 层唯一 memory.add。
@@ -151,7 +151,7 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 - 键盘：Enter 发送（busy 时排队，轮次结束自动发）；Esc 中断当前轮（保留已流部分）；
   PgUp/PgDn 滚动；Ctrl+P 命令面板；Ctrl+C 双击退出
 
-- `src/mommy_chaogu/tui/app.py` — App 主类（单屏 compose）+ `main()` 入口
+- `src/mojiang_chaogu/tui/app.py` — App 主类（单屏 compose）+ `main()` 入口
 - `tui/services/bootstrap.py` — Services 容器（DataService / AgentBridge / FakeServices
   + 指数/信号/@联想数据源）
 - `tui/services/renderers.py` — 工具结果 → 卡片分发；`tui/services/errors.py` — 错误文案友好映射
@@ -160,7 +160,7 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 
 ## Web 前端
 
-`uv run mommy-web` → Vue 3 + shadcn/vue + Tailwind v4。
+`uv run mojiang-web` → Vue 3 + shadcn/vue + Tailwind v4。
 
 - 桌面端侧边导航 + 移动端底部 tab（响应式）
 - 9 个页面：仪表盘/行情/主题/持仓/AI对话/个股详情/信号/设置/主题详情
@@ -170,9 +170,9 @@ Agent 交互指导见 `docs/AGENT-INTERACTION-GUIDE.md`。
 
 ## 产品定位（所有 Agent 的主事实）
 
-mommy-chaogu 是一套**边界明确、可由 Agent 接管和编排的本地投研工具箱**。用户不需要先学习
+mojiang-chaogu 是一套**边界明确、可由 Agent 接管和编排的本地投研工具箱**。用户不需要先学习
 复杂界面或命令，而是用自然语言表达目标、指标、规则、频率和流程；宿主 Agent 负责理解与编排，
-mommy-chaogu 提供行情数据、确定性计算、本地记录、策略蒸馏和受支持的自动监测。CLI / TUI /
+mojiang-chaogu 提供行情数据、确定性计算、本地记录、策略蒸馏和受支持的自动监测。CLI / TUI /
 Web 是可选入口，不是产品本体；本项目也不是面向其他应用建设的通用后端平台。
 
 产品能力按以下方式理解和交付：
@@ -188,7 +188,7 @@ Web 是可选入口，不是产品本体；本项目也不是面向其他应用�
 - **持续监测**：只把当前监控系统能够准确表达的条件变成候选，先展示触发规则和当前检查，用户
   另行确认后才启用；无法自动化的部分继续保留在人工流程中。
 
-外部 Agent 模式下，宿主 Agent 是唯一推理者和用户体验前端，不要求用户再给 mommy-chaogu 配置
+外部 Agent 模式下，宿主 Agent 是唯一推理者和用户体验前端，不要求用户再给 mojiang-chaogu 配置
 第二套 LLM Key。Agent 超级入口先解释产品与能力边界，再展示安装、文件与权限计划；**不得在安装前
 强制用户选择研究 / 策略 / 指标 / 监测路径**——工具箱的设计意图是连接后供自由探索。完成语义分两层：
 配置、三个 Skill、真实 MCP initialize/tools-list 与权限边界全部通过，即代表**集成可用**，此时工具箱
@@ -198,7 +198,7 @@ Web 是可选入口，不是产品本体；本项目也不是面向其他应用�
 
 能力边界必须诚实：
 
-- 自动管理的宿主范围以 `src/mommy_chaogu/cli_commands/agent_managed.py` 中
+- 自动管理的宿主范围以 `src/mojiang_chaogu/cli_commands/agent_managed.py` 中
   `SUPPORTED_HOSTS` 与实际 adapter registry 为准。portable stdio MCP Server 存在，不代表某个
   宿主的配置、Skill 安装和 doctor 已被自动支持；未适配宿主不得伪造 host、路径或成功状态。
 - “本地优先”指密钥和产品数据库默认保存在用户设备；公共行情仍会请求外部数据源，对话与工具
@@ -211,7 +211,7 @@ Web 是可选入口，不是产品本体；本项目也不是面向其他应用�
 
 ## 产品交付原则（高于工程偏好）
 
-mommy-chaogu 是直接服务最终用户的应用，不是为其他应用提供抽象能力的平台。工程正确性用于
+mojiang-chaogu 是直接服务最终用户的应用，不是为其他应用提供抽象能力的平台。工程正确性用于
 支撑用户结果，不能取代用户结果。规划、实现和评审时遵守以下顺序：
 
 1. **先定义用户可感知的完成事件**：写清目标用户、当前问题、最短使用路径，以及用户最终能

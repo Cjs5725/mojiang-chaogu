@@ -8,17 +8,17 @@ from pathlib import Path
 import pytest
 from sqlalchemy import text
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.memory import ConversationMemory
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-from mommy_chaogu.agent.semantic_memory import SemanticMemory
-from mommy_chaogu.agent.token_tracker import TokenTracker
-from mommy_chaogu.cache.store import CacheStore
-from mommy_chaogu.earnings.store import EarningsStore
-from mommy_chaogu.portfolio.store import PortfolioStore
-from mommy_chaogu.semicon.store import SemiconStore
-from mommy_chaogu.signals.custom_alerts import CustomAlertStore
-from mommy_chaogu.watchlist.store import WatchlistStore
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.memory import ConversationMemory
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.semantic_memory import SemanticMemory
+from mojiang_chaogu.agent.token_tracker import TokenTracker
+from mojiang_chaogu.cache.store import CacheStore
+from mojiang_chaogu.earnings.store import EarningsStore
+from mojiang_chaogu.portfolio.store import PortfolioStore
+from mojiang_chaogu.semicon.store import SemiconStore
+from mojiang_chaogu.signals.custom_alerts import CustomAlertStore
+from mojiang_chaogu.watchlist.store import WatchlistStore
 
 ENGINE_OWNERS = (
     EpisodicMemory,

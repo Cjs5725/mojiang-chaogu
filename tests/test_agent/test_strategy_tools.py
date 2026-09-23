@@ -9,10 +9,10 @@ from unittest.mock import MagicMock
 import pytest
 from pydantic import ValidationError
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.agent.tools.strategies import DEFS
-from mommy_chaogu.signals.custom_alerts import CustomAlertStore
-from mommy_chaogu.strategy.models import StrategyCard
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.agent.tools.strategies import DEFS
+from mojiang_chaogu.signals.custom_alerts import CustomAlertStore
+from mojiang_chaogu.strategy.models import StrategyCard
 
 
 def _card(*, summary: str = "价格到达观察位时提醒，其余形态由用户人工确认。") -> dict[str, object]:

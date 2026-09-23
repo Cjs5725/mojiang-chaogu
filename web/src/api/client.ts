@@ -11,8 +11,8 @@
 import { ref } from 'vue'
 
 const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || ''
-const TOKEN_KEY = 'mommy-owner-token'
-const CHAT_SESSION_KEY = 'mommy-chat-session'
+const TOKEN_KEY = 'mojiang-owner-token'
+const CHAT_SESSION_KEY = 'mojiang-chat-session'
 
 /**
  * 统一 API 错误。

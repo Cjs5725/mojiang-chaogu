@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.backtest.metrics import drawdown_fraction
-from mommy_chaogu.portfolio.analysis import PortfolioAnalyzer
-from mommy_chaogu.portfolio.store import (
+from mojiang_chaogu.backtest.metrics import drawdown_fraction
+from mojiang_chaogu.portfolio.analysis import PortfolioAnalyzer
+from mojiang_chaogu.portfolio.store import (
     PortfolioError,
     PortfolioStore,
     PositionNotFoundError,

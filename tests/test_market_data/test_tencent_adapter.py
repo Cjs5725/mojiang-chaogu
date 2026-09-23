@@ -11,12 +11,12 @@ from decimal import Decimal
 
 import pytest
 
-from mommy_chaogu.market_data import (
+from mojiang_chaogu.market_data import (
     FallbackAdapter,
     MarketDataAdapter,
     TencentAdapter,
 )
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     Quote,
@@ -53,7 +53,7 @@ def _mock_session_with_response(text: str):
 
 def _patch_session(monkeypatch, text: str) -> None:
     """把 TencentAdapter._session 替换成 mock。"""
-    from mommy_chaogu.market_data import tencent_adapter
+    from mojiang_chaogu.market_data import tencent_adapter
 
     monkeypatch.setattr(
         tencent_adapter.TencentAdapter,

@@ -1,20 +1,20 @@
 #!/bin/sh
 
-# mommy-chaogu installer for macOS and Linux.
+# mojiang-chaogu installer for macOS and Linux.
 #
 # Usage:
-#   curl -LsSf https://github.com/coffee-man666/mommy-chaogu/raw/refs/heads/main/install.sh | sh
+#   curl -LsSf https://github.com/Cjs5725/mojiang-chaogu/raw/refs/heads/main/install.sh | sh
 #
 # Optional overrides:
-#   MOMMY_INSTALL_SOURCE='mommy-chaogu @ https://example.com/package.whl'
-#   MOMMY_INSTALL_PYTHON=3.13
+#   MOJIANG_INSTALL_SOURCE='mojiang-chaogu @ https://example.com/package.whl'
+#   MOJIANG_INSTALL_PYTHON=3.13
 
 set -eu
 
-REPOSITORY="coffee-man666/mommy-chaogu"
-DEFAULT_SOURCE="mommy-chaogu @ https://github.com/${REPOSITORY}/archive/refs/heads/main.tar.gz"
-PACKAGE_SOURCE=${MOMMY_INSTALL_SOURCE:-$DEFAULT_SOURCE}
-PYTHON_VERSION=${MOMMY_INSTALL_PYTHON:-3.12}
+REPOSITORY="Cjs5725/mojiang-chaogu"
+DEFAULT_SOURCE="mojiang-chaogu @ https://github.com/${REPOSITORY}/archive/refs/heads/main.tar.gz"
+PACKAGE_SOURCE=${MOJIANG_INSTALL_SOURCE:-$DEFAULT_SOURCE}
+PYTHON_VERSION=${MOJIANG_INSTALL_PYTHON:-3.12}
 
 info() {
     printf '\033[1;34m%s\033[0m\n' "$1"
@@ -72,26 +72,26 @@ if uv_binary=$(find_uv); then
     info "使用现有 uv：$uv_binary"
 else
     info "没有检测到 uv，正在安装…"
-    temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/mommy-chaogu-install.XXXXXX")
+    temporary_directory=$(mktemp -d "${TMPDIR:-/tmp}/mojiang-chaogu-install.XXXXXX")
     uv_installer="$temporary_directory/uv-install.sh"
     download "https://astral.sh/uv/install.sh" "$uv_installer"
     sh "$uv_installer"
     uv_binary=$(find_uv) || fail "uv 已运行安装程序，但仍未找到可执行文件。"
 fi
 
-info "正在安装 mommy-chaogu（Python ${PYTHON_VERSION}）…"
+info "正在安装 mojiang-chaogu（Python ${PYTHON_VERSION}）…"
 "$uv_binary" tool install \
     --quiet \
     --quiet \
-    --refresh-package mommy-chaogu \
-    --reinstall-package mommy-chaogu \
+    --refresh-package mojiang-chaogu \
+    --reinstall-package mojiang-chaogu \
     --python "$PYTHON_VERSION" \
     "$PACKAGE_SOURCE"
 
 tool_bin_dir=$("$uv_binary" tool dir --bin)
-mommy_binary="$tool_bin_dir/mommy"
-[ -x "$mommy_binary" ] || fail "安装结束后没有找到 mommy 命令：$mommy_binary"
-"$mommy_binary" --help >/dev/null
+mojiang_binary="$tool_bin_dir/mojiang"
+[ -x "$mojiang_binary" ] || fail "安装结束后没有找到 mojiang 命令：$mojiang_binary"
+"$mojiang_binary" --help >/dev/null
 
 case ":$PATH:" in
     *":$tool_bin_dir:"*) path_ready=1 ;;
@@ -102,9 +102,9 @@ case ":$PATH:" in
 esac
 
 printf '\n'
-success "mommy-chaogu 安装完成。"
-printf '\n第一次运行：\n\n  mommy\n\n'
-printf '它会自动进入模型配置；也可以运行 `mommy setup` 手动配置。\n'
+success "mojiang-chaogu 安装完成。"
+printf '\n第一次运行：\n\n  mojiang\n\n'
+printf '它会自动进入模型配置；也可以运行 `mojiang setup` 手动配置。\n'
 if [ "$path_ready" -eq 0 ]; then
-    printf '\n如果当前终端仍提示找不到 mommy，请重新打开终端后再运行。\n'
+    printf '\n如果当前终端仍提示找不到 mojiang，请重新打开终端后再运行。\n'
 fi

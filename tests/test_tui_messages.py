@@ -6,7 +6,7 @@ tui/messages.py 目前只有 StepStatus 在实际使用（工作流步骤进度�
 
 from __future__ import annotations
 
-from mommy_chaogu.tui.messages import StepStatus
+from mojiang_chaogu.tui.messages import StepStatus
 
 
 class TestStepStatus:

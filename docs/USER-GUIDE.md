@@ -1,6 +1,6 @@
 # 场景化使用指南
 
-> 本指南通过真实使用场景，带你和你的 AI agent 从零开始玩转 mommy-chaogu。
+> 本指南通过真实使用场景，带你和你的 AI agent 从零开始玩转 mojiang-chaogu。
 
 ---
 
@@ -30,9 +30,9 @@
 ### Step 1：启动
 
 ```bash
-git clone https://github.com/coffee-man666/mommy-chaogu.git
-cd mommy-chaogu
-uv run mommy
+git clone https://github.com/Cjs5725/mojiang-chaogu.git
+cd mojiang-chaogu
+uv run mojiang
 ```
 
 `uv run` 会准备运行环境。第一次启动会自动进入配置向导；没有 API Key 也可以跳过，
@@ -41,7 +41,7 @@ uv run mommy
 ### Step 2：配置 AI 与微信
 
 ```bash
-uv run mommy setup
+uv run mojiang setup
 ```
 
 向导会选择 Provider 和模型、隐藏输入并验证 Key，最后可选微信扫码。配置默认以私有权限
@@ -49,14 +49,14 @@ uv run mommy setup
 [从安装到运行](GETTING-STARTED.md)。
 
 > **没有 API key？** 也能用。行情查询、资金流分析等 9 个预定义工作流不需要 LLM。
-> 只有 "AI 对话" 功能需要 API key。运行 `mommy "今天大盘怎么样"` 会正常工作，
-> 但 `mommy "帮我分析一下这个股的投资逻辑"` 会提示需要配置 key。
+> 只有 "AI 对话" 功能需要 API key。运行 `mojiang "今天大盘怎么样"` 会正常工作，
+> 但 `mojiang "帮我分析一下这个股的投资逻辑"` 会提示需要配置 key。
 
 ### Step 3：验证
 
 ```bash
 # 测试行情查询（不需要 API key）
-uv run mommy "今天怎么样"
+uv run mojiang "今天怎么样"
 ```
 
 你应该看到：
@@ -89,13 +89,13 @@ uv run mommy "今天怎么样"
 ### 方式 A：自然语言（最快）
 
 ```bash
-uv run mommy "今天大盘怎么样"
+uv run mojiang "今天大盘怎么样"
 ```
 
 系统会执行 `market_check` 工作流：获取上证/深证/创业板指数 + 板块排行。
 
 ```bash
-uv run mommy "持仓怎么样"
+uv run mojiang "持仓怎么样"
 ```
 
 系统会执行 `portfolio_review` 工作流：查询持仓报价 + 分析盈亏。
@@ -103,7 +103,7 @@ uv run mommy "持仓怎么样"
 ### 方式 B：交互式 REPL
 
 ```bash
-uv run mommy
+uv run mojiang
 ```
 
 进入对话模式，连续提问：
@@ -129,7 +129,7 @@ uv run mommy
 ### 方式 C：Web 看板
 
 ```bash
-uv run mommy web --port 8765
+uv run mojiang web --port 8765
 ```
 
 手机打开 `http://你的IP:8765`，首页 Dashboard 一屏看完：指数 + 自选股 + 持仓 + 信号。
@@ -145,7 +145,7 @@ uv run mommy web --port 8765
 ### 自然语言方式
 
 ```bash
-uv run mommy "分析一下比亚迪"
+uv run mojiang "分析一下比亚迪"
 ```
 
 系统执行 `stock_analysis` 工作流：报价 + K 线 + 资金流，三步自动完成。
@@ -153,7 +153,7 @@ uv run mommy "分析一下比亚迪"
 ### AI Agent 深度分析
 
 ```bash
-uv run mommy agent "中芯国际最近资金流怎么样？有什么值得注意的？"
+uv run mojiang agent "中芯国际最近资金流怎么样？有什么值得注意的？"
 ```
 
 Agent 会自主选择工具调用链：
@@ -176,7 +176,7 @@ Agent 会自主选择工具调用链：
 加 `-v` / `--verbose` 看完整路由 + 工具参数：
 
 ```bash
-uv run mommy -v "分析 600519"
+uv run mojiang -v "分析 600519"
 ```
 
 输出：
@@ -201,23 +201,23 @@ uv run mommy -v "分析 600519"
 
 ```bash
 # 拉取自选股的资金流数据
-uv run mommy flows pull
+uv run mojiang flows pull
 
 # 查看主力净流入 TOP 20
-uv run mommy flows top --direction in --n 20
+uv run mojiang flows top --direction in --n 20
 
 # 查看主力净流出 TOP 20
-uv run mommy flows top --direction out --n 20
+uv run mojiang flows top --direction out --n 20
 
 # 单只股票资金流详情
-uv run mommy flows show 688981 --days 30
+uv run mojiang flows show 688981 --days 30
 ```
 
 ### 持续监控
 
 ```bash
 # 每 5 分钟扫描一次，检测资金流异动
-uv run mommy flows run --interval 300
+uv run mojiang flows run --interval 300
 ```
 
 系统会实时检测 ratio 信号（主力净流入占流通市值的比例异常），发现异动时记录到日志。
@@ -226,7 +226,7 @@ uv run mommy flows run --interval 300
 
 ```bash
 # 生成今日收盘资金流报告（Markdown）
-uv run mommy flows report
+uv run mojiang flows report
 ```
 
 报告包含：板块资金流排行、个股异动、自选股汇总。
@@ -235,8 +235,8 @@ uv run mommy flows report
 
 ```bash
 # 从半导体产业链池拉取资金流
-uv run mommy flows pull --pool semicon --days 30
-uv run mommy flows top --pool semicon --direction in
+uv run mojiang flows pull --pool semicon --days 30
+uv run mojiang flows top --pool semicon --direction in
 ```
 
 ---
@@ -250,7 +250,7 @@ uv run mommy flows top --pool semicon --direction in
 ### 查看记忆统计
 
 ```bash
-uv run mommy memory stats
+uv run mojiang memory stats
 ```
 
 ```
@@ -266,7 +266,7 @@ uv run mommy memory stats
 ### 查看近期事件
 
 ```bash
-uv run mommy memory events
+uv run mojiang memory events
 ```
 
 ```
@@ -281,19 +281,19 @@ uv run mommy memory events
 
 ```bash
 # 所有预测
-uv run mommy memory predictions
+uv run mojiang memory predictions
 
 # 只看命中的
-uv run mommy memory predictions --status hit
+uv run mojiang memory predictions --status hit
 
 # 只看待验证的
-uv run mommy memory predictions --status pending
+uv run mojiang memory predictions --status pending
 ```
 
 ### 查看知识库
 
 ```bash
-uv run mommy memory knowledge
+uv run mojiang memory knowledge
 ```
 
 系统会从对话和分析中自动提炼语义知识，比如：
@@ -303,7 +303,7 @@ uv run mommy memory knowledge
 ### 查看对话历史
 
 ```bash
-uv run mommy memory history --limit 10
+uv run mojiang memory history --limit 10
 ```
 
 ### 记忆如何工作
@@ -329,7 +329,7 @@ uv run mommy memory history --limit 10
 ### 查看可用工具
 
 ```bash
-uv run mommy agent tools
+uv run mojiang agent tools
 ```
 
 25 个 function-calling 工具一览：
@@ -351,7 +351,7 @@ uv run mommy agent tools
 ### Agent 自主推理示例
 
 ```bash
-uv run mommy agent "帮我看看白酒板块最近怎么样，有没有机会"
+uv run mojiang agent "帮我看看白酒板块最近怎么样，有没有机会"
 ```
 
 Agent 内部推理链：
@@ -473,20 +473,20 @@ uv run python scripts/backtest_evolution.py --db /tmp/backtest.db
 
 ```bash
 # 价格告警：贵州茅台跌破 1600 提醒
-uv run mommy watchlist add-alert 600519 --rule "price <= 1600" --severity warning
+uv run mojiang watchlist add-alert 600519 --rule "price <= 1600" --severity warning
 
 # 涨跌幅告警：TCL中环涨超 5% 提醒
-uv run mommy watchlist add-alert 002129 --rule "change_pct >= 5" --severity info
+uv run mojiang watchlist add-alert 002129 --rule "change_pct >= 5" --severity info
 ```
 
 ### Step 2：启动监控
 
 ```bash
 # CLI 监控（每 30 秒轮询）
-uv run mommy monitor run --interval 30
+uv run mojiang monitor run --interval 30
 
 # 或启动 Web 服务（后台自动监控）
-uv run mommy web
+uv run mojiang web
 ```
 
 ### 告警效果
@@ -526,7 +526,7 @@ uv run mommy web
 ### 启动
 
 ```bash
-uv run mommy web --port 8765
+uv run mojiang web --port 8765
 # 或 Docker: docker compose up -d
 ```
 
@@ -602,7 +602,7 @@ ws.onmessage = (e) => {
 ### 启动
 
 ```bash
-uv run mommy tui
+uv run mojiang tui
 ```
 
 ### 两种模式（Tab 键切换）
@@ -625,18 +625,18 @@ uv run mommy tui
 
 ### 你的需求
 
-你已在 Kimi Code 或 Claude Code 登录，希望直接使用 mommy-chaogu 的投研逻辑和本地数据，
+你已在 Kimi Code 或 Claude Code 登录，希望直接使用 mojiang-chaogu 的投研逻辑和本地数据，
 不再配置第二套 LLM Key。
 
 ### MCP Server
 
 ```bash
 # 一键注册 MCP + 安装投研 Skill + 连通测试
-uv run mommy connect kimi          # 也可用 claude / cline / codex / dsh
+uv run mojiang connect kimi          # 也可用 claude / cline / codex / dsh
 
 # 查看和复测
-uv run mommy connect status
-uv run mommy connect test kimi
+uv run mojiang connect status
+uv run mojiang connect test kimi
 ```
 
 新连接默认 `market-only`：只开放公共行情。用户看到权限计划并明确同意切换到 `personal` 后，
@@ -644,7 +644,7 @@ uv run mommy connect test kimi
 但仍默认不写研究记录。保存结论需要先展示给用户并得到明确确认。若要显式保持公共模式，执行：
 
 ```bash
-uv run mommy connect kimi --profile market-only
+uv run mojiang connect kimi --profile market-only
 ```
 
 已有连接在未传 `--profile` 时会保持原选择；从 `market-only` 切换到个人能力必须显式使用
@@ -657,14 +657,14 @@ uv run mommy connect kimi --profile market-only
 
 ```bash
 # 安全断开；不会删除其他 MCP Server，修改过的 Skill 也会保留
-uv run mommy connect disconnect kimi
+uv run mojiang connect disconnect kimi
 ```
 
 高级用户仍可手动启动 stdio server：
 
 ```bash
-uv run mommy-mcp --profile market-only
-uv run mommy-mcp --profile personal
+uv run mojiang-mcp --profile market-only
+uv run mojiang-mcp --profile personal
 ```
 
 ### 通过 API 自动化
@@ -672,9 +672,9 @@ uv run mommy-mcp --profile personal
 你的脚本也可以通过 Python 模块直接调用：
 
 ```python
-from mommy_chaogu.cache import CachedMarketDataAdapter, CacheStore
-from mommy_chaogu.market_data import EfinanceAdapter, FallbackAdapter, TencentAdapter
-from mommy_chaogu.db_paths import MARKET_DB
+from mojiang_chaogu.cache import CachedMarketDataAdapter, CacheStore
+from mojiang_chaogu.market_data import EfinanceAdapter, FallbackAdapter, TencentAdapter
+from mojiang_chaogu.db_paths import MARKET_DB
 
 # 构建数据适配器
 adapter = CachedMarketDataAdapter(
@@ -697,79 +697,79 @@ print(f"数据来源: {adapter.format_source_label()}")  # "东方财富 实时"
 ### 自然语言入口
 
 ```bash
-mommy                           # 交互式 REPL
-mommy "今天怎么样"               # 单次自然语言查询
-mommy -v "分析 600519"          # --verbose 显示工具调用详情
-mommy setup                     # Provider + 模型 + Key + 微信统一配置
-mommy --setup                   # 兼容入口
+mojiang                           # 交互式 REPL
+mojiang "今天怎么样"               # 单次自然语言查询
+mojiang -v "分析 600519"          # --verbose 显示工具调用详情
+mojiang setup                     # Provider + 模型 + Key + 微信统一配置
+mojiang --setup                   # 兼容入口
 ```
 
 ### 结构化子命令
 
 ```bash
 # 自选股管理
-mommy watchlist add 600519 --group 白酒
-mommy watchlist list --by-group
-mommy watchlist groups
-mommy watchlist stats
+mojiang watchlist add 600519 --group 白酒
+mojiang watchlist list --by-group
+mojiang watchlist groups
+mojiang watchlist stats
 
 # 行情监控
-mommy monitor snapshot          # 一次性快照
-mommy monitor run --interval 30 # 持续监控
+mojiang monitor snapshot          # 一次性快照
+mojiang monitor run --interval 30 # 持续监控
 
 # 缓存管理
-mommy cache stats               # 命中率 + 覆盖率
-mommy cache warmup              # 预热全市场
-mommy cache refresh             # 刷新缓存
+mojiang cache stats               # 命中率 + 覆盖率
+mojiang cache warmup              # 预热全市场
+mojiang cache refresh             # 刷新缓存
 
 # 资金流
-mommy flows pull                # 拉取资金流
-mommy flows top --direction in  # 主力流入排行
-mommy flows show 688981         # 单股资金流
-mommy flows report              # 收盘日报
+mojiang flows pull                # 拉取资金流
+mojiang flows top --direction in  # 主力流入排行
+mojiang flows show 688981         # 单股资金流
+mojiang flows report              # 收盘日报
 
 # 记忆系统
-mommy memory stats              # 记忆统计
-mommy memory events             # 近期事件
-mommy memory predictions        # 预测记录
-mommy memory knowledge          # 语义知识
-mommy memory history            # 对话历史
+mojiang memory stats              # 记忆统计
+mojiang memory events             # 近期事件
+mojiang memory predictions        # 预测记录
+mojiang memory knowledge          # 语义知识
+mojiang memory history            # 对话历史
 
 # AI Agent
-mommy agent "你的问题"          # 单次对话
-mommy agent tools               # 列出工具
+mojiang agent "你的问题"          # 单次对话
+mojiang agent tools               # 列出工具
 
 # 其他
-mommy web --port 8765           # Web UI
-mommy tui                       # 终端 UI
-mommy semicon list              # 半导体产业链
-mommy report render             # HTML 报告
+mojiang web --port 8765           # Web UI
+mojiang tui                       # 终端 UI
+mojiang semicon list              # 半导体产业链
+mojiang report render             # HTML 报告
 ```
 
 ### LLM Provider 切换
 
 ```bash
 # 临时切换（环境变量）
-AGENT_PROVIDER=zai uv run mommy "今天怎么样"
+AGENT_PROVIDER=zai uv run mojiang "今天怎么样"
 
 # 永久切换：重新运行配置向导（同时更新 Provider、model 和对应 key）
-uv run mommy setup
+uv run mojiang setup
 
 # 排查当前到底读取了哪一层配置（不会显示 key 内容）
-uv run mommy setup --check
+uv run mojiang setup --check
 ```
 
 ### 数据库位置
 
 | 数据库 | 路径 | 环境变量覆盖 |
 |--------|------|-------------|
-| market | `data/market.db` | `MOMMY_MARKET_DB` |
-| portfolio | `data/portfolio.db` | `MOMMY_PORTFOLIO_DB` |
-| agent | `data/agent.db` | `MOMMY_AGENT_DB` |
-| reference | `data/reference.db` | `MOMMY_REFERENCE_DB` |
+| market | `data/market.db` | `MOJIANG_MARKET_DB` |
+| portfolio | `data/portfolio.db` | `MOJIANG_PORTFOLIO_DB` |
+| agent | `data/agent.db` | `MOJIANG_AGENT_DB` |
+| reference | `data/reference.db` | `MOJIANG_REFERENCE_DB` |
 
 ---
 
-> 💡 **有问题？** [提 Issue](https://github.com/coffee-man666/mommy-chaogu/issues) 或 [发起 Discussion](https://github.com/coffee-man666/mommy-chaogu/discussions)。
+> 💡 **有问题？** [提 Issue](https://github.com/Cjs5725/mojiang-chaogu/issues) 或 [发起 Discussion](https://github.com/Cjs5725/mojiang-chaogu/discussions)。
 >
 > ⚠️ **免责声明**：本项目仅供学习和个人投资参考，不构成任何投资建议。A 股投资有风险，入市需谨慎。

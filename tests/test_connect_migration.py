@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from mommy_chaogu.cli_commands.connect import (
+from mojiang_chaogu.cli_commands.connect import (
     _connection_spec,
     _state_path,
     _status,
@@ -20,7 +20,7 @@ def test_legacy_connection_without_profile_is_market_only_and_not_rewritten(
 ) -> None:
     config_dir = tmp_path / "config"
     kimi_home = tmp_path / "kimi"
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(config_dir))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(config_dir))
     monkeypatch.setenv("KIMI_CODE_HOME", str(kimi_home))
     spec = _connection_spec("market-only")
     kimi_home.mkdir(parents=True)
@@ -28,7 +28,7 @@ def test_legacy_connection_without_profile_is_market_only_and_not_rewritten(
         json.dumps(
             {
                 "mcpServers": {
-                    "mommy-chaogu": {
+                    "mojiang-chaogu": {
                         "command": spec.command,
                         "args": spec.args,
                         "env": spec.env,
@@ -55,7 +55,7 @@ def test_legacy_connection_without_profile_is_market_only_and_not_rewritten(
 
     reconnect = build_connect_parser().parse_args(["kimi", "--skip-test"])
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which",
+        "mojiang_chaogu.cli_commands.connect.shutil.which",
         side_effect=lambda name: "/bin/kimi" if name == "kimi" else None,
     ):
         assert cmd_connect(reconnect) == 0
@@ -67,7 +67,7 @@ def test_legacy_connection_without_profile_is_market_only_and_not_rewritten(
 
     upgrade = build_connect_parser().parse_args(["kimi", "--profile", "personal", "--skip-test"])
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which",
+        "mojiang_chaogu.cli_commands.connect.shutil.which",
         side_effect=lambda name: "/bin/kimi" if name == "kimi" else None,
     ):
         assert cmd_connect(upgrade) == 0
@@ -80,11 +80,11 @@ def test_market_only_connection_does_not_record_personal_consent(
     tmp_path: Path, monkeypatch
 ) -> None:
     config_dir = tmp_path / "config"
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(config_dir))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(config_dir))
     monkeypatch.setenv("KIMI_CODE_HOME", str(tmp_path / "kimi"))
     args = build_connect_parser().parse_args(["kimi", "--profile", "market-only", "--skip-test"])
     with patch(
-        "mommy_chaogu.cli_commands.connect.shutil.which",
+        "mojiang_chaogu.cli_commands.connect.shutil.which",
         side_effect=lambda name: "/bin/kimi" if name == "kimi" else None,
     ):
         assert cmd_connect(args) == 0

@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.earnings.store import EarningsStore
-from mommy_chaogu.earnings.types import (
+from mojiang_chaogu.earnings.store import EarningsStore
+from mojiang_chaogu.earnings.types import (
     EarningsActual,
     EarningsCalendar,
     EarningsScore,

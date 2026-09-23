@@ -1,11 +1,11 @@
 # GitHub Pages 宣传站
 
-宣传站与 `mommy-chaogu plugins store` 源码位于 `site/`，包含：
+宣传站与 `mojiang-chaogu plugins store` 源码位于 `site/`，包含：
 
 - 项目能力介绍与产品边界
 - `v1.5.0`、`v1.4.0`、`v1.3.0`、`v1.2.0` 更新摘要
 - `2026-08-19` 粮食安全主题分析的可交互页面、报告入口和整包下载
-- 六个并列展示的项目插件：`mommy-onboard`、`mommy-research`、`mommy-strategy`、`market-watch-loop`、`basket-analysis`、`food-security-analysis`
+- 六个并列展示的项目插件：`mojiang-onboard`、`mojiang-research`、`mojiang-strategy`、`market-watch-loop`、`basket-analysis`、`food-security-analysis`
 - 六个插件的当前版本 ZIP；`basket-analysis` 另提供 `.tar.gz` 归档
 - 可实际执行的 `install-skill.py` 安装脚本
 
@@ -23,10 +23,10 @@ python3 -m http.server 4173 --directory site
 ```bash
 python3 site/install-skill.py \
   --target custom \
-  --destination /tmp/mommy-chaogu-skill-smoke \
+  --destination /tmp/mojiang-chaogu-skill-smoke \
   site/skills/basket-analysis-v1.2.1.zip
 ```
 
 其他五个归档也可将最后一行替换为 Plugins Store 中对应的 `site/skills/*.zip`；`basket-analysis` 另有 `.tar.gz` 版本。
 
-六个内置插件（包括 `basket-analysis` 和 `food-security-analysis`）都应使用项目真实支持的 `mommy agent plan/connect` 路径安装；每个插件也有可下载 ZIP，两个主题插件另外保留 tar.gz 归档，适合单独检查或分发。
+六个内置插件（包括 `basket-analysis` 和 `food-security-analysis`）都应使用项目真实支持的 `mojiang agent plan/connect` 路径安装；每个插件也有可下载 ZIP，两个主题插件另外保留 tar.gz 归档，适合单独检查或分发。

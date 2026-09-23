@@ -15,7 +15,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ class TestSearchNews:
                 }
             ]
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.intel.search_news", fake_search_news)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.intel.search_news", fake_search_news)
 
         result = registry.call("search_news", {"keyword": "创新药", "limit": 5})
         data = json.loads(result)
@@ -68,7 +68,7 @@ class TestSearchNews:
             captured["limit"] = limit
             return []
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.intel.search_news", fake_search_news)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.intel.search_news", fake_search_news)
 
         registry.call("search_news", {"keyword": "半导体"})
         assert captured["limit"] == 10
@@ -79,7 +79,7 @@ class TestSearchNews:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.intel.search_news",
+            "mojiang_chaogu.agent.tools.intel.search_news",
             lambda keyword, limit=10: [],
         )
         result = registry.call("search_news", {"keyword": "无结果"})
@@ -110,7 +110,7 @@ class TestGetAnnouncements:
             ]
 
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.intel.get_announcements", fake_get_announcements
+            "mojiang_chaogu.agent.tools.intel.get_announcements", fake_get_announcements
         )
 
         result = registry.call("get_announcements", {"code": "600519", "limit": 3})
@@ -132,7 +132,7 @@ class TestGetAnnouncements:
             return []
 
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.intel.get_announcements", fake_get_announcements
+            "mojiang_chaogu.agent.tools.intel.get_announcements", fake_get_announcements
         )
 
         registry.call("get_announcements", {"code": "000001"})
@@ -165,7 +165,7 @@ class TestGetLonghuban:
                 }
             ]
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.intel.get_longhuban", fake_get_longhuban)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.intel.get_longhuban", fake_get_longhuban)
 
         result = registry.call("get_longhuban", {"date": "2026-07-01", "limit": 10})
         data = json.loads(result)
@@ -187,7 +187,7 @@ class TestGetLonghuban:
             captured["limit"] = limit
             return []
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.intel.get_longhuban", fake_get_longhuban)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.intel.get_longhuban", fake_get_longhuban)
 
         registry.call("get_longhuban", {})
         assert captured["date"] is None
@@ -222,7 +222,7 @@ class TestGetFundamentals:
             }
 
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.intel.get_fundamentals", fake_get_fundamentals
+            "mojiang_chaogu.agent.tools.intel.get_fundamentals", fake_get_fundamentals
         )
 
         result = registry.call("get_fundamentals", {"code": "600519"})

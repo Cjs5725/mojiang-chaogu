@@ -16,10 +16,10 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.cache import CacheStore
-from mommy_chaogu.flows.pool import CustomPool
-from mommy_chaogu.flows.service import FlowService, FlowSummary, PullResult
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.cache import CacheStore
+from mojiang_chaogu.flows.pool import CustomPool
+from mojiang_chaogu.flows.service import FlowService, FlowSummary, PullResult
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     MoneyFlow,

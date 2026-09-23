@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.market_data.adapter import MarketDataAdapter
-from mommy_chaogu.market_data.massive_adapter import MassiveAdapter, _is_us_code
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.adapter import MarketDataAdapter
+from mojiang_chaogu.market_data.massive_adapter import MassiveAdapter, _is_us_code
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     BarInterval,
     MarketType,

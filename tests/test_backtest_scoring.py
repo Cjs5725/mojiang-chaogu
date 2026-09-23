@@ -1,8 +1,8 @@
-"""统一评分模块 ``mommy_chaogu.backtest.scoring`` 的测试。"""
+"""统一评分模块 ``mojiang_chaogu.backtest.scoring`` 的测试。"""
 
 from __future__ import annotations
 
-from mommy_chaogu.backtest.scoring import (
+from mojiang_chaogu.backtest.scoring import (
     score_direction,
     verify_prediction,
 )

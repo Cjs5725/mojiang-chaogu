@@ -13,7 +13,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.earnings.types import EarningsScore, EarningsVerdict
+from mojiang_chaogu.earnings.types import EarningsScore, EarningsVerdict
 
 # ---------------------------------------------------------------------------
 # 1. /api/agent/predictions
@@ -54,7 +54,7 @@ class TestPredictionsEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: _FakeTracker(),
         )
         resp = client.get("/api/agent/predictions")
@@ -68,7 +68,7 @@ class TestPredictionsEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: None,
         )
         resp = client.get("/api/agent/predictions")
@@ -79,7 +79,7 @@ class TestPredictionsEndpoint:
 class TestPredictionStatsEndpoint:
     def test_returns_stats(self, client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: _FakeTracker(),
         )
         resp = client.get("/api/agent/predictions/stats")
@@ -95,7 +95,7 @@ class TestPredictionStatsEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: None,
         )
         resp = client.get("/api/agent/predictions/stats")
@@ -145,7 +145,7 @@ class TestEarningsScoresEndpoint:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.earnings._store",
+            "mojiang_chaogu.web.routes.earnings._store",
             lambda: _FakeEarningsStore(),
         )
 
@@ -168,7 +168,7 @@ class TestEarningsScoresEndpoint:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.earnings._store",
+            "mojiang_chaogu.web.routes.earnings._store",
             lambda: _FakeEarningsStore(),
         )
 
@@ -184,14 +184,14 @@ class TestEarningsScoresEndpoint:
 
 class TestWSSignalMessageSchema:
     def test_schema_matches_actual_push(self) -> None:
-        from mommy_chaogu.web.schemas import WSSignalMessage
+        from mojiang_chaogu.web.schemas import WSSignalMessage
 
         assert "signals" in WSSignalMessage.model_fields
         assert "signal" not in WSSignalMessage.model_fields
 
     def test_validates_real_payload(self) -> None:
-        from mommy_chaogu.web.mappers import signal_to_out
-        from mommy_chaogu.web.schemas import WSSignalMessage
+        from mojiang_chaogu.web.mappers import signal_to_out
+        from mojiang_chaogu.web.schemas import WSSignalMessage
 
         from .conftest import make_signal
 

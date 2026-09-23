@@ -1,5 +1,5 @@
 // 判断市场阶段（A 股 Asia/Shanghai 或 美股 America/New_York）
-// 移植自 src/mommy_chaogu/tui/widgets/top_bar.py market_phase()
+// 移植自 src/mojiang_chaogu/tui/widgets/top_bar.py market_phase()
 //
 // 用于：StatusBar 的"交易中/午休/已收盘/集合竞价"标签，
 // 以及看板的自适应轮询节奏（交易中 5s / 午休 60s / 收盘停）。

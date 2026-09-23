@@ -134,7 +134,7 @@ def show_existing_groups(conn: sqlite3.Connection) -> None:
 def seed_groups(dry_run: bool = False) -> tuple[int, int, int]:
     """建组 + 入股。返回 (group_added, entry_added, entry_skipped)。"""
 
-    from mommy_chaogu.watchlist.store import (
+    from mojiang_chaogu.watchlist.store import (
         GroupAlreadyExistsError,
         WatchlistStore,
     )

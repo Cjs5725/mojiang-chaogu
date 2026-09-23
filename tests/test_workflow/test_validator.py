@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from mommy_chaogu.workflow.definitions import get_default_registry
-from mommy_chaogu.workflow.spec import ArgSource, StepSpec, WorkflowSpec
-from mommy_chaogu.workflow.validator import blocking_issues, validate_spec
+from mojiang_chaogu.workflow.definitions import get_default_registry
+from mojiang_chaogu.workflow.spec import ArgSource, StepSpec, WorkflowSpec
+from mojiang_chaogu.workflow.validator import blocking_issues, validate_spec
 
 
 def _valid(**kwargs: object) -> WorkflowSpec:

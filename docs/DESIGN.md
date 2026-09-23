@@ -1,6 +1,6 @@
 # 设计文档 (DESIGN.md)
 
-> mommy-chaogu 的架构、原则、关键决策。本文回答「**为什么这样设计**」。
+> mojiang-chaogu 的架构、原则、关键决策。本文回答「**为什么这样设计**」。
 
 最后更新：2026-08-11
 
@@ -79,7 +79,7 @@ class MarketDataAdapter(Protocol):
 - `fetched_at`：什么时候拉取的
 - `quote_ts`：数据自身的时间戳（如行情时间）
 
-妈妈能在 `mommy-cache stats` 里看到「这条数据是 5 分钟前拉的还是 5 秒前」。
+妈妈能在 `mojiang-cache stats` 里看到「这条数据是 5 分钟前拉的还是 5 秒前」。
 
 ### P3 — 降级优先 (Graceful Degradation)
 
@@ -120,7 +120,7 @@ CachedMarketDataAdapter  ←  加 DB 缓存 + 节流
 ## 3. 模块架构
 
 ```
-src/mommy_chaogu/
+src/mojiang_chaogu/
 ├── market_data/         # 数据源适配层
 │   ├── types.py             # 11 个 dataclass + 4 个 StrEnum
 │   ├── adapter.py           # MarketDataAdapter Protocol
@@ -150,15 +150,15 @@ src/mommy_chaogu/
 │   └── manager.py           # CacheManager（warmup / refresh / stats）
 │
 └── cli.py               # argparse 入口
-    ├── mommy-watchlist      # 自选股管理
-    ├── mommy-monitor        # 行情监控
-    └── mommy-cache          # 缓存管理
+    ├── mojiang-watchlist      # 自选股管理
+    ├── mojiang-monitor        # 行情监控
+    └── mojiang-cache          # 缓存管理
 ```
 
 ## 4. 数据流（一次 `get_quote("600519")` 的全链路）
 
 ```
-[CLI: mommy-monitor run]
+[CLI: mojiang-monitor run]
     ↓ every N seconds
 [Monitor.snapshot_now("600519")]
     ↓

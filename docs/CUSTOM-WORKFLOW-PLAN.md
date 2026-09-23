@@ -14,7 +14,7 @@
 
 ## Phase 1：交易积木（中层复合工具）
 
-### 1.1 新建 `src/mommy_chaogu/agent/tools/analysis.py`
+### 1.1 新建 `src/mojiang_chaogu/agent/tools/analysis.py`
 
 遵循现有域模块模式（`DEFS: list[ToolDef]` + `HANDLERS: dict[str, ToolHandler]`），注册 3 个积木：
 
@@ -78,7 +78,7 @@ import 时一致性校验自动生效。
 
 ## Phase 2：WorkflowSpec + SpecRuntime
 
-### 2.1 新建 `src/mommy_chaogu/workflow/spec.py` — 数据模型
+### 2.1 新建 `src/mojiang_chaogu/workflow/spec.py` — 数据模型
 
 ```python
 @dataclass(frozen=True)
@@ -113,7 +113,7 @@ class WorkflowSpec:
     def from_json(cls, s: str) -> WorkflowSpec: ...  # 反序列化
 ```
 
-### 2.2 新建 `src/mommy_chaogu/workflow/spec_runtime.py` — Spec → Workflow 转换
+### 2.2 新建 `src/mojiang_chaogu/workflow/spec_runtime.py` — Spec → Workflow 转换
 
 ```python
 def spec_to_workflow(spec: WorkflowSpec) -> Workflow:
@@ -129,7 +129,7 @@ def spec_to_workflow(spec: WorkflowSpec) -> Workflow:
 
 对 `step_field` 的特殊处理：如果前序步骤返回 `{"results": [...], "count": N}` 格式，自动从每个 item 提取 `code` 字段组成 `codes` 列表。这是积木工具的标准输出格式，让步骤间的数据传递变简单。
 
-### 2.3 新建 `src/mommy_chaogu/workflow/validator.py` — 校验器
+### 2.3 新建 `src/mojiang_chaogu/workflow/validator.py` — 校验器
 
 ```python
 def validate_spec(spec: WorkflowSpec, tool_registry: ToolRegistry) -> list[str]:
@@ -154,7 +154,7 @@ def validate_spec(spec: WorkflowSpec, tool_registry: ToolRegistry) -> list[str]:
 
 ## Phase 3：WorkflowCompiler（LLM 编译器）
 
-### 3.1 新建 `src/mommy_chaogu/workflow/compiler.py`
+### 3.1 新建 `src/mojiang_chaogu/workflow/compiler.py`
 
 ```python
 class WorkflowCompiler:
@@ -224,7 +224,7 @@ class CompileResult:
 
 ## Phase 4：持久化 + CLI + NLRouter 集成
 
-### 4.1 新建 `src/mommy_chaogu/workflow/store.py` — 持久化
+### 4.1 新建 `src/mojiang_chaogu/workflow/store.py` — 持久化
 
 agent.db 新增表：
 
@@ -249,18 +249,18 @@ class WorkflowStore:
     def increment_hit(self, workflow_id: str) -> None: ...
 ```
 
-### 4.2 CLI 子命令：`mommy workflow`
+### 4.2 CLI 子命令：`mojiang workflow`
 
-在 `cli.py` 中添加 `workflow` 子命令分支（在现有 `main_mommy` 的子命令检测之前）：
+在 `cli.py` 中添加 `workflow` 子命令分支（在现有 `main_mojiang` 的子命令检测之前）：
 
 ```bash
-mommy workflow create "当自选股主力净流入超过流通市值0.5%时，看看业绩公告和K线"
-mommy workflow create "..." --dry-run    # 只编译不注册
-mommy workflow list                       # 列出所有工作流（内置 + 自定义）
-mommy workflow delete user_flow_001       # 删除自定义工作流
+mojiang workflow create "当自选股主力净流入超过流通市值0.5%时，看看业绩公告和K线"
+mojiang workflow create "..." --dry-run    # 只编译不注册
+mojiang workflow list                       # 列出所有工作流（内置 + 自定义）
+mojiang workflow delete user_flow_001       # 删除自定义工作流
 ```
 
-实现：在 `main_mommy()` 的子命令检测段（`cli.py:486` 附近），添加 `workflow` 子命令分支，路由到新函数 `_handle_workflow_subcommand(args)`。
+实现：在 `main_mojiang()` 的子命令检测段（`cli.py:486` 附近），添加 `workflow` 子命令分支，路由到新函数 `_handle_workflow_subcommand(args)`。
 
 ### 4.3 NLRouter 启动时加载自定义工作流
 
@@ -274,8 +274,8 @@ router = NLRouter(get_default_registry(), executor=executor)
 # 改为：加载自定义工作流并合并
 registry = get_default_registry()
 # 创建一个新的 registry（包含内置 + 自定义），避免污染全局单例
-from mommy_chaogu.workflow.spec_runtime import spec_to_workflow
-from mommy_chaogu.workflow.store import WorkflowStore
+from mojiang_chaogu.workflow.spec_runtime import spec_to_workflow
+from mojiang_chaogu.workflow.store import WorkflowStore
 
 store = WorkflowStore(AGENT_DB)
 for spec in store.load_all():
@@ -300,14 +300,14 @@ router = NLRouter(registry, executor=executor)
 
 | 操作 | 文件 | 说明 |
 |---|---|---|
-| 新建 | `src/mommy_chaogu/agent/tools/analysis.py` | 3 个交易积木工具 |
-| 修改 | `src/mommy_chaogu/agent/tools/registry.py` | `_MODULES` 加 `analysis` |
-| 新建 | `src/mommy_chaogu/workflow/spec.py` | WorkflowSpec / StepSpec / ArgSource 数据模型 |
-| 新建 | `src/mommy_chaogu/workflow/spec_runtime.py` | spec_to_workflow + step_field 提取逻辑 |
-| 新建 | `src/mommy_chaogu/workflow/validator.py` | validate_spec |
-| 新建 | `src/mommy_chaogu/workflow/compiler.py` | WorkflowCompiler（LLM 编译器） |
-| 新建 | `src/mommy_chaogu/workflow/store.py` | WorkflowStore（agent.db CRUD） |
-| 修改 | `src/mommy_chaogu/cli.py` | `workflow create/list/delete` 子命令 + 启动时加载自定义工作流 |
+| 新建 | `src/mojiang_chaogu/agent/tools/analysis.py` | 3 个交易积木工具 |
+| 修改 | `src/mojiang_chaogu/agent/tools/registry.py` | `_MODULES` 加 `analysis` |
+| 新建 | `src/mojiang_chaogu/workflow/spec.py` | WorkflowSpec / StepSpec / ArgSource 数据模型 |
+| 新建 | `src/mojiang_chaogu/workflow/spec_runtime.py` | spec_to_workflow + step_field 提取逻辑 |
+| 新建 | `src/mojiang_chaogu/workflow/validator.py` | validate_spec |
+| 新建 | `src/mojiang_chaogu/workflow/compiler.py` | WorkflowCompiler（LLM 编译器） |
+| 新建 | `src/mojiang_chaogu/workflow/store.py` | WorkflowStore（agent.db CRUD） |
+| 修改 | `src/mojiang_chaogu/cli.py` | `workflow create/list/delete` 子命令 + 启动时加载自定义工作流 |
 | 新建 | `tests/test_tools/test_analysis.py` | 积木工具测试 |
 | 新建 | `tests/test_workflow/test_spec.py` | Spec 序列化 + spec_to_workflow 测试 |
 | 新建 | `tests/test_workflow/test_compiler.py` | 编译器测试（mock LLM） |
@@ -346,7 +346,7 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4（严格顺序依赖）
 需要补：
 - **注册顺序策略**：内置永远优先于自定义（注册自定义前先查重，冲突时拒绝或 warn）
 - **validator 里加 trigger 冲突检测**：对 `re.search` 逐一对内置工作流的 pattern 做前缀/包含检查，命中就报错让 LLM 重试
-- 或者更稳：自定义工作流优先**显式触发**（`mommy workflow run <id>`），模糊匹配作为 bonus
+- 或者更稳：自定义工作流优先**显式触发**（`mojiang workflow run <id>`），模糊匹配作为 bonus
 
 ## 实质遗漏 2：积木实现细节有一个隐患
 
@@ -362,4 +362,4 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4（严格顺序依赖）
 
 ## 可选的小建议
 
-`mommy workflow list` 内置 + 自定义混在一起，用户建多了会乱。建议分组显示（`[内置]` / `[自定义]`），自定义的显示触发词和命中次数——`hit_count` 字段既然建了就让它有用。
+`mojiang workflow list` 内置 + 自定义混在一起，用户建多了会乱。建议分组显示（`[内置]` / `[自定义]`），自定义的显示触发词和命中次数——`hit_count` 字段既然建了就让它有用。

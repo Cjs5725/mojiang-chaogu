@@ -4,7 +4,7 @@
 >
 > 状态：**已实现**（2026-07-05，MemoryPipeline 全入口激活，代码与设计对齐）
 >
-> 前置依赖：`docs/archive/BRANCH-MERGE-ANALYSIS.md`（merge 完成）、`src/mommy_chaogu/agent/memory.py`（现有朴素记忆）
+> 前置依赖：`docs/archive/BRANCH-MERGE-ANALYSIS.md`（merge 完成）、`src/mojiang_chaogu/agent/memory.py`（现有朴素记忆）
 
 ---
 
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS episodic_embeddings (
 | `AgentService.chat()` 返回后 | 后置 hook：LLM 提取 observations + predictions → 写 episodic + predictions |
 | `AgentReportService.generate()` | 完成后写 `analysis_record` |
 | `AgentMonitor.scan_once()` | 有 alert 时写 `signal_event` |
-| 新增 CLI: `mommy-agent remember --type trade --code 600519 --action buy --price 80 --shares 100 --reason "底部反转"` | 手动写入 |
+| 新增 CLI: `mojiang-agent remember --type trade --code 600519 --action buy --price 80 --shares 100 --reason "底部反转"` | 手动写入 |
 | 收盘 cron 15:30 | 拉大盘数据写 `market_snapshot` |
 
 ### 5.3 对话后事实抽取
@@ -449,10 +449,10 @@ class MarketNarrative:
 
 **CLI**：
 ```bash
-mommy-agent narrative --days 30          # 生成 30 天市场脉络
-mommy-agent narrative --scope "sector:创新药" --days 14
-mommy-agent narrative --changes           # 检测最近变化
-mommy-agent narrative --days 7 --push     # + 微信推送
+mojiang-agent narrative --days 30          # 生成 30 天市场脉络
+mojiang-agent narrative --scope "sector:创新药" --days 14
+mojiang-agent narrative --changes           # 检测最近变化
+mojiang-agent narrative --days 7 --push     # + 微信推送
 ```
 
 ---
@@ -640,7 +640,7 @@ Embedding 用 DeepSeek/OpenAI 的 embedding API，写入事件时异步生成。
 ### 12.2 新增文件
 
 ```
-src/mommy_chaogu/agent/
+src/mojiang_chaogu/agent/
 ├── memory.py                  # 现有（不动）
 ├── episodic_memory.py         # Phase 1: 情景记忆存储 + CRUD
 ├── prediction_tracker.py      # Phase 2: 预测追踪 + 状态机
@@ -690,49 +690,49 @@ def chat(self, user_message, memory=None, episodic=None):
 
 ```bash
 # 手动写入事件
-mommy-agent remember --type trade --code 603662 --action buy --price 80 --shares 100
+mojiang-agent remember --type trade --code 603662 --action buy --price 80 --shares 100
 
 # 预测管理
-mommy-agent verify               # 验证所有到期预测
-mommy-agent predictions          # 查看所有预测 + 状态
-mommy-agent predictions --pending  # 只看待验证
+mojiang-agent verify               # 验证所有到期预测
+mojiang-agent predictions          # 查看所有预测 + 状态
+mojiang-agent predictions --pending  # 只看待验证
 
 # 市场脉络
-mommy-agent narrative --days 30  # 30 天市场脉络
-mommy-agent narrative --changes  # 最近变化
+mojiang-agent narrative --days 30  # 30 天市场脉络
+mojiang-agent narrative --changes  # 最近变化
 
 # 知识管理
-mommy-agent consolidate --all    # 手动触发知识提炼
-mommy-agent knowledge list       # 查看已有知识
-mommy-agent knowledge search "创新药"
+mojiang-agent consolidate --all    # 手动触发知识提炼
+mojiang-agent knowledge list       # 查看已有知识
+mojiang-agent knowledge search "创新药"
 
 # 事件查询
-mommy-agent events --scope "sector:创新药" --days 14
-mommy-agent events --type signal_event
+mojiang-agent events --scope "sector:创新药" --days 14
+mojiang-agent events --type signal_event
 ```
 
 ### 12.5 Cron 集成
 
 | 时间 | 任务 | 说明 | 状态 |
 |---|---|---|---|
-| 15:30 周一~五 | `mommy-agent snapshot` | 拉大盘数据写 market_snapshot | ⬜ 待实现 |
-| 16:00 周一~五 | `mommy-agent verify` | 验证到期预测（收盘后 1h） | ✅ 已实现（见下） |
-| 周日 10:00 | `mommy-agent consolidate --all` | 知识提炼 + 置信度校准 | ⬜ 待实现 |
-| 周日 10:00 | `mommy-agent review` | 生成周报 + 经验摘要 + 脉络叙述 | ⬜ 待实现 |
+| 15:30 周一~五 | `mojiang-agent snapshot` | 拉大盘数据写 market_snapshot | ⬜ 待实现 |
+| 16:00 周一~五 | `mojiang-agent verify` | 验证到期预测（收盘后 1h） | ✅ 已实现（见下） |
+| 周日 10:00 | `mojiang-agent consolidate --all` | 知识提炼 + 置信度校准 | ⬜ 待实现 |
+| 周日 10:00 | `mojiang-agent review` | 生成周报 + 经验摘要 + 脉络叙述 | ⬜ 待实现 |
 
 #### 验证 cron（16:00 周一~五）
 
 已落地两种封装，任选其一：
 
 ```bash
-# 方式 1：shell 脚本（轻量，调 mommy-agent CLI）
+# 方式 1：shell 脚本（轻量，调 mojiang-agent CLI）
 0 16 * * 1-5 cd /path/to/project && /path/to/scripts/cron_verify.sh
 
 # 方式 2：Python 封装（可移植，Windows / 容器友好，复用 verify_pending 核心逻辑）
 0 16 * * 1-5 cd /path/to/project && uv run python scripts/cron_verify.py
 ```
 
-- `scripts/cron_verify.sh` — 调 `uv run mommy-agent verify`，日志写 `data/cron_verify.log`
+- `scripts/cron_verify.sh` — 调 `uv run mojiang-agent verify`，日志写 `data/cron_verify.log`
 - `scripts/cron_verify.py` — 直接 import `verify_pending`（不经 argparse），带 `--db` / `--log` 参数，日志同时输出 stdout 和文件
 - 两者都设置在 16:00（收盘后 1 小时）以避开 15:00–15:30 的数据空窗
 
@@ -747,7 +747,7 @@ mommy-agent events --type signal_event
 - 对话后事实抽取 hook（LLM structured output）
 - `data_coverage` 字段标记
 - 注入近期事件到 system prompt
-- CLI: `mommy-agent remember` / `mommy-agent events`
+- CLI: `mojiang-agent remember` / `mojiang-agent events`
 
 ### Phase 2 — 预测追踪 + 降级验证（2-3 天）
 
@@ -755,14 +755,14 @@ mommy-agent events --type signal_event
 - `verify_engine.py`：降级验证逻辑（报价优先 → 资金流可选 → unverifiable）
 - 评分规则（方向 + 目标价）
 - 注入最近验证结果到 system prompt
-- CLI: `mommy-agent verify` / `mommy-agent predictions`
+- CLI: `mojiang-agent verify` / `mojiang-agent predictions`
 - Cron: 16:00 自动验证
 
 ### Phase 3 — 市场脉络（2-3 天）
 
 - `narrative.py`：`generate_narrative()` / `detect_changes()` / `compare_periods()`
 - Agent 工具：`get_market_narrative`
-- CLI: `mommy-agent narrative`
+- CLI: `mojiang-agent narrative`
 - 周报中加入脉络叙述
 
 ### Phase 4 — 语义记忆 + 知识提炼（3-4 天）
@@ -771,7 +771,7 @@ mommy-agent events --type signal_event
 - `consolidator.py`：4 种知识类型提炼
 - 置信度校准（由 predictions 命中率动态调整）
 - 注入活跃知识到 system prompt
-- CLI: `mommy-agent consolidate` / `mommy-agent knowledge`
+- CLI: `mojiang-agent consolidate` / `mojiang-agent knowledge`
 - Cron: 周日 10:00 自动提炼
 
 ### Phase 5 — 向量检索（2-3 天）
@@ -829,7 +829,7 @@ mommy-agent events --type signal_event
 
 ### 架构
 
-`MemoryPipeline`（`src/mommy_chaogu/agent/memory_pipeline.py`）是记忆系统的统一入口，封装了所有记忆操作：
+`MemoryPipeline`（`src/mojiang_chaogu/agent/memory_pipeline.py`）是记忆系统的统一入口，封装了所有记忆操作：
 
 ```
 MemoryPipeline

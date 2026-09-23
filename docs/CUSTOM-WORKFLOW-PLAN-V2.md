@@ -104,7 +104,7 @@ KNOWN_CODE_EXTRACTORS: dict[str, Callable[[Any], list[str]]] = {
 
 ## Phase 1：交易积木
 
-### 新建 `src/mommy_chaogu/agent/tools/analysis.py`
+### 新建 `src/mojiang_chaogu/agent/tools/analysis.py`
 
 三个积木，全部遵守输出契约、直接调 `ctx.adapter`（走缓存）、**不复用其他工具 handler**
 （避免绕开 registry 的截断和错误处理，行为不一致）：
@@ -269,10 +269,10 @@ class WorkflowStore:
 ### CLI（cli.py 新增 `workflow` 子命令族）
 
 ```bash
-mommy workflow add <file.json>            # 手写 spec 注册（本阶段测试编译器之前的主路径）
-mommy workflow run <id> [--set key=val]   # 显式执行，--set 覆盖 params
-mommy workflow list                       # 分组显示：[内置] / [自定义]（含触发词、命中次数、stale 标记）
-mommy workflow delete <id>
+mojiang workflow add <file.json>            # 手写 spec 注册（本阶段测试编译器之前的主路径）
+mojiang workflow run <id> [--set key=val]   # 显式执行，--set 覆盖 params
+mojiang workflow list                       # 分组显示：[内置] / [自定义]（含触发词、命中次数、stale 标记）
+mojiang workflow delete <id>
 ```
 
 启动时构建 merged registry（**新建实例，不污染全局单例**）：
@@ -337,8 +337,8 @@ LLM 可选提供；curated 模板库是 P2。
 ### CLI 增补
 
 ```bash
-mommy workflow create "当自选股主力净流入超过0.5%时，看看业绩和K线" [--dry-run]
-mommy workflow update <id> "改成阈值1%，只看业绩"
+mojiang workflow create "当自选股主力净流入超过0.5%时，看看业绩和K线" [--dry-run]
+mojiang workflow update <id> "改成阈值1%，只看业绩"
 ```
 
 ### 测试
@@ -391,14 +391,14 @@ create（编译）→ run（反复使用，hit_count 增长）→ update（修�
 
 | 操作 | 文件 | Phase |
 |---|---|---|
-| 新建 | `src/mommy_chaogu/agent/tools/analysis.py` | 1 |
-| 修改 | `src/mommy_chaogu/agent/tools/registry.py`（`_MODULES` 加 analysis） | 1 |
-| 新建 | `src/mommy_chaogu/workflow/spec.py` | 2 |
-| 新建 | `src/mommy_chaogu/workflow/spec_runtime.py`（含提取规则表） | 2 |
-| 新建 | `src/mommy_chaogu/workflow/validator.py`（含 trigger 冲突检测） | 2 |
-| 新建 | `src/mommy_chaogu/workflow/store.py` | 3 |
-| 修改 | `src/mommy_chaogu/cli.py`（workflow 子命令 + merged registry） | 3、4 |
-| 新建 | `src/mommy_chaogu/workflow/compiler.py` | 4 |
+| 新建 | `src/mojiang_chaogu/agent/tools/analysis.py` | 1 |
+| 修改 | `src/mojiang_chaogu/agent/tools/registry.py`（`_MODULES` 加 analysis） | 1 |
+| 新建 | `src/mojiang_chaogu/workflow/spec.py` | 2 |
+| 新建 | `src/mojiang_chaogu/workflow/spec_runtime.py`（含提取规则表） | 2 |
+| 新建 | `src/mojiang_chaogu/workflow/validator.py`（含 trigger 冲突检测） | 2 |
+| 新建 | `src/mojiang_chaogu/workflow/store.py` | 3 |
+| 修改 | `src/mojiang_chaogu/cli.py`（workflow 子命令 + merged registry） | 3、4 |
+| 新建 | `src/mojiang_chaogu/workflow/compiler.py` | 4 |
 | 新建 | `scripts/smoke_workflow.py` | 5 |
 | 测试 | `tests/test_tools/test_analysis.py` | 1 |
 | 测试 | `tests/test_workflow/test_spec.py` + `test_validator.py` | 2 |
@@ -531,7 +531,7 @@ create（编译）→ run（反复使用，hit_count 增长）→ update（修�
 
 ## 修复 1（中 2）：`workflow run` 增加 `--input` 参数
 
-**文件**：`src/mommy_chaogu/cli_commands/workflow.py`
+**文件**：`src/mojiang_chaogu/cli_commands/workflow.py`
 
 argparse 定义处（当前 28-30 行）加参数：
 
@@ -589,7 +589,7 @@ except ValueError as exc:
 ## 修复 3（低 4）：`cli.py` 主入口的 WorkflowStore 补 close
 
 - 单次查询模式：`sys.exit(0)` 之前调 `workflow_store.close()`
-- REPL 模式：`_run_mommy_repl(...)` 返回后调 `workflow_store.close()`
+- REPL 模式：`_run_mojiang_repl(...)` 返回后调 `workflow_store.close()`
   （注意 REPL 持有的是 `workflow_store.increment_hit` 引用，REPL 退出后 close 安全）
 
 ## 修复 4（低 3）：`run --help` 写明无 LLM 总结
@@ -627,14 +627,14 @@ uv run pytest tests/test_workflow/ tests/test_tools/test_analysis.py -m "not net
 # 预期：111 passed（109 + 2 新增）
 
 # 2. lint + 类型
-uv run ruff check src/mommy_chaogu/cli_commands/workflow.py src/mommy_chaogu/cli.py
-uv run mypy --strict src/mommy_chaogu/cli_commands/workflow.py
+uv run ruff check src/mojiang_chaogu/cli_commands/workflow.py src/mojiang_chaogu/cli.py
+uv run mypy --strict src/mojiang_chaogu/cli_commands/workflow.py
 
 # 3. 手动验证（真实 CLI）
-mommy workflow add /tmp/user_regex_spec.json
-mommy workflow run user_xxx                     # 无 --input → 友好错误，无 traceback
-mommy workflow run user_xxx --input "分析 600519"  # 正常执行
-mommy workflow list                              # 显示 hits 计数
+mojiang workflow add /tmp/user_regex_spec.json
+mojiang workflow run user_xxx                     # 无 --input → 友好错误，无 traceback
+mojiang workflow run user_xxx --input "分析 600519"  # 正常执行
+mojiang workflow list                              # 显示 hits 计数
 ```
 
 ## 不在本次范围

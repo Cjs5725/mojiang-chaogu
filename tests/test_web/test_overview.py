@@ -23,10 +23,10 @@ def _d(v: str) -> Decimal:
 
 def _patch_indexes(monkeypatch: pytest.MonkeyPatch) -> None:
     """Patch fetch_indexes to return the 4 core indexes."""
-    from mommy_chaogu.market_data.rankings import IndexQuote
+    from mojiang_chaogu.market_data.rankings import IndexQuote
 
     monkeypatch.setattr(
-        "mommy_chaogu.web.routes.overview.fetch_indexes",
+        "mojiang_chaogu.web.routes.overview.fetch_indexes",
         lambda: [
             IndexQuote("sh000001", "上证指数", "1.000001", _d("3100"), _d("0.6"), _d("3080")),
             IndexQuote("sz399001", "深证成指", "0.399001", _d("9500"), _d("-0.3"), _d("9528")),
@@ -54,10 +54,10 @@ class TestOverviewBasic:
         self, client: pytest.fixture, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """指数只返回 4 个核心，不返回科创50/上证50。"""
-        from mommy_chaogu.market_data.rankings import IndexQuote
+        from mojiang_chaogu.market_data.rankings import IndexQuote
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.overview.fetch_indexes",
+            "mojiang_chaogu.web.routes.overview.fetch_indexes",
             lambda: [
                 IndexQuote("sh000001", "上证指数", "1.000001", _d("3100"), _d("0.6"), _d("3080")),
                 IndexQuote("sz399001", "深证成指", "0.399001", _d("9500"), _d("-0.3"), _d("9528")),
@@ -122,7 +122,7 @@ class TestOverviewWatchlist:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """快照未生成但有自选股时降级为 stale。"""
-        from mommy_chaogu.watchlist.models import Group
+        from mojiang_chaogu.watchlist.models import Group
         from tests.test_web.conftest import make_stock_entry
 
         mock_service.latest_snapshot = None
@@ -168,7 +168,7 @@ class TestOverviewPartialFailure:
         def _boom() -> list[object]:
             raise RuntimeError("network error")
 
-        monkeypatch.setattr("mommy_chaogu.web.routes.overview.fetch_indexes", _boom)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.overview.fetch_indexes", _boom)
         data = client.get("/api/overview").json()
         assert data["indexes"]["block"]["status"] == "unavailable"
         assert data["watchlist"]["block"]["status"] == "ok"
@@ -178,7 +178,7 @@ class TestOverviewPartialFailure:
     ) -> None:
         """指数返回空列表。"""
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.overview.fetch_indexes",
+            "mojiang_chaogu.web.routes.overview.fetch_indexes",
             lambda: [],
         )
         data = client.get("/api/overview").json()
@@ -208,7 +208,7 @@ class TestOverviewThemes:
         _patch_indexes(monkeypatch)
         mock_service.latest_snapshot = None
         monkeypatch.setattr(
-            "mommy_chaogu.services.theme_service.ThemeService.list_theme_details",
+            "mojiang_chaogu.services.theme_service.ThemeService.list_theme_details",
             lambda _self: [
                 {
                     "id": "chips",
@@ -265,13 +265,13 @@ class TestOverviewThemePreferenceOrdering:
             )
             quotes[code] = make_quote(code, f"股{i}", change_pct=pct)
         monkeypatch.setattr(
-            "mommy_chaogu.services.theme_service.ThemeService.list_theme_details",
+            "mojiang_chaogu.services.theme_service.ThemeService.list_theme_details",
             lambda _self: details,
         )
         mock_cache_store.get_quote.side_effect = lambda code: SimpleNamespace(quote=quotes[code])
 
     def _set_prefs(self, mock_watchlist_store: MagicMock, **overrides: object) -> None:
-        from mommy_chaogu.preferences import default_preferences
+        from mojiang_chaogu.preferences import default_preferences
 
         prefs = default_preferences()
         prefs.update(overrides)
@@ -443,7 +443,7 @@ class TestOverviewBlockFailureIsolation:
         def _boom(service: object | None = None) -> object:
             raise RuntimeError("signal read error")
 
-        monkeypatch.setattr("mommy_chaogu.web.routes.overview._build_signals", _boom)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.overview._build_signals", _boom)
         _patch_indexes(monkeypatch)
         data = client.get("/api/overview").json()
         assert data["signals"]["block"]["status"] == "unavailable"
@@ -453,7 +453,7 @@ class TestOverviewBlockFailureIsolation:
         self, client: pytest.fixture, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.overview.fetch_indexes",
+            "mojiang_chaogu.web.routes.overview.fetch_indexes",
             lambda: [object()],
         )
 
@@ -466,7 +466,7 @@ class TestOverviewBlockFailureIsolation:
     ) -> None:
         _patch_indexes(monkeypatch)
         monkeypatch.setattr(
-            "mommy_chaogu.services.theme_service.ThemeService.list_theme_details",
+            "mojiang_chaogu.services.theme_service.ThemeService.list_theme_details",
             lambda _self: [{"id": "missing-name", "stocks": []}],
         )
 

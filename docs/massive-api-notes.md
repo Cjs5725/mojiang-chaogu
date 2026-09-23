@@ -1,6 +1,6 @@
 # Massive / Polygon REST API — 客户端参考
 
-本文件是 `src/mommy_chaogu/market_data/massive_client.py` 的接口参考,内容以该模块的实实现为准。
+本文件是 `src/mojiang_chaogu/market_data/massive_client.py` 的接口参考,内容以该模块的实实现为准。
 
 ## 端点与认证
 

@@ -1,4 +1,4 @@
-"""mommy-agent verify / consolidate 子命令测试（EVALUATION-2026-07-18 P1）。
+"""mojiang-agent verify / consolidate 子命令测试（EVALUATION-2026-07-18 P1）。
 
 回归点：
 - "verify" / "consolidate" 在 chat 解析前被拦截为子命令，不会被当成提问
@@ -14,14 +14,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.cli_commands import agent as agent_cli
+from mojiang_chaogu.cli_commands import agent as agent_cli
 
 
 class TestVerifySubcommand:
     def test_dispatches_to_run_verify(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """mommy-agent verify → 调 run_verify 并退出 0（不走 chat 路径）。"""
+        """mojiang-agent verify → 调 run_verify 并退出 0（不走 chat 路径）。"""
         db = tmp_path / "agent.db"
         called: list[Path] = []
 
@@ -37,7 +37,7 @@ class TestVerifySubcommand:
             }
 
         monkeypatch.setattr(agent_cli, "run_verify", fake_run_verify)
-        monkeypatch.setattr(sys, "argv", ["mommy-agent", "verify", "--db", str(db)])
+        monkeypatch.setattr(sys, "argv", ["mojiang-agent", "verify", "--db", str(db)])
 
         with pytest.raises(SystemExit) as exc_info:
             agent_cli.main_agent()
@@ -80,7 +80,7 @@ class TestConsolidateSubcommand:
         """无法构造 LLM client 时退出码 1，且给出明确错误信息。"""
         monkeypatch.setattr(agent_cli, "_build_llm_client", lambda *a, **kw: (None, None, None))
         monkeypatch.setattr(
-            sys, "argv", ["mommy-agent", "consolidate", "--db", str(tmp_path / "agent.db")]
+            sys, "argv", ["mojiang-agent", "consolidate", "--db", str(tmp_path / "agent.db")]
         )
 
         with pytest.raises(SystemExit) as exc_info:
@@ -101,7 +101,7 @@ class TestConsolidateSubcommand:
             agent_cli, "_build_llm_client", lambda *a, **kw: (fake_client, "test-model", None)
         )
         monkeypatch.setattr(
-            sys, "argv", ["mommy-agent", "consolidate", "--db", str(tmp_path / "agent.db")]
+            sys, "argv", ["mojiang-agent", "consolidate", "--db", str(tmp_path / "agent.db")]
         )
 
         with pytest.raises(SystemExit) as exc_info:
@@ -121,8 +121,8 @@ class TestChatPathVectorSearchFallback:
         修复前 cli 用 ``VectorSearch(AGENT_DB)``（Path 当 EpisodicMemory 传
         且缺 client）直接 TypeError，agent 启动即崩。
         """
-        import mommy_chaogu.agent.vector_search as vs_mod
-        from mommy_chaogu.agent import llm as llm_provider
+        import mojiang_chaogu.agent.vector_search as vs_mod
+        from mojiang_chaogu.agent import llm as llm_provider
 
         # 环境隔离：main_agent 会真实跑 load_config()/load_dotenv()——
         # 把所有 provider key 与 AGENT_PROVIDER 置空串占位（load_dotenv
@@ -143,6 +143,6 @@ class TestChatPathVectorSearchFallback:
 
         # AgentService 会因无 API key 抛 ValueError——证明执行越过了
         # VectorSearch 构造点（否则先抛 RuntimeError("boom")）。
-        monkeypatch.setattr(sys, "argv", ["mommy-agent", "测试"])
+        monkeypatch.setattr(sys, "argv", ["mojiang-agent", "测试"])
         with pytest.raises(ValueError, match="API key"):
             agent_cli.main_agent()

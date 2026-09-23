@@ -24,8 +24,8 @@ from typing import Any
 import requests
 from backtest_stats import compute_buyhold_baseline, format_hit_rate
 
-from mommy_chaogu.backtest.scoring import score_direction
-from mommy_chaogu.db_paths import AGENT_DB
+from mojiang_chaogu.backtest.scoring import score_direction
+from mojiang_chaogu.db_paths import AGENT_DB
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s %(message)s")
 _log = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ def fetch_efinance_history(code: str) -> list[dict[str, Any]]:
         [{date: "2026-06-04", main_net: float, ratio: float}, ...]
     """
     try:
-        from mommy_chaogu.market_data.efinance_adapter import EfinanceAdapter
+        from mojiang_chaogu.market_data.efinance_adapter import EfinanceAdapter
 
         adapter = EfinanceAdapter()
         flows = adapter.get_history_money_flow(code)
@@ -287,7 +287,7 @@ def verify_prediction(
 ) -> tuple[str, float]:
     """验证单条预测。返回 (status, score)。
 
-    评分委托给统一模块 ``mommy_chaogu.backtest.scoring.score_direction``，
+    评分委托给统一模块 ``mojiang_chaogu.backtest.scoring.score_direction``，
     保证与 ``backtest_llm.py`` 等 4 条回测路径口径一致。
     """
     if actual_price is None:
@@ -308,11 +308,11 @@ def run_backtest(db_path: str = str(AGENT_DB)) -> None:
         db.unlink()
 
     # 延迟导入（确保用新 db）
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-    from mommy_chaogu.agent.prompt import SYSTEM_PROMPT
-    from mommy_chaogu.agent.prompt_builder import build_system_prompt
-    from mommy_chaogu.agent.semantic_memory import SemanticMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.prompt import SYSTEM_PROMPT
+    from mojiang_chaogu.agent.prompt_builder import build_system_prompt
+    from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
     episodic = EpisodicMemory(db)
     tracker = PredictionTracker(db)

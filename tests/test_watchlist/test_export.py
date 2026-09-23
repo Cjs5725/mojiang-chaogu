@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.watchlist import WatchlistStore
-from mommy_chaogu.watchlist.store import EXPORT_SCHEMA_VERSION
+from mojiang_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.watchlist.store import EXPORT_SCHEMA_VERSION
 
 
 @pytest.fixture

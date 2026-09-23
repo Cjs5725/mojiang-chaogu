@@ -9,9 +9,9 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
-from mommy_chaogu.web.app import create_app
-from mommy_chaogu.web.background import BackgroundService, set_service
-from mommy_chaogu.web.security import WebSecurity
+from mojiang_chaogu.web.app import create_app
+from mojiang_chaogu.web.background import BackgroundService, set_service
+from mojiang_chaogu.web.security import WebSecurity
 
 from .conftest import make_mock_service
 
@@ -115,12 +115,12 @@ class TestWebSocketTickets:
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         security = WebSecurity(api_token="secret", ticket_ttl_seconds=10)
-        monkeypatch.setattr("mommy_chaogu.web.security.time.time", lambda: 100)
+        monkeypatch.setattr("mojiang_chaogu.web.security.time.time", lambda: 100)
         ticket, _ = security.issue_ws_ticket()
         assert security.validate_ws_ticket(ticket)
         assert not security.validate_ws_ticket(f"{ticket}x")
 
-        monkeypatch.setattr("mommy_chaogu.web.security.time.time", lambda: 111)
+        monkeypatch.setattr("mojiang_chaogu.web.security.time.time", lambda: 111)
         assert not security.validate_ws_ticket(ticket)
 
 

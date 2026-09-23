@@ -19,9 +19,9 @@ mkdir -p data
 echo "=== $(date '+%Y-%m-%d %H:%M:%S') ===" >> "$LOG_FILE"
 
 # 先验证到期预测
-uv run mommy-agent verify >> "$LOG_FILE" 2>&1 || echo "⚠️ verify failed" >> "$LOG_FILE"
+uv run mojiang-agent verify >> "$LOG_FILE" 2>&1 || echo "⚠️ verify failed" >> "$LOG_FILE"
 
 # 再提炼知识
-uv run mommy-agent consolidate >> "$LOG_FILE" 2>&1 || echo "⚠️ consolidate failed" >> "$LOG_FILE"
+uv run mojiang-agent consolidate >> "$LOG_FILE" 2>&1 || echo "⚠️ consolidate failed" >> "$LOG_FILE"
 
 echo "✅ Done" >> "$LOG_FILE"

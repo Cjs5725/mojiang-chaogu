@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from mommy_chaogu.workflow.spec import StepSpec, WorkflowSpec
-from mommy_chaogu.workflow.store import WorkflowStore
+from mojiang_chaogu.workflow.spec import StepSpec, WorkflowSpec
+from mojiang_chaogu.workflow.store import WorkflowStore
 
 
 def _spec(description: str = "first") -> WorkflowSpec:

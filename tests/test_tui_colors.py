@@ -14,14 +14,14 @@ from typing import ClassVar
 
 import pytest
 
-from mommy_chaogu.tui.services.colors import (
+from mojiang_chaogu.tui.services.colors import (
     LIGHT_BG_THEMES,
     ROLES,
     THEMES,
     color,
 )
 
-_TUI_DIR = (Path(__file__).parent.parent / "src" / "mommy_chaogu" / "tui").resolve()
+_TUI_DIR = (Path(__file__).parent.parent / "src" / "mojiang_chaogu" / "tui").resolve()
 
 
 class TestPalette:

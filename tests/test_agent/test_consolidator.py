@@ -7,10 +7,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.consolidator import MemoryConsolidator
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-from mommy_chaogu.agent.semantic_memory import SemanticMemory
+from mojiang_chaogu.agent.consolidator import MemoryConsolidator
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
 
 @pytest.fixture

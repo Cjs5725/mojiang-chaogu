@@ -13,8 +13,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.watchlist import WatchlistStore
-from mommy_chaogu.web.deps import get_watchlist_store
+from mojiang_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.web.deps import get_watchlist_store
 
 _DEFAULT_BODY = {
     "style": "balanced",

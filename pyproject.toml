@@ -1,12 +1,12 @@
 [project]
-name = "mommy-chaogu"
+name = "mojiang-chaogu"
 dynamic = ["version"]
 description = "可由现有 Agent 接管的本地 A 股 / 美股投研与监控应用"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
-    { name = "coffee-man666" }
+    { name = "Cjs5725" }
 ]
 dependencies = [
     "efinance>=0.5.8",
@@ -31,24 +31,24 @@ dependencies = [
 ]
 
 [project.scripts]
-mommy-watchlist = "mommy_chaogu.cli:main_watchlist"
-mommy-monitor = "mommy_chaogu.cli:main_monitor"
-mommy-report = "mommy_chaogu.cli:main_report"
-mommy-cache = "mommy_chaogu.cli:main_cache"
-mommy-semicon = "mommy_chaogu.cli:main_semicon"
-mommy-flows = "mommy_chaogu.cli:main_flows"
-mommy-web = "mommy_chaogu.cli:main_web"
-mommy-earnings = "mommy_chaogu.earnings.cli:main_earnings"
-mommy-agent = "mommy_chaogu.cli:main_agent"
-mommy-memory = "mommy_chaogu.cli:main_memory"
-mommy-mcp = "mommy_chaogu.agent.mcp_server:main_mcp"
-mommy-chaogu = "mommy_chaogu.cli:main"
-mommy = "mommy_chaogu.cli:main_mommy"
-mommy-tui = "mommy_chaogu.tui.app:main"
-mommy-channel = "mommy_chaogu.cli:main_channel"
-mommy-connect = "mommy_chaogu.cli:main_connect"
-mommy-doctor = "mommy_chaogu.cli:main_doctor"
-mommy-setup = "mommy_chaogu.setup:main_setup"
+mojiang-watchlist = "mojiang_chaogu.cli:main_watchlist"
+mojiang-monitor = "mojiang_chaogu.cli:main_monitor"
+mojiang-report = "mojiang_chaogu.cli:main_report"
+mojiang-cache = "mojiang_chaogu.cli:main_cache"
+mojiang-semicon = "mojiang_chaogu.cli:main_semicon"
+mojiang-flows = "mojiang_chaogu.cli:main_flows"
+mojiang-web = "mojiang_chaogu.cli:main_web"
+mojiang-earnings = "mojiang_chaogu.earnings.cli:main_earnings"
+mojiang-agent = "mojiang_chaogu.cli:main_agent"
+mojiang-memory = "mojiang_chaogu.cli:main_memory"
+mojiang-mcp = "mojiang_chaogu.agent.mcp_server:main_mcp"
+mojiang-chaogu = "mojiang_chaogu.cli:main"
+mojiang = "mojiang_chaogu.cli:main_mojiang"
+mojiang-tui = "mojiang_chaogu.tui.app:main"
+mojiang-channel = "mojiang_chaogu.cli:main_channel"
+mojiang-connect = "mojiang_chaogu.cli:main_connect"
+mojiang-doctor = "mojiang_chaogu.cli:main_doctor"
+mojiang-setup = "mojiang_chaogu.setup:main_setup"
 
 [project.optional-dependencies]
 dev = [
@@ -71,19 +71,19 @@ build-backend = "hatchling.build"
 # under bundled_skills/ are part of the installable project package.
 exclude = [
     "/output/**",
-    "/src/mommy_chaogu/bundled_skills/market-monitoring-test/**",
+    "/src/mojiang_chaogu/bundled_skills/market-monitoring-test/**",
 ]
 
 [tool.hatch.build.targets.sdist]
 # Hatch's sdist file selection follows repository ignore rules. Keep the
 # catalog plugins explicit so wheel builds from sdist remain complete.
-force-include = {"src/mommy_chaogu/bundled_skills/mommy-onboard" = "src/mommy_chaogu/bundled_skills/mommy-onboard", "src/mommy_chaogu/bundled_skills/mommy-research" = "src/mommy_chaogu/bundled_skills/mommy-research", "src/mommy_chaogu/bundled_skills/mommy-strategy" = "src/mommy_chaogu/bundled_skills/mommy-strategy", "src/mommy_chaogu/bundled_skills/market-watch-loop" = "src/mommy_chaogu/bundled_skills/market-watch-loop", "src/mommy_chaogu/bundled_skills/basket-analysis" = "src/mommy_chaogu/bundled_skills/basket-analysis", "src/mommy_chaogu/bundled_skills/food-security-analysis" = "src/mommy_chaogu/bundled_skills/food-security-analysis"}
+force-include = {"src/mojiang_chaogu/bundled_skills/mojiang-onboard" = "src/mojiang_chaogu/bundled_skills/mojiang-onboard", "src/mojiang_chaogu/bundled_skills/mojiang-research" = "src/mojiang_chaogu/bundled_skills/mojiang-research", "src/mojiang_chaogu/bundled_skills/mojiang-strategy" = "src/mojiang_chaogu/bundled_skills/mojiang-strategy", "src/mojiang_chaogu/bundled_skills/market-watch-loop" = "src/mojiang_chaogu/bundled_skills/market-watch-loop", "src/mojiang_chaogu/bundled_skills/basket-analysis" = "src/mojiang_chaogu/bundled_skills/basket-analysis", "src/mojiang_chaogu/bundled_skills/food-security-analysis" = "src/mojiang_chaogu/bundled_skills/food-security-analysis"}
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mommy_chaogu"]
+packages = ["src/mojiang_chaogu"]
 
 [tool.hatch.version]
-path = "src/mommy_chaogu/version.py"
+path = "src/mojiang_chaogu/version.py"
 
 [tool.ruff]
 line-length = 100
@@ -92,8 +92,8 @@ target-version = "py312"
 # payloads from the public Plugins Store; their scripts are not application
 # modules and should be linted by their own release process.
 exclude = [
-    "src/mommy_chaogu/bundled_skills/basket-analysis/**",
-    "src/mommy_chaogu/bundled_skills/food-security-analysis/**",
+    "src/mojiang_chaogu/bundled_skills/basket-analysis/**",
+    "src/mojiang_chaogu/bundled_skills/food-security-analysis/**",
     "site/install-skill.py",
 ]
 
@@ -107,7 +107,7 @@ ignore = ["E501", "RUF001", "RUF002", "RUF003"]
 strict = true
 python_version = "3.12"
 # Store payload scripts are standalone Skill assets, not imported project code.
-exclude = "src/mommy_chaogu/bundled_skills/(basket-analysis|food-security-analysis)/"
+exclude = "src/mojiang_chaogu/bundled_skills/(basket-analysis|food-security-analysis)/"
 
 [[tool.mypy.overrides]]
 module = [
@@ -132,7 +132,7 @@ markers = [
 
 [tool.coverage.run]
 branch = true
-source = ["mommy_chaogu"]
+source = ["mojiang_chaogu"]
 
 [tool.coverage.report]
 show_missing = true

@@ -1,4 +1,4 @@
-# mommy-chaogu 用户优先交付主计划
+# mojiang-chaogu 用户优先交付主计划
 
 > 状态：Strategy Distillation 与 Agent-managed 第一版实现完成，待真实用户产品验收
 >
@@ -8,7 +8,7 @@
 
 ## 当前目标
 
-mommy-chaogu 是一套可以被用户现有 Agent 接管的本地投研应用。用户表达目标，Agent 负责安全
+mojiang-chaogu 是一套可以被用户现有 Agent 接管的本地投研应用。用户表达目标，Agent 负责安全
 连接、解释证据、整理方法和后续维护；后端只提供完成这条体验所需的确定性能力。
 
 当前主线是 Strategy Distillation：用户把文章、研报或个人方法交给 Agent，先看到一张忠于原意、

@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.watchlist import WatchlistStore
-from mommy_chaogu.watchlist.store import (
+from mojiang_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.watchlist.store import (
     GroupAlreadyExistsError,
     GroupNotFoundError,
     StockEntryNotFoundError,

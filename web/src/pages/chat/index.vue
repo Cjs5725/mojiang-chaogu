@@ -100,8 +100,8 @@ let routeAbortController: AbortController | null = null
 const retainedStreams = new Set<AgentStreamClient>()
 const retainedStreamTimers = new Map<AgentStreamClient, number>()
 
-const CHAT_STORAGE_KEY = 'mommy_chat_messages_v1'
-const CHAT_DRAFT_KEY = 'mommy_chat_draft_v1'
+const CHAT_STORAGE_KEY = 'mojiang_chat_messages_v1'
+const CHAT_DRAFT_KEY = 'mojiang_chat_draft_v1'
 
 const activePageContext = computed<AgentPageContext | undefined>(() => {
   const stockCode = typeof route.query.stock === 'string' ? route.query.stock : ''
@@ -603,7 +603,7 @@ onUnmounted(() => {
   <div class="flex h-[calc(100dvh-var(--mobile-nav-height))] bg-muted/30 md:h-dvh">
     <section class="flex min-w-0 flex-1 flex-col" aria-label="AI 对话">
       <header class="flex shrink-0 items-center gap-2 border-b bg-card px-3 py-2.5 sm:px-4">
-        <BrandMark alt="妈妈炒股老奶奶 Logo" size="sm" />
+        <BrandMark alt="墨匠工坊老奶奶 Logo" size="sm" />
         <div class="min-w-0">
           <h1 class="truncate text-sm font-semibold sm:text-base">投研对话</h1>
           <span class="flex items-center gap-1 text-[11px] text-muted-foreground" role="status" aria-live="polite">

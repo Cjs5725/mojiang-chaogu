@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.web.app import (
+from mojiang_chaogu.web.app import (
     _frontend_dist_candidates,
     _resolve_frontend_dist,
     create_app,
@@ -24,7 +24,7 @@ def test_configured_frontend_dist_has_priority(
 ) -> None:
     configured = tmp_path / "configured-dist"
     _write_frontend(configured)
-    monkeypatch.setenv("MOMMY_WEB_DIST", str(configured))
+    monkeypatch.setenv("MOJIANG_WEB_DIST", str(configured))
 
     assert _frontend_dist_candidates()[0] == configured
     assert _resolve_frontend_dist() == configured
@@ -37,7 +37,7 @@ def test_incomplete_configured_dist_falls_back_to_working_directory(
     configured.mkdir()
     fallback = tmp_path / "web" / "dist"
     _write_frontend(fallback)
-    monkeypatch.setenv("MOMMY_WEB_DIST", str(configured))
+    monkeypatch.setenv("MOJIANG_WEB_DIST", str(configured))
     monkeypatch.chdir(tmp_path)
 
     assert _resolve_frontend_dist() == fallback
@@ -48,7 +48,7 @@ def test_configured_frontend_is_served_at_root(
 ) -> None:
     configured = tmp_path / "configured-dist"
     _write_frontend(configured)
-    monkeypatch.setenv("MOMMY_WEB_DIST", str(configured))
+    monkeypatch.setenv("MOJIANG_WEB_DIST", str(configured))
 
     response = TestClient(create_app()).get("/")
 
@@ -58,7 +58,7 @@ def test_configured_frontend_is_served_at_root(
 
 
 def test_packaged_frontend_is_available_for_installed_wheels() -> None:
-    packaged = Path(__file__).resolve().parents[2] / "src" / "mommy_chaogu" / "web" / "static"
+    packaged = Path(__file__).resolve().parents[2] / "src" / "mojiang_chaogu" / "web" / "static"
 
     assert packaged in _frontend_dist_candidates()
     assert (packaged / "index.html").is_file()

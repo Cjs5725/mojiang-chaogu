@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from requests import Response
 
-from mommy_chaogu.market_data.massive_client import MassiveClient
+from mojiang_chaogu.market_data.massive_client import MassiveClient
 
 # ---------- 工具 ----------
 

@@ -31,9 +31,9 @@
 | `data/agent.db` | 记忆系统 | episodic_events, predictions, semantic_knowledge, insight_summary |
 | `data/reference.db` | 参考库 | semicon_stocks, earnings_* |
 
-路径可通过环境变量覆盖：`MOMMY_MARKET_DB` / `MOMMY_PORTFOLIO_DB` / `MOMMY_AGENT_DB` / `MOMMY_REFERENCE_DB`
+路径可通过环境变量覆盖：`MOJIANG_MARKET_DB` / `MOJIANG_PORTFOLIO_DB` / `MOJIANG_AGENT_DB` / `MOJIANG_REFERENCE_DB`
 
-定义在 `src/mommy_chaogu/db_paths.py`。
+定义在 `src/mojiang_chaogu/db_paths.py`。
 
 ---
 
@@ -93,11 +93,11 @@ pipeline.consolidate()
 ### 记忆可见性 CLI
 
 ```bash
-mommy memory stats        # 记忆统计
-mommy memory events       # 近期事件
-mommy memory predictions  # 预测历史
-mommy memory knowledge    # 活跃知识
-mommy memory history      # 对话历史
+mojiang memory stats        # 记忆统计
+mojiang memory events       # 近期事件
+mojiang memory predictions  # 预测历史
+mojiang memory knowledge    # 活跃知识
+mojiang memory history      # 对话历史
 ```
 
 ---
@@ -163,27 +163,27 @@ Alpha (策略-基准): -24%
 
 ## CLI 速查
 
-统一入口 `mommy`，所有子功能通过子命令访问（旧命令 `mommy-watchlist` 等仍兼容）：
+统一入口 `mojiang`，所有子功能通过子命令访问（旧命令 `mojiang-watchlist` 等仍兼容）：
 
 ```
-mommy <自然语言>        # AI 自然语言对话（推荐）
-mommy                   # 进入交互式 REPL
-mommy watchlist ...     # 自选股管理（分组 / 增删 / 告警 / 导出）
-mommy monitor ...       # 实时监控（快照 / 持续轮询 / 信号日志）
-mommy cache ...         # 缓存管理（命中率 / warmup / refresh）
-mommy flows ...         # 资金流拉新 + 板块扫描 + 收盘日报
-mommy report ...        # HTML 报告渲染
-mommy semicon ...       # 半导体产业链查询
-mommy earnings ...      # 财报前瞻 vs 实际 比对
-mommy agent ...         # AI 行情助手（chat / report / scan / verify / consolidate ...）
-mommy memory ...        # 记忆系统（stats / events / predictions / knowledge / history）
-mommy channel weixin ... # 微信二维码登录 / 本地消息网关
-mommy web ...           # Web 服务（REST API + WebSocket）
-mommy tui               # 终端 UI（Textual 单屏对话 + 内联数据卡片）
-mommy mcp               # MCP Server（stdio 协议，可接入 Claude Desktop）
+mojiang <自然语言>        # AI 自然语言对话（推荐）
+mojiang                   # 进入交互式 REPL
+mojiang watchlist ...     # 自选股管理（分组 / 增删 / 告警 / 导出）
+mojiang monitor ...       # 实时监控（快照 / 持续轮询 / 信号日志）
+mojiang cache ...         # 缓存管理（命中率 / warmup / refresh）
+mojiang flows ...         # 资金流拉新 + 板块扫描 + 收盘日报
+mojiang report ...        # HTML 报告渲染
+mojiang semicon ...       # 半导体产业链查询
+mojiang earnings ...      # 财报前瞻 vs 实际 比对
+mojiang agent ...         # AI 行情助手（chat / report / scan / verify / consolidate ...）
+mojiang memory ...        # 记忆系统（stats / events / predictions / knowledge / history）
+mojiang channel weixin ... # 微信二维码登录 / 本地消息网关
+mojiang web ...           # Web 服务（REST API + WebSocket）
+mojiang tui               # 终端 UI（Textual 单屏对话 + 内联数据卡片）
+mojiang mcp               # MCP Server（stdio 协议，可接入 Claude Desktop）
 ```
 
-`mommy agent` 子命令：
+`mojiang agent` 子命令：
 
 ```
 chat         与 agent 对话（自动调用记忆系统）
@@ -205,18 +205,18 @@ tools        列出可用工具
 
 ```bash
 # 自选股管理
-mommy watchlist add-group 半导体 --description "持仓分组"
-mommy watchlist add 688981 --group 半导体
-mommy watchlist list
+mojiang watchlist add-group 半导体 --description "持仓分组"
+mojiang watchlist add 688981 --group 半导体
+mojiang watchlist list
 
 # 行情快照
-mommy monitor snapshot
+mojiang monitor snapshot
 
 # 资金流扫描
-mommy flows pull --pool semicon --days 30
+mojiang flows pull --pool semicon --days 30
 ```
 
-> **提示**：旧的独立命令（`mommy-watchlist`、`mommy-monitor` 等）仍然可用，向后兼容。
+> **提示**：旧的独立命令（`mojiang-watchlist`、`mojiang-monitor` 等）仍然可用，向后兼容。
 
 ---
 
@@ -225,9 +225,9 @@ mommy flows pull --pool semicon --days 30
 ### Web 安全边界
 
 - 默认监听 `127.0.0.1`，本机使用无需令牌。
-- 非本机监听必须设置 `MOMMY_API_TOKEN`。
+- 非本机监听必须设置 `MOJIANG_API_TOKEN`。
 - REST API 使用 Bearer token；WebSocket 使用 60 秒有效的 HMAC 签名 ticket。
-- `MOMMY_CORS_ORIGINS` 用逗号分隔可信前端 origin；默认不允许跨域。
+- `MOJIANG_CORS_ORIGINS` 用逗号分隔可信前端 origin；默认不允许跨域。
 - Agent REST/WebSocket 共用有界并发槽，防止意外消耗 LLM 配额。
 - Web 对话按浏览器会话 ID 隔离；旧数据自动迁移到 `default` 会话。
 - 非默认 Web 会话保留 30 天，可用 `[web].session_retention_days` 调整。
@@ -262,8 +262,8 @@ mommy flows pull --pool semicon --days 30
 ## 项目结构
 
 ```
-mommy-chaogu/
-├── src/mommy_chaogu/
+mojiang-chaogu/
+├── src/mojiang_chaogu/
 │   ├── market_data/         # 数据源适配层（massive + yahoo 美股 + efinance + tencent fallback）
 │   ├── cache/               # SQLite 缓存（5 表 + 节流 + freshness）
 │   ├── watchlist/           # 自选股 ORM（SQLAlchemy 2.0）
@@ -294,15 +294,15 @@ mommy-chaogu/
 
 ```bash
 # 安装（需要 Python 3.12+）
-git clone https://github.com/coffee-man666/mommy-chaogu.git
-cd mommy-chaogu
+git clone https://github.com/Cjs5725/mojiang-chaogu.git
+cd mojiang-chaogu
 uv sync --extra dev
 
 # 配置并验证模型（默认写用户级私有配置）
-uv run mommy setup
+uv run mojiang setup
 
 # 如需项目隔离
-uv run mommy setup --local
+uv run mojiang setup --local
 
 # 跑测试确认环境正常
 uv run pytest -m "not network"

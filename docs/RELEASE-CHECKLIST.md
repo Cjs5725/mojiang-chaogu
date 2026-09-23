@@ -16,7 +16,7 @@
 - [x] Package metadata and FastAPI report `1.2.0`
 - [x] `CHANGELOG.md` includes the `1.2.0` release notes
 - [x] `.env` and runtime databases are absent from the commit
-- [ ] Remote deployments set `MOMMY_API_TOKEN` and explicit CORS origins
+- [ ] Remote deployments set `MOJIANG_API_TOKEN` and explicit CORS origins
 - [ ] SQLite deployments mount persistent storage at `/app/data`
 - [ ] Railway volume deployments set `RAILWAY_RUN_UID=0` and verify the app drops to UID 1000
 - [ ] Database layout migration is checked before upgrading an existing installation

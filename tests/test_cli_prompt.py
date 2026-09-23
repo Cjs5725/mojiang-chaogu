@@ -2,7 +2,7 @@
 
 from prompt_toolkit.buffer import Buffer
 
-from mommy_chaogu.cli_prompt import _delete_before_cursor
+from mojiang_chaogu.cli_prompt import _delete_before_cursor
 
 
 def test_backspace_removes_every_character_including_first() -> None:

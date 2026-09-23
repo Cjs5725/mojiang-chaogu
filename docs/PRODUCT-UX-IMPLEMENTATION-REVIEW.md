@@ -51,10 +51,10 @@ The two release blockers are:
 
 **Evidence**
 
-- `src/mommy_chaogu/web/app.py:58-72` documents that installed wheels fall back to `src/mommy_chaogu/web/static`.
-- `src/mommy_chaogu/web/static/index.html:50` references `index-C0nx-0V1.js`.
+- `src/mojiang_chaogu/web/app.py:58-72` documents that installed wheels fall back to `src/mojiang_chaogu/web/static`.
+- `src/mojiang_chaogu/web/static/index.html:50` references `index-C0nx-0V1.js`.
 - `web/dist/index.html:50` references the newer `index-CVPzl8QI.js`.
-- Commit `a3f58ea` contains no changes under `src/mommy_chaogu/web/static/`.
+- Commit `a3f58ea` contains no changes under `src/mojiang_chaogu/web/static/`.
 
 **Impact**
 
@@ -63,16 +63,16 @@ Source checkouts may display the new P1–P4 interface because `web/dist` is pre
 **Recommended fix**
 
 - Run the production frontend build.
-- Synchronize `web/dist/` into `src/mommy_chaogu/web/static/` with deletion of obsolete hashed assets.
+- Synchronize `web/dist/` into `src/mojiang_chaogu/web/static/` with deletion of obsolete hashed assets.
 - Add a CI assertion that both directories are identical after a build.
 
 ### P1 — Weixin notifications can repeat every polling interval
 
 **Evidence**
 
-- `src/mommy_chaogu/web/background.py:146-153` calls `send_signal_notifications()` on every polling tick whenever signals exist.
+- `src/mojiang_chaogu/web/background.py:146-153` calls `send_signal_notifications()` on every polling tick whenever signals exist.
 - The default polling interval is 5 seconds.
-- `src/mommy_chaogu/channels/notify.py:42-49` creates a new in-memory `seen` set for each call.
+- `src/mojiang_chaogu/channels/notify.py:42-49` creates a new in-memory `seen` set for each call.
 - Existing tests verify duplicates within one call, but not repeated calls or repeated polling ticks.
 
 **Impact**
@@ -108,8 +108,8 @@ One slow Weixin request can block the event loop and delay quote WebSockets, sig
 
 **Evidence**
 
-- `src/mommy_chaogu/web/routes/overview.py:306` invokes `_build_watchlist()` without an isolation boundary.
-- `src/mommy_chaogu/web/routes/overview.py:316` invokes `_build_portfolio()` without an isolation boundary.
+- `src/mojiang_chaogu/web/routes/overview.py:306` invokes `_build_watchlist()` without an isolation boundary.
+- `src/mojiang_chaogu/web/routes/overview.py:316` invokes `_build_portfolio()` without an isolation boundary.
 - `store.list_entries()`, `store.list_positions()`, snapshot conversion, and response construction can raise outside the current local `try` blocks.
 - Tests cover index failure but not watchlist, portfolio, theme-schema, or malformed-snapshot failure.
 
@@ -128,7 +128,7 @@ A failure in one block can still return HTTP 500 for the entire Today page, cont
 
 **Evidence**
 
-- `src/mommy_chaogu/web/routes/overview.py:241-249` truncates the global theme list to four items.
+- `src/mojiang_chaogu/web/routes/overview.py:241-249` truncates the global theme list to four items.
 - `web/src/pages/today/index.vue:35-40` filters that already-truncated list using locally followed IDs.
 
 **Impact**
@@ -147,8 +147,8 @@ The overview theme contract also lacks the planned overall performance, leader, 
 
 **Evidence**
 
-- `src/mommy_chaogu/web/routes/agent.py:205` loads the latest `limit` predictions globally.
-- `src/mommy_chaogu/web/routes/agent.py:206-207` then filters those rows by stock code.
+- `src/mojiang_chaogu/web/routes/agent.py:205` loads the latest `limit` predictions globally.
+- `src/mojiang_chaogu/web/routes/agent.py:206-207` then filters those rows by stock code.
 
 **Impact**
 
@@ -372,8 +372,8 @@ The matrix below is the historical result at commit `9c0fd0b`; current dispositi
 - GitHub Actions run `30686992603` concludes `failure` for commit `9c0fd0b`.
 - Both Python 3.12 and Python 3.13 backend jobs fail at the Ruff format step.
 - `uv run ruff format --check .` reports:
-  - `src/mommy_chaogu/channels/notify.py`
-  - `src/mommy_chaogu/web/routes/overview.py`
+  - `src/mojiang_chaogu/channels/notify.py`
+  - `src/mojiang_chaogu/web/routes/overview.py`
   - `tests/test_web/test_overview.py`
 - The Frontend job fails at Browser smoke.
 - Local Playwright reproduction: **3 failed, 5 passed, 1 skipped**.
@@ -394,9 +394,9 @@ The release gate is failing, and the acceptance suite no longer verifies the pro
 
 **Evidence**
 
-- `src/mommy_chaogu/web/routes/agent.py:162-168` passes `style_hint` as `system_override`.
-- `src/mommy_chaogu/web/routes/ws.py:205-213` does the same for streaming chat.
-- `src/mommy_chaogu/agent/service.py:269-275` assigns `system_prompt = system_override` whenever it is non-empty.
+- `src/mojiang_chaogu/web/routes/agent.py:162-168` passes `style_hint` as `system_override`.
+- `src/mojiang_chaogu/web/routes/ws.py:205-213` does the same for streaming chat.
+- `src/mojiang_chaogu/agent/service.py:269-275` assigns `system_prompt = system_override` whenever it is non-empty.
 - This bypasses both `SYSTEM_PROMPT` and `MemoryService.get_context()`.
 - The WebSocket path accepts an unbounded, unvalidated JSON value for `style_hint`; REST only constrains its string length.
 - No test asserts that the base prompt, tool behavior, memory context, and exact visible user message are all preserved together.
@@ -417,8 +417,8 @@ Every normal Web chat sends the default “balanced” style hint, so the Agent 
 
 **Evidence**
 
-- `src/mommy_chaogu/channels/notify.py:27` hardcodes `Path("data/weixin_pushed.json")`.
-- This bypasses `MOMMY_DATA_DIR`, the installed-app user data directory, and the app's configured database root.
+- `src/mojiang_chaogu/channels/notify.py:27` hardcodes `Path("data/weixin_pushed.json")`.
+- This bypasses `MOJIANG_DATA_DIR`, the installed-app user data directory, and the app's configured database root.
 - `mark_pushed()` runs only after `send_text()` succeeds.
 - `_save()` raises on an unwritable cwd; the outer send loop catches that as a send failure after the message has already been delivered.
 - The next polling tick creates a fresh deduper, sees no persisted key, and sends the same message again.
@@ -437,7 +437,7 @@ The original notification-spam blocker can recur when the installed service star
 
 **Evidence**
 
-- `src/mommy_chaogu/web/background.py:152-154` awaits the thread before quote and signal broadcasts at lines 158-162.
+- `src/mojiang_chaogu/web/background.py:152-154` awaits the thread before quote and signal broadcasts at lines 158-162.
 - Signals are delivered sequentially with a per-message read timeout of up to 20 seconds.
 - The fingerprint is only `code | rule_id | UTC date`; trigger state, severity, value movement, and clear/retrigger transitions are ignored.
 
@@ -456,8 +456,8 @@ The event loop is no longer blocked, but subscribers can still receive the curre
 
 **Evidence**
 
-- `src/mommy_chaogu/web/routes/overview.py:58-70` protects only the index fetch; index response mapping is outside the `try`.
-- `src/mommy_chaogu/web/routes/overview.py:229-249` protects theme service loading; dictionary access and schema construction are outside the `try`.
+- `src/mojiang_chaogu/web/routes/overview.py:58-70` protects only the index fetch; index response mapping is outside the `try`.
+- `src/mojiang_chaogu/web/routes/overview.py:229-249` protects theme service loading; dictionary access and schema construction are outside the `try`.
 - `get_overview()` directly calls both helpers without an aggregation-boundary catch.
 - New tests cover watchlist, portfolio, and a monkeypatched signals builder, but not malformed index/theme rows.
 
@@ -741,7 +741,7 @@ Commit `b1e6ba2` implements the shared-preference package named as the next acti
 
 - `user_preferences` singleton table in portfolio.db (via `WatchlistBase`, additive `create_all`): style, holding period, drawdown sensitivity, notify minimum severity, watched rules, reminder windows, updated_at.
 - `GET/PUT /api/preferences` + `POST /api/preferences/reset`. Strict enum and HH:MM validation (422 on invalid values; unknown fields forbidden); partial updates via `model_fields_set`; derived `default_hold_days` (short 3 / swing 5 / long 20) is the single source of truth for the future backtest entry.
-- One-time browser migration: a legacy `mommy-trading-style` localStorage value is pushed to the server on the first `getPreferences()` and the key is removed whether or not the push succeeds. The server model is the only authority afterwards.
+- One-time browser migration: a legacy `mojiang-trading-style` localStorage value is pushed to the server on the first `getPreferences()` and the key is removed whether or not the push succeeds. The server model is the only authority afterwards.
 - Today basket ordering applies preference-driven priority after follow filtering and before the 4-item slice: anomaly × drawdown sensitivity, negative performance × (conservative | high sensitivity), positive performance × aggressive. Moved items carry `priority_reason`; the block carries `ordering_note` built from the factors that actually fired. Default preferences keep the previous order and render nothing extra, and a dedicated test proves numeric market values are identical across styles.
 - Agent REST and WebSocket no longer accept browser-supplied style. Both read the server preference and compose one `<trading_preference>` addendum (style + holding period with derived days + drawdown sensitivity + notification summary) appended after the base prompt and memory context; `system_override` is not used, and visible user messages / stored history are unchanged. Store-read failure falls back to defaults.
 - Weixin delivery filters by severity floor, watched-rule allowlist, and Asia/Shanghai reminder windows (midnight wrap supported) before dedup reservation. A failing preference provider fails open — logged, delivery unfiltered — so critical alerts are never silently dropped (documented in the code).
@@ -819,7 +819,7 @@ Reviewed baseline: `ab5e8f938ba65a25ca3d8d3881fba86565ff3d55` (`main`, equal to 
 The shared-preference and prediction/backtest foundations are implemented and the complete local quality gates pass. The audit identified two behavior-level reliability issues before remediation:
 
 1. **Prediction attachment ordering and connection lifetime** — the backend background callback is scheduled independently of the `done` frame, so `predictions_created` can arrive before `done`. The page assigns `lastTurnAssistantIdx` only in the `done` handler, which can drop the event or attach it to the preceding answer. After `done`, a quick follow-up or automatically processed queued message closes the old stream and invalidates its request id, defeating the 60-second grace period. Use a stable `turn_id` on all frames and retain/correlate attachment delivery independently of the active composer turn; add coverage for before-`done`, immediate-follow-up, and queued-message cases.
-2. **Legacy preference migration data loss** — `migrateLegacyStyle()` removes `mommy-trading-style` in `finally`, including when the server `PUT` fails. A transient startup or network failure therefore discards the only copy of the user's previous selection. Remove the key only after a successful write; retain a valid value for retry, while invalid legacy values may still be discarded.
+2. **Legacy preference migration data loss** — `migrateLegacyStyle()` removes `mojiang-trading-style` in `finally`, including when the server `PUT` fails. A transient startup or network failure therefore discards the only copy of the user's previous selection. Remove the key only after a successful write; retain a valid value for retry, while invalid legacy values may still be discarded.
 
 ### Remediation result (`1b2a77a`)
 

@@ -10,12 +10,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.monitor import (
+from mojiang_chaogu.agent.monitor import (
     AgentAlert,
     AgentMonitor,
     _calc_bp,
 )
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     MoneyFlow,
@@ -330,7 +330,7 @@ class TestEpisodicMemory:
         tmp_path: Path,
     ) -> None:
         """告警推送时，episodic memory 写入 signal_event 事件。"""
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
         memory = EpisodicMemory(tmp_path / "test_monitor.db")
         notifier = MagicMock()
@@ -380,7 +380,7 @@ class TestEpisodicMemory:
         tmp_path: Path,
     ) -> None:
         """端到端：scan_once 产生告警 → episodic memory 有 signal_event。"""
-        from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+        from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
         memory = EpisodicMemory(tmp_path / "test_scan.db")
 

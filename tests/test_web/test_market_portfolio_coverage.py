@@ -40,7 +40,7 @@ def _make_quote(
 
 class TestRankingLogic:
     def test_filters_st_stocks(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         quotes = [
             _make_quote(code="600519", name="贵州茅台", change_pct=5.0),
@@ -52,14 +52,14 @@ class TestRankingLogic:
         assert "000001" not in codes
 
     def test_filters_delisted(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         result = _ranking([_make_quote(code="000002", name="万科退", change_pct=3.0)], "up", 10)
         assert len(result) == 0
 
     def test_filters_abnormal_pct(self) -> None:
         """涨跌幅 > 11% 视为新上市，过滤。"""
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         result = _ranking(
             [_make_quote(change_pct=15.0)],
@@ -69,13 +69,13 @@ class TestRankingLogic:
         assert len(result) == 0
 
     def test_filters_bad_code_length(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         result = _ranking([_make_quote(code="123", name="测试", change_pct=3.0)], "up", 10)
         assert len(result) == 0
 
     def test_sorts_descending_for_up(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         quotes = [
             _make_quote(code="000001", name="A", change_pct=3.0),
@@ -88,7 +88,7 @@ class TestRankingLogic:
         assert pcts[0] == 8.0
 
     def test_sorts_ascending_for_down(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         quotes = [
             _make_quote(code="000001", name="A", change_pct=-3.0),
@@ -101,7 +101,7 @@ class TestRankingLogic:
         assert pcts[0] == -8.0
 
     def test_limit_applied(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         quotes = [
             _make_quote(code=f"00000{i}", name=f"S{i}", change_pct=float(i)) for i in range(1, 6)
@@ -110,12 +110,12 @@ class TestRankingLogic:
         assert len(result) == 3
 
     def test_empty_input(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         assert _ranking([], "up", 10) == []
 
     def test_output_format(self) -> None:
-        from mommy_chaogu.web.routes.market import _ranking
+        from mojiang_chaogu.web.routes.market import _ranking
 
         result = _ranking([_make_quote(code="600519", name="贵州茅台", change_pct=5.2)], "up", 10)
         assert len(result) == 1
@@ -133,7 +133,7 @@ class TestRankingLogic:
 
 class TestPortfolioRoutes:
     def test_empty_portfolio(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         store = MagicMock()
         store.list_positions.return_value = []
@@ -151,8 +151,8 @@ class TestPortfolioRoutes:
     def test_list_positions(self, client: TestClient) -> None:
         from datetime import UTC, datetime
 
-        from mommy_chaogu.portfolio.models import Position
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.portfolio.models import Position
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         pos = Position(
             id=1,
@@ -178,8 +178,8 @@ class TestPortfolioRoutes:
         client.app.dependency_overrides.clear()  # type: ignore[attr-defined]
 
     def test_remove_position_not_found(self, client: TestClient) -> None:
-        from mommy_chaogu.portfolio.store import PositionNotFoundError
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.portfolio.store import PositionNotFoundError
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         store = MagicMock()
         store.remove_position.side_effect = PositionNotFoundError("not found")
@@ -191,7 +191,7 @@ class TestPortfolioRoutes:
         client.app.dependency_overrides.clear()  # type: ignore[attr-defined]
 
     def test_add_position_bad_date(self, client: TestClient) -> None:
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         store = MagicMock()
         client.app.dependency_overrides[get_portfolio_store] = lambda: store  # type: ignore[attr-defined]
@@ -213,8 +213,8 @@ class TestPortfolioRoutes:
     def test_add_position_success(self, client: TestClient) -> None:
         from datetime import UTC, datetime
 
-        from mommy_chaogu.portfolio.models import Position
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.portfolio.models import Position
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         pos = Position(
             id=1,
@@ -246,8 +246,8 @@ class TestPortfolioRoutes:
         client.app.dependency_overrides.clear()  # type: ignore[attr-defined]
 
     def test_list_adjustments_not_found(self, client: TestClient) -> None:
-        from mommy_chaogu.portfolio.store import PositionNotFoundError
-        from mommy_chaogu.web.deps import get_portfolio_store
+        from mojiang_chaogu.portfolio.store import PositionNotFoundError
+        from mojiang_chaogu.web.deps import get_portfolio_store
 
         store = MagicMock()
         store.get_position.side_effect = PositionNotFoundError("not found")

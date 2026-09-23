@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent.prompt import SYSTEM_PROMPT
-from mommy_chaogu.agent.service import SUPPORTED_PROVIDERS, AgentService, ChatCallbacks
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent.prompt import SYSTEM_PROMPT
+from mojiang_chaogu.agent.service import SUPPORTED_PROVIDERS, AgentService, ChatCallbacks
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture

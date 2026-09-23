@@ -27,7 +27,7 @@ Strategy Distillation 不是“把观点编译成一个可回测的通用策略�
 - 不把历史计算、收益统计或 deterministic hash 当作 Strategy Distillation 的完成条件。
 - 不承诺真实回测；当前数据复权、时间语义、组合构造和验证方法未达到该承诺所需条件。
 - 不做 Walk-forward、Regime、Sharpe、组合收益等包装性指标。
-- 不先建设 `mommy-experiment` Skill、Web 策略编辑器或新的前端页面。
+- 不先建设 `mojiang-experiment` Skill、Web 策略编辑器或新的前端页面。
 - 不为尚未出现的多应用场景重构通用平台；只补本闭环必需的接口和存储。
 
 历史验证以后可以成为某些策略卡的可选动作，但必须作为独立能力做资源与方法评审，不能成为
@@ -38,7 +38,7 @@ Strategy Distillation 不是“把观点编译成一个可回测的通用策略�
 ### 可以保留的产品方向
 
 - MCP server-level instructions：给未正确加载 Skill 的 Agent 最低行为边界。
-- `mommy-onboard` Skill 的分层思路：生命周期指导与日常研究指导分开。
+- `mojiang-onboard` Skill 的分层思路：生命周期指导与日常研究指导分开。
 - 机器可读的基础诊断和 JSON research 调用：可作为外部 Agent 的 bootstrap。
 - 默认 `market-only`、外部 Agent 不要求第二套 LLM key、写入和监控需明确授权。
 
@@ -46,7 +46,7 @@ Strategy Distillation 不是“把观点编译成一个可回测的通用策略�
 
 ### 合并前必须修正
 
-- 启动文档安装 `mommy-chaogu[mcp]==1.4.0`，但现有 `v1.4.0` tag 不包含新管理命令；本地
+- 启动文档安装 `mojiang-chaogu[mcp]==1.4.0`，但现有 `v1.4.0` tag 不包含新管理命令；本地
   wheel checksum 也没有绑定实际安装来源。
 - `doctor` 目前可把“配置存在”报告为 MCP initialize/tools 正常，并未执行相应探针；状态必须
   改为诚实的 `not_checked`，或执行真实的最小探针。
@@ -62,7 +62,7 @@ Strategy Distillation 不是“把观点编译成一个可回测的通用策略�
   和 2.1 MB 行情快照。
 - 基于临时 SMA20 规则的 spike 及其指标。它既不代表用户的
   `ma_suppression_monitor` 方法，也不构成有效组合回测。
-- 为此 spike 规划的 experiment capabilities 和未来 `mommy-experiment` Skill。
+- 为此 spike 规划的 experiment capabilities 和未来 `mojiang-experiment` Skill。
 - 在策略沉淀纵向闭环出现前，对 Web/TUI/MCP/CLI 做统一 typed runtime 迁移、完整 extras/release
   matrix、repair/upgrade 平台化等扩展。若 Agent-managed bootstrap 确有需要，可逐项最小化引入。
 
@@ -71,7 +71,7 @@ Strategy Distillation 不是“把观点编译成一个可回测的通用策略�
 | 能力 | 用户能感受到什么 | 第一版最小实现 |
 |---|---|---|
 | 来源接收与溯源 | 知道策略来自哪篇文章/哪段原话 | Host Agent 读取文本、文件或 URL；保存来源标识、摘要和关键摘录 |
-| 策略提炼 | 看到自己的方法被整理清楚 | 新建 `mommy-strategy` Skill，输出固定的策略卡模板 |
+| 策略提炼 | 看到自己的方法被整理清楚 | 新建 `mojiang-strategy` Skill，输出固定的策略卡模板 |
 | 澄清与确认 | 能纠正 Agent，而不是批准一份技术 spec | 只对影响含义的问题做一次成组澄清；自然语言修改后显式确认 |
 | 能力边界标注 | 知道哪些能自动检查、哪些不能 | 每项条件标记 `supported / manual / unavailable` 及原因 |
 | 本地保存与找回 | 以后能再次使用这套方法 | 最小 `save/list/get/archive`，保存策略卡和来源，不保存未经确认的草稿 |
@@ -99,7 +99,7 @@ Gate：用户认可策略卡的内容和语言。未通过时只改体验，不�
 
 用户产物：用户把一段方法发给 Agent，当场得到可修改的策略卡。
 
-- [x] 新建边界清晰的 `mommy-strategy` Skill。
+- [x] 新建边界清晰的 `mojiang-strategy` Skill。
 - [x] 支持直接文本、本地文件和 Agent 已能访问的 URL；不另建抓取平台。
 - [x] 输出来源摘录、事实/解释区分、条件清单、失效条件和能力状态。
 - [x] 最多进行一次成组澄清；不问技术实现细节。
@@ -152,8 +152,8 @@ Gate：一次真实或 fixture 触发能让用户理解“为什么提醒我”�
 - [x] 根目录提供 `agent-start.md`，README 第一入口改为“把这句话发给 Agent”。
 - [x] 提供精简的 `agent detect/plan/connect/doctor/repair --json`，不引入通用 capability runtime。
 - [x] plan 列出配置目标、MCP 命令、三个 Skills 和隐私范围；执行前要求用户确认。
-- [x] MCP 绑定当前 `mommy` 的 Python 环境，避免新计划误连旧版全局 server。
-- [x] 安装 `mommy-onboard` / `mommy-research` / `mommy-strategy` 三层 Skill，并保护用户修改。
+- [x] MCP 绑定当前 `mojiang` 的 Python 环境，避免新计划误连旧版全局 server。
+- [x] 安装 `mojiang-onboard` / `mojiang-research` / `mojiang-strategy` 三层 Skill，并保护用户修改。
 - [x] 新连接默认 `market-only`；个人上下文、研究写回、策略保存和监控逐层授权。
 - [x] doctor 真实执行 MCP initialize/tools-list；失败时不推断 privacy 正常，`--timeout` 真正生效。
 - [x] MCP discovery 延迟数据库/数据源初始化，诊断探针不靠创建个人数据证明成功。
@@ -191,7 +191,7 @@ Gate：安装/连接状态永远不能单独宣称成功体验；用户必须看
 - `ruff check .`：通过。
 - `mypy --strict src`：206 个源码文件通过。
 - `pytest -m "not network"`：2,082 个离线测试通过；14 个网络探针按 marker 排除。
-- `mommy-onboard` / `mommy-research` / `mommy-strategy`：官方 Skill validator 全部通过。
+- `mojiang-onboard` / `mojiang-research` / `mojiang-strategy`：官方 Skill validator 全部通过。
 - 从源码分发包重建 wheel 成功；wheel 只包含三个正式 Skills。
 - wheel 内 MCP 真实完成 initialize/tools-list，`market-only` 发现 20 个公共工具且 discovery 未创建数据库。
 - 源码包和 wheel 均排除本地 `output/` 与实验性 `market-monitoring-test` Skill，避免脏工作树泄露。

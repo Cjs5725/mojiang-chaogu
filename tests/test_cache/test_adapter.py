@@ -8,12 +8,12 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.cache import (
+from mojiang_chaogu.cache import (
     CacheConfig,
     CachedMarketDataAdapter,
     CacheStore,
 )
-from mommy_chaogu.market_data import (
+from mojiang_chaogu.market_data import (
     AdjustmentType,
     Bar,
     BarInterval,
@@ -566,7 +566,7 @@ def test_store_quote_cache_quote_ts_distinct_from_fetched_at(store: CacheStore) 
 
 
 def test_cache_manager_format_freshness(cached: CachedMarketDataAdapter) -> None:
-    from mommy_chaogu.cache import CacheManager
+    from mojiang_chaogu.cache import CacheManager
 
     cached.get_quote("600519")
     mgr = CacheManager(store=cached.store, adapter=cached)
@@ -576,7 +576,7 @@ def test_cache_manager_format_freshness(cached: CachedMarketDataAdapter) -> None
 
 
 def test_cache_manager_stats(cached: CachedMarketDataAdapter) -> None:
-    from mommy_chaogu.cache import CacheManager
+    from mojiang_chaogu.cache import CacheManager
 
     cached.get_quote("600519")
     cached.get_quote("600519")

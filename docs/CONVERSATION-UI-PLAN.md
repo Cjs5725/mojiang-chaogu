@@ -45,7 +45,7 @@ EVALUATION-2026-07-18（`docs/archive/EVALUATION-2026-07-18-backend.md`）的 17
 | TUI：13 个 slash 命令 + 对话内富卡片 + `@` 股票联想 | ✅ | `782bb91` |
 | TUI：状态可见性（TopBar AI 状态点、重试进度、记忆回执、截断标注） | ✅ | `782bb91` |
 | Web 先行块：错误状态约定（ErrorState≠EmptyState、401 横幅、stores 保留旧数据） | ✅ | `cd44e7e` |
-| `mommy` 主入口补 `load_dotenv()`（实测复现的高优 bug） | ✅ | `cd44e7e` |
+| `mojiang` 主入口补 `load_dotenv()`（实测复现的高优 bug） | ✅ | `cd44e7e` |
 | 文档：CHANGELOG Unreleased、README/AGENTS/docs 数字同步 | ✅ | `cd44e7e` |
 | 验证：1518 pytest + ruff + mypy strict + web vitest 35 + build/typecheck | ✅ | — |
 | 界面验收（Pilot 冒烟 + SVG 渲染检查） | ✅ | — |
@@ -202,7 +202,7 @@ EVALUATION-2026-07-18（`docs/archive/EVALUATION-2026-07-18-backend.md`）的 17
 
 | 风险 | 缓解 |
 |---|---|
-| TUI 大改后真实终端 CJK 渲染差异（SVG 导出验收有伪影） | 用户亲测 `mommy-tui` 后再合并 Phase 1 |
+| TUI 大改后真实终端 CJK 渲染差异（SVG 导出验收有伪影） | 用户亲测 `mojiang-tui` 后再合并 Phase 1 |
 | Web 对话页重写给 e2e 带来大面积选择器失效 | 重写时同步更新 e2e（步骤 3.7-8 内含） |
 | `@`/搜股联想数据源覆盖不全（非半导体非自选股） | 联想仅作快捷方式，手输 6 位代码永远可用；后续可加行情快照全表 |
 | 老用户找不到看板/预测页 | 欢迎卡与 `/help` 引导；Web `/predictions` `/signals` 路由保留深链 |

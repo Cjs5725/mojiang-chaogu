@@ -8,11 +8,11 @@ from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.services.bootstrap import AgentBridge, DataService, FakeServices
-from mommy_chaogu.tui.views.chat import _CODE_RE, ChatView
-from mommy_chaogu.tui.widgets import cards
-from mommy_chaogu.tui.widgets.hint_bar import HintBar
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.services.bootstrap import AgentBridge, DataService, FakeServices
+from mojiang_chaogu.tui.views.chat import _CODE_RE, ChatView
+from mojiang_chaogu.tui.widgets import cards
+from mojiang_chaogu.tui.widgets.hint_bar import HintBar
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -31,7 +31,7 @@ async def _wait_for(pilot: Any, predicate: Any, timeout: float = 3.0) -> bool:
 
 def test_dynamic_markup_is_escaped() -> None:
     async def _test() -> None:
-        app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+        app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
         async with app.run_test() as pilot:
             chat = app.query_one(ChatView)
             dangerous = "[/red] [link=https://example.test]"
@@ -62,7 +62,7 @@ def test_dynamic_markup_is_escaped() -> None:
 
 def test_clear_is_atomic_on_fresh_and_busy_chat() -> None:
     async def _test() -> None:
-        app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+        app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
         async with app.run_test() as pilot:
             chat = app.query_one(ChatView)
             chat.set_busy(True)
@@ -103,7 +103,7 @@ def test_fullwidth_digits_are_not_stock_codes() -> None:
 
 def test_hidden_suggestion_selection_scrolls_into_view() -> None:
     async def _test() -> None:
-        app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+        app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
         async with app.run_test() as pilot:
             chat = app.query_one(ChatView)
             prompt = chat.query_one("#prompt")
@@ -153,7 +153,7 @@ def test_agent_receives_bounded_conversation_history() -> None:
         agent = HistoryAgent()
         services = FakeServices.create()
         services.agent = AgentBridge(_agent=agent)
-        app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+        app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
         async with app.run_test() as pilot:
             chat = app.query_one(ChatView)
             app.handle_chat_message("第一问")

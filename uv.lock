@@ -917,7 +917,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mommy-chaogu"
+name = "mojiang-chaogu"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },

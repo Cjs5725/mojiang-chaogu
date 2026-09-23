@@ -11,12 +11,12 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
-    docker compose build mommy-web
+    docker compose build mojiang-web
 fi
-docker compose up -d --no-build mommy-web
+docker compose up -d --no-build mojiang-web
 
 for _ in $(seq 1 45); do
-    if curl --fail --silent http://127.0.0.1:8000/api/health >/tmp/mommy-health.json; then
+    if curl --fail --silent http://127.0.0.1:8000/api/health >/tmp/mojiang-health.json; then
         break
     fi
     sleep 1
@@ -24,16 +24,16 @@ done
 
 if ! curl --fail --silent http://127.0.0.1:8000/api/health >/dev/null; then
     docker compose ps
-    docker compose logs mommy-web
+    docker compose logs mojiang-web
     exit 1
 fi
 
 curl --fail --silent http://127.0.0.1:8000/api/health | grep '"ok":true' >/dev/null
 curl --fail --silent http://127.0.0.1:8000/ | grep '<div id="app">' >/dev/null
 
-container_user="$(docker compose exec -T mommy-web id -u)"
+container_user="$(docker compose exec -T mojiang-web id -u)"
 test "$container_user" != "0"
 
-docker compose exec -T mommy-web sh -c 'test -w /app/data'
+docker compose exec -T mojiang-web sh -c 'test -w /app/data'
 
 echo "Docker smoke test passed"

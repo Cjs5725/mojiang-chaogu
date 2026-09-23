@@ -21,8 +21,8 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette.requests import Request
 
-from mommy_chaogu.web.app import create_app
-from mommy_chaogu.web.background import set_service
+from mojiang_chaogu.web.app import create_app
+from mojiang_chaogu.web.background import set_service
 
 from .conftest import make_mock_adapter, make_mock_service
 
@@ -50,7 +50,7 @@ def _make_client(
     )
 
     mock_adapter = make_mock_adapter()
-    from mommy_chaogu.web.deps import (
+    from mojiang_chaogu.web.deps import (
         get_adapter,
         get_alerter,
         get_cache_store,
@@ -77,8 +77,8 @@ def _make_client(
 @pytest.fixture(autouse=True)
 def _isolate_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Isolate env so tests never touch real user/project secrets."""
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(tmp_path / "user-config"))
-    monkeypatch.setenv("MOMMY_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(tmp_path / "user-config"))
+    monkeypatch.setenv("MOJIANG_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
     for key in (
         "DEEPSEEK_API_KEY",
         "OPENAI_API_KEY",
@@ -159,14 +159,14 @@ class TestStatusAuthMode:
     """auth_mode must reflect the runtime WebSecurity.auth_mode truth source.
 
     Local CLI intentionally forces api_token="" on loopback even if
-    MOMMY_API_TOKEN is configured. status must report the actual runtime state.
+    MOJIANG_API_TOKEN is configured. status must report the actual runtime state.
     """
 
     def test_stale_config_token_reports_none_when_runtime_disabled(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """MOMMY_API_TOKEN in env but runtime token="" (loopback) → mode=none."""
-        monkeypatch.setenv("MOMMY_API_TOKEN", "stale-configured-for-remote")
+        """MOJIANG_API_TOKEN in env but runtime token="" (loopback) → mode=none."""
+        monkeypatch.setenv("MOJIANG_API_TOKEN", "stale-configured-for-remote")
         client = _make_client(
             api_token="",  # runtime: loopback forced it empty
             local_setup_enabled=True,
@@ -177,7 +177,7 @@ class TestStatusAuthMode:
 
     def test_runtime_token_reports_token_mode(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Runtime token set (no pairing digest) → mode=token."""
-        monkeypatch.setenv("MOMMY_API_TOKEN", "")
+        monkeypatch.setenv("MOJIANG_API_TOKEN", "")
         client = _make_client(
             api_token="owner-secret",  # runtime: explicitly set
             local_setup_enabled=False,
@@ -192,10 +192,10 @@ class TestStatusAuthMode:
 
     def test_pairing_digest_reports_pairing_mode(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Runtime token + pairing_digest → mode=pairing, not token."""
-        from mommy_chaogu.web.security import generate_pairing_code_and_digest
+        from mojiang_chaogu.web.security import generate_pairing_code_and_digest
 
         _, digest = generate_pairing_code_and_digest("owner-secret")
-        monkeypatch.setenv("MOMMY_API_TOKEN", "")
+        monkeypatch.setenv("MOJIANG_API_TOKEN", "")
         client = _make_client(
             api_token="owner-secret",
             local_setup_enabled=False,
@@ -247,11 +247,11 @@ class TestSecretFreeResponses:
         client = _make_client(local_setup_enabled=True, loopback=True)
         # mock validate so no network call
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.validate_llm_connection",
+            "mojiang_chaogu.web.routes.setup.validate_llm_connection",
             lambda p, m, k: (True, "连接成功"),
         )
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup._write_env_file",
+            "mojiang_chaogu.web.routes.setup._write_env_file",
             lambda *a, **kw: None,
         )
         r = client.post(
@@ -277,7 +277,7 @@ class TestValidate:
             return True, "连接成功"
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.validate_llm_connection",
+            "mojiang_chaogu.web.routes.setup.validate_llm_connection",
             fake_validate,
         )
         r = client.post(
@@ -315,7 +315,7 @@ class TestValidate:
     def test_validate_returns_failure_message(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client = _make_client(local_setup_enabled=True, loopback=True)
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.validate_llm_connection",
+            "mojiang_chaogu.web.routes.setup.validate_llm_connection",
             lambda p, m, k: (False, "API key 无效或已失效"),
         )
         r = client.post(
@@ -348,12 +348,12 @@ class TestSave:
             written["provider"] = provider
             written["model"] = kw.get("model")
 
-        monkeypatch.setattr("mommy_chaogu.web.routes.setup.validate_llm_connection", fake_validate)
-        monkeypatch.setattr("mommy_chaogu.web.routes.setup._write_env_file", fake_write)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.setup.validate_llm_connection", fake_validate)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.setup._write_env_file", fake_write)
 
         cleared: list[str] = []
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.reload_agent_caches",
+            "mojiang_chaogu.web.routes.setup.reload_agent_caches",
             lambda: cleared.append("called"),
         )
 
@@ -386,14 +386,14 @@ class TestSave:
         write_called: list[bool] = []
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.validate_llm_connection",
+            "mojiang_chaogu.web.routes.setup.validate_llm_connection",
             lambda p, m, k: (False, "API key 无效或已失效"),
         )
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup._write_env_file",
+            "mojiang_chaogu.web.routes.setup._write_env_file",
             lambda *a, **kw: write_called.append(True),
         )
-        monkeypatch.setattr("mommy_chaogu.web.routes.setup.reload_agent_caches", lambda: None)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.setup.reload_agent_caches", lambda: None)
 
         r = client.post(
             "/api/setup/save",
@@ -414,15 +414,15 @@ class TestSave:
         client = _make_client(local_setup_enabled=True, loopback=True)
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.validate_llm_connection",
+            "mojiang_chaogu.web.routes.setup.validate_llm_connection",
             lambda p, m, k: (True, "连接成功"),
         )
         # Redirect preferred_setup_env_path to our temp file
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.setup.preferred_setup_env_path",
+            "mojiang_chaogu.web.routes.setup.preferred_setup_env_path",
             lambda: env_file,
         )
-        monkeypatch.setattr("mommy_chaogu.web.routes.setup.reload_agent_caches", lambda: None)
+        monkeypatch.setattr("mojiang_chaogu.web.routes.setup.reload_agent_caches", lambda: None)
 
         r = client.post(
             "/api/setup/save",
@@ -447,12 +447,12 @@ class TestCacheInvalidation:
     def test_reload_agent_caches_clears_targeted_caches(self) -> None:
         """reload_agent_caches should clear get_agent_service + get_memory_service
         + _get_router, but NOT close shared market/adapter resources."""
-        from mommy_chaogu.web.deps import (
+        from mojiang_chaogu.web.deps import (
             get_agent_service,
             get_memory_service,
             reload_agent_caches,
         )
-        from mommy_chaogu.web.routes.agent import _get_router
+        from mojiang_chaogu.web.routes.agent import _get_router
 
         cleared: list[str] = []
 
@@ -500,28 +500,28 @@ class TestIsLoopbackRequest:
 
     @pytest.mark.parametrize("host", ["127.0.0.1", "::1"])
     def test_loopback_addresses(self, host: str) -> None:
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         assert is_loopback_request(_make_request(host)) is True
 
     def test_localhost_hostname(self) -> None:
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         assert is_loopback_request(_make_request("localhost")) is True
 
     def test_non_loopback_address(self) -> None:
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         assert is_loopback_request(_make_request("93.184.216.34")) is False
 
     def test_missing_client(self) -> None:
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         assert is_loopback_request(_make_request(None)) is False
 
     def test_x_forwarded_for_does_not_spoof_loopback(self) -> None:
         """A real non-loopback peer with spoofed X-Forwarded-For must stay False."""
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         request = _make_request(
             "93.184.216.34",
@@ -531,7 +531,7 @@ class TestIsLoopbackRequest:
 
     def test_x_forwarded_for_does_not_spoof_non_loopback(self) -> None:
         """A real loopback peer with spoofed X-Forwarded-For must stay True."""
-        from mommy_chaogu.web.security import is_loopback_request
+        from mojiang_chaogu.web.security import is_loopback_request
 
         request = _make_request(
             "127.0.0.1",

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.agent.semantic_memory import SemanticMemory
+from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
 
 @pytest.fixture

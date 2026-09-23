@@ -6,8 +6,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from unittest.mock import MagicMock
 
-from mommy_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
-from mommy_chaogu.services.us_market_service import (
+from mojiang_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
+from mojiang_chaogu.services.us_market_service import (
     US_MARKET_BRIEF,
     fetch_us_market_brief,
 )

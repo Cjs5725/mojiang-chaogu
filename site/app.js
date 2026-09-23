@@ -23,7 +23,7 @@
   const commandElement = document.querySelector("#install-command");
   const copyButton = document.querySelector("[data-copy-command]");
   if (commandElement) {
-    const fallbackOrigin = "https://coffee-man666.github.io/mommy-chaogu";
+    const fallbackOrigin = "https://Cjs5725.github.io/mojiang-chaogu";
     const isHttp = window.location.protocol === "http:" || window.location.protocol === "https:";
     const pathname = window.location.pathname;
     const directory = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname.slice(0, pathname.lastIndexOf("/"));

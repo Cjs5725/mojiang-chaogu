@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.tui.views.chat import SLASH_COMMANDS, SlashCommand, SlashSuggester
+from mojiang_chaogu.tui.views.chat import SLASH_COMMANDS, SlashCommand, SlashSuggester
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -148,13 +148,13 @@ class TestSlashCards:
     def test_flows_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -171,13 +171,13 @@ class TestSlashCards:
     def test_flows_without_code_renders_watchlist_ranking(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -194,13 +194,13 @@ class TestSlashCards:
     def test_memory_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -218,13 +218,13 @@ class TestSlashCards:
     def test_watch_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -242,13 +242,13 @@ class TestSlashCards:
     def test_portfolio_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -265,13 +265,13 @@ class TestSlashCards:
     def test_signals_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -289,13 +289,13 @@ class TestSlashCards:
     def test_predictions_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -314,13 +314,13 @@ class TestSlashCards:
     def test_status_renders_card(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
         from tests.test_tui_smoke import _wait_for
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -339,12 +339,12 @@ class TestSlashCards:
     def test_unknown_command_hint(self) -> None:
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)

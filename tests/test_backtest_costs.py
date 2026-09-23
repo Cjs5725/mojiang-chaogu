@@ -1,8 +1,8 @@
-"""A 股交易成本模型 ``mommy_chaogu.backtest.costs`` 的测试。"""
+"""A 股交易成本模型 ``mojiang_chaogu.backtest.costs`` 的测试。"""
 
 from __future__ import annotations
 
-from mommy_chaogu.backtest.costs import (
+from mojiang_chaogu.backtest.costs import (
     DEFAULT_COSTS,
     TradingCosts,
     apply_costs,

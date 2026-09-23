@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-from mommy_chaogu.agent.semantic_memory import SemanticMemory
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
 
 @pytest.fixture
@@ -100,8 +100,8 @@ class TestRecordAnalysis:
         )
 
         with (
-            patch("mommy_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
-            patch("mommy_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
+            patch("mojiang_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
+            patch("mojiang_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
         ):
             mock_extract.return_value = {"observations": [{"code": "603662"}], "predictions": []}
             pipe = MemoryPipeline(episodic, tracker, None, client=client, model="test-model")
@@ -122,8 +122,8 @@ class TestRecordAnalysis:
         pipe = MemoryPipeline(episodic, tracker, None, client=None, model=None)
 
         with (
-            patch("mommy_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
-            patch("mommy_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
+            patch("mojiang_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
+            patch("mojiang_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
         ):
             pipe.record_analysis("user", "assistant")
             mock_extract.assert_not_called()
@@ -138,8 +138,8 @@ class TestRecordAnalysis:
         client = make_mock_client()
 
         with (
-            patch("mommy_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
-            patch("mommy_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
+            patch("mojiang_chaogu.agent.memory_pipeline.extract_from_conversation") as mock_extract,
+            patch("mojiang_chaogu.agent.memory_pipeline.store_extraction") as mock_store,
         ):
             mock_extract.return_value = None
             pipe = MemoryPipeline(episodic, tracker, None, client=client, model="m")
@@ -157,7 +157,7 @@ class TestRecordAnalysis:
         client = make_mock_client()
 
         with patch(
-            "mommy_chaogu.agent.memory_pipeline.extract_from_conversation",
+            "mojiang_chaogu.agent.memory_pipeline.extract_from_conversation",
             side_effect=Exception("API down"),
         ):
             pipe = MemoryPipeline(episodic, tracker, None, client=client, model="m")
@@ -215,7 +215,7 @@ class TestConsolidate:
         """有全部组件时调用 MemoryConsolidator.consolidate_all。"""
         client = make_mock_client(response_content="测试知识")
 
-        with patch("mommy_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons_class:
+        with patch("mojiang_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons_class:
             mock_instance = mock_cons_class.return_value
             pipe = MemoryPipeline(episodic, tracker, semantic, client=client, model="m")
             assert pipe.consolidate() is True
@@ -232,7 +232,7 @@ class TestConsolidate:
         """consolidate_all 抛异常时静默降级。"""
         client = make_mock_client()
 
-        with patch("mommy_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons_class:
+        with patch("mojiang_chaogu.agent.memory_pipeline.MemoryConsolidator") as mock_cons_class:
             mock_cons_class.return_value.consolidate_all.side_effect = Exception("boom")
             pipe = MemoryPipeline(episodic, tracker, semantic, client=client, model="m")
             assert pipe.consolidate() is False

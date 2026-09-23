@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from mommy_chaogu.agent.tools.alerts import HANDLERS as ALERTS_HANDLERS
-from mommy_chaogu.agent.tools.base import ToolContext
-from mommy_chaogu.agent.tools.holdings import HANDLERS as HOLDINGS_HANDLERS
+from mojiang_chaogu.agent.tools.alerts import HANDLERS as ALERTS_HANDLERS
+from mojiang_chaogu.agent.tools.base import ToolContext
+from mojiang_chaogu.agent.tools.holdings import HANDLERS as HOLDINGS_HANDLERS
 
 # ---------------------------------------------------------------------------
 # manage_alert handler
@@ -157,7 +157,7 @@ class TestGetWatchlist:
         assert json.loads(result)["error"] == "自选股未配置"
 
     def test_returns_entries(self) -> None:
-        from mommy_chaogu.watchlist.models import StockEntry
+        from mojiang_chaogu.watchlist.models import StockEntry
 
         group = MagicMock()
         group.name = "默认"
@@ -209,7 +209,7 @@ class TestManageWatchlist:
         assert "error" not in data
         assert data["group"] == "默认"
 
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         entries = WatchlistStore(db).list_entries()
         assert [e.code for e in entries] == ["600519"]
@@ -217,7 +217,7 @@ class TestManageWatchlist:
 
     def test_add_uses_injected_store(self, tmp_path: Path) -> None:
         """注入了 watchlist_store 时优先用注入的 store。"""
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)
@@ -233,7 +233,7 @@ class TestManageWatchlist:
         assert [e.code for e in entries] == ["000858"]
 
     def test_add_idempotent(self, tmp_path: Path) -> None:
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)
@@ -242,7 +242,7 @@ class TestManageWatchlist:
         assert len(store.list_entries()) == 1
 
     def test_remove(self, tmp_path: Path) -> None:
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)
@@ -254,7 +254,7 @@ class TestManageWatchlist:
         assert store.list_entries() == []
 
     def test_remove_nonexistent(self, tmp_path: Path) -> None:
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)
@@ -264,7 +264,7 @@ class TestManageWatchlist:
         assert "error" in json.loads(result)
 
     def test_missing_code(self, tmp_path: Path) -> None:
-        from mommy_chaogu.watchlist.store import WatchlistStore
+        from mojiang_chaogu.watchlist.store import WatchlistStore
 
         store = WatchlistStore(tmp_path / "portfolio.db")
         ctx = ToolContext(adapter=MagicMock(), watchlist_store=store)

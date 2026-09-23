@@ -45,7 +45,7 @@ onUnmounted(() => {
   <div
     class="sticky top-0 z-20 flex items-center gap-2.5 border-b border-border bg-background/90 px-3.5 py-2 font-mono text-xs text-muted-foreground backdrop-blur"
   >
-    <span class="font-semibold text-foreground">{{ props.brand ?? 'mommy-chaogu' }}</span>
+    <span class="font-semibold text-foreground">{{ props.brand ?? 'mojiang-chaogu' }}</span>
     <span class="inline-block h-2 w-2 rounded-full" :class="dotClass(props.connection)" />
     <span class="text-primary">{{ phase }}</span>
     <span class="ml-auto tabular-nums">{{ clock }}</span>

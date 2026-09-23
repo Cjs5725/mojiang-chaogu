@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.verify_engine import (
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.verify_engine import (
     _score_direction,
     _score_target,
     verify_one,
@@ -66,7 +66,7 @@ def _create_aged_prediction(
     而不是用裸 SQL 改写 verify_after——那是生产不可能出现的数据形状，
     恰好掩盖了"验证窗口宽度为零"的 bug。
     """
-    import mommy_chaogu.agent.prediction_tracker as pt
+    import mojiang_chaogu.agent.prediction_tracker as pt
 
     fake_now = datetime.now(UTC) - timedelta(days=days_old)
     with monkeypatch.context() as m:
@@ -353,7 +353,7 @@ class TestVerifyPending:
         回归 P2：6 天前创建的 5d 预测（1 天前到期，仍在 5 天宽限期内），
         修复前 now > created_at + 5d 恒成立 → 直接 expired，adapter 不被调用。
         """
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         pid = _create_aged_prediction(
@@ -388,7 +388,7 @@ class TestVerifyPending:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """neutral 预测验证后记 unverifiable，不进 hit_rate 分母。"""
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         _create_aged_prediction(
@@ -420,7 +420,7 @@ class TestVerifyPending:
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         # 6 天前创建的 5d 预测：1 天前到期，仍在宽限期内（真实时间关系）
@@ -467,7 +467,7 @@ class TestVerifyPending:
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         _create_aged_prediction(
@@ -506,7 +506,7 @@ class TestVerifyPending:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """验证 hit/missed 后，源事件的 prediction_id 被回填。"""
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         episodic = EpisodicMemory(tmp_path / "episodic.db")
         tracker = PredictionTracker(tmp_path / "test.db")
@@ -587,7 +587,7 @@ class TestVerifyDataFreshness:
         """终态回填的 data_coverage_at_verify 带 source + quote_age_seconds。"""
         import json
 
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         pid = _create_aged_prediction(
@@ -622,7 +622,7 @@ class TestVerifyDataFreshness:
         """stale cache 来源的验证把缓存年龄（秒）写进 coverage。"""
         import json
 
-        from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+        from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
         tracker = PredictionTracker(tmp_path / "test.db")
         pid = _create_aged_prediction(

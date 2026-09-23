@@ -14,9 +14,9 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from mommy_chaogu.coding_agents import adapter_for
-from mommy_chaogu.coding_agents.base import ConnectionSpec
-from mommy_chaogu.coding_agents.dsh import (
+from mojiang_chaogu.coding_agents import adapter_for
+from mojiang_chaogu.coding_agents.base import ConnectionSpec
+from mojiang_chaogu.coding_agents.dsh import (
     TESTED_DSH_VERSION,
     _PatchLoader,
     dsh_version_check,
@@ -45,8 +45,8 @@ def dsh_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def _spec(**overrides: Any) -> ConnectionSpec:
     values: dict[str, Any] = {
         "command": "/usr/bin/python3",
-        "args": ["-m", "mommy_chaogu.agent.mcp_server", "--profile", "market-only"],
-        "env": {"MOMMY_AGENT_DB": "/tmp/agent.db"},
+        "args": ["-m", "mojiang_chaogu.agent.mcp_server", "--profile", "market-only"],
+        "env": {"MOJIANG_AGENT_DB": "/tmp/agent.db"},
         "cwd": "/tmp",
         "profile": "market-only",
     }
@@ -62,7 +62,7 @@ def _load(path: Path) -> list[Any]:
     return yaml.load(path.read_text(encoding="utf-8"), Loader=_PatchLoader)
 
 
-def _mommy_rows(patches: list[Any]) -> list[dict[str, Any]]:
+def _mojiang_rows(patches: list[Any]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for op in patches:
         if isinstance(op, dict) and isinstance(op.get("insert"), list):
@@ -71,7 +71,7 @@ def _mommy_rows(patches: list[Any]) -> list[dict[str, Any]]:
                     isinstance(row, dict)
                     and row.get("name") == "@deepseek-ai/dsh-mcp-client"
                     and isinstance(row.get("config"), dict)
-                    and row["config"].get("serverName") == "mommy-chaogu"
+                    and row["config"].get("serverName") == "mojiang-chaogu"
                 ):
                     rows.append(row)
     return rows
@@ -85,16 +85,16 @@ def test_register_appends_row_and_preserves_user_patches(dsh_home: Path) -> None
     _adapter().register_mcp(_spec())
 
     patches = _load(patch)
-    assert len(patches) == 3  # 两个用户操作 + mommy 追加的一个
+    assert len(patches) == 3  # 两个用户操作 + mojiang 追加的一个
     assert patches[0]["insert"][0]["name"] == "someone/other-plugin"
     assert [op for op in patches if isinstance(op, dict) and "remove" in op]
-    rows = _mommy_rows(patches)
+    rows = _mojiang_rows(patches)
     assert len(rows) == 1
     config = rows[0]["config"]
     assert config["transport"] == "stdio"
     assert config["command"] == "/usr/bin/python3"
     assert config["args"][-2:] == ["--profile", "market-only"]
-    assert config["env"] == {"MOMMY_AGENT_DB": "/tmp/agent.db"}
+    assert config["env"] == {"MOJIANG_AGENT_DB": "/tmp/agent.db"}
     assert config["cwd"] == "/tmp"
     # 未知标签 !!js 原样保留（值与标签都在）。
     preserved = patches[0]["insert"][0]["config"]["cwd"]
@@ -107,13 +107,13 @@ def test_reregister_replaces_row_in_place(dsh_home: Path) -> None:
     first = _spec()
     _adapter().register_mcp(first)
     previous = {"profile": first.profile, "spec": first.as_dict()}
-    second = _spec(env={"MOMMY_AGENT_DB": "/tmp/agent-2.db"})
+    second = _spec(env={"MOJIANG_AGENT_DB": "/tmp/agent-2.db"})
 
     _adapter(previous).register_mcp(second)
 
-    rows = _mommy_rows(_load(patch))
+    rows = _mojiang_rows(_load(patch))
     assert len(rows) == 1
-    assert rows[0]["config"]["env"] == {"MOMMY_AGENT_DB": "/tmp/agent-2.db"}
+    assert rows[0]["config"]["env"] == {"MOJIANG_AGENT_DB": "/tmp/agent-2.db"}
 
 
 def test_disconnect_removes_only_managed_row_and_empty_op(dsh_home: Path) -> None:
@@ -122,12 +122,12 @@ def test_disconnect_removes_only_managed_row_and_empty_op(dsh_home: Path) -> Non
     patch.write_text(USER_PATCHES, encoding="utf-8")
     spec = _spec()
     _adapter().register_mcp(spec)
-    assert len(_mommy_rows(_load(patch))) == 1
+    assert len(_mojiang_rows(_load(patch))) == 1
 
     _adapter({"profile": spec.profile, "spec": spec.as_dict()}).disconnect()
 
     patches = _load(patch)
-    assert _mommy_rows(patches) == []
+    assert _mojiang_rows(patches) == []
     assert len(patches) == 2  # 用户的 insert + remove 操作原样保留
     assert patches[0]["insert"][0]["name"] == "someone/other-plugin"
 
@@ -145,10 +145,10 @@ def test_modified_managed_row_requires_force(dsh_home: Path) -> None:
     dsh_home.mkdir(parents=True)
     patch.write_text(
         "- insert:\n"
-        "    - id: mcp-mommy-chaogu\n"
+        "    - id: mcp-mojiang-chaogu\n"
         "      name: '@deepseek-ai/dsh-mcp-client'\n"
         "      config:\n"
-        "        serverName: mommy-chaogu\n"
+        "        serverName: mojiang-chaogu\n"
         "        transport: stdio\n"
         "        command: edited-by-user\n",
         encoding="utf-8",
@@ -224,7 +224,7 @@ def test_dsh_version_check_reports_drift_as_non_blocking_warning() -> None:
 def test_doctor_includes_dsh_version_check_without_blocking(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from mommy_chaogu.cli_commands import agent_managed
+    from mojiang_chaogu.cli_commands import agent_managed
 
     monkeypatch.setenv("DSH_HOME", "/tmp/nonexistent-dsh-home")
     with (

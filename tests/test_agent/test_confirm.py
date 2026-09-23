@@ -16,13 +16,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent.service import (
+from mojiang_chaogu.agent.service import (
     DENIAL_RESULT_MESSAGE,
     AgentService,
     ChatCallbacks,
     requires_confirmation,
 )
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture

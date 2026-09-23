@@ -35,7 +35,7 @@ jobs:
       - name: Type check
         run: uv run mypy --strict src
       - name: Offline tests
-        run: uv run pytest -m "not network" --tb=short --cov=mommy_chaogu --cov-report=xml --cov-fail-under=70
+        run: uv run pytest -m "not network" --tb=short --cov=mojiang_chaogu --cov-report=xml --cov-fail-under=70
       - name: Resource lifecycle gate
         run: uv run pytest tests/test_db_lifecycle.py -W error::ResourceWarning
       - name: Upload coverage
@@ -73,7 +73,7 @@ jobs:
       - name: Production build
         run: npm run build
       - name: Packaged frontend is current
-        run: diff -qr dist ../src/mommy_chaogu/web/static
+        run: diff -qr dist ../src/mojiang_chaogu/web/static
       - name: Install browser
         run: npx playwright install --with-deps chromium
       - name: Browser smoke
@@ -104,29 +104,29 @@ jobs:
       - run: uv sync --frozen
       - name: Verify commands
         run: |
-          timeout 30s uv run mommy-watchlist --help
-          timeout 30s uv run mommy-monitor --help
-          timeout 30s uv run mommy-cache --help
-          timeout 30s uv run mommy-earnings --help
-          timeout 30s uv run mommy-flows --help
-          timeout 30s uv run mommy-semicon --help
-          timeout 30s uv run mommy-report --help
-          timeout 30s uv run mommy-agent --help
-          timeout 30s uv run mommy-mcp --help
-          timeout 30s uv run mommy-tui --help
-          timeout 30s uv run mommy --help
+          timeout 30s uv run mojiang-watchlist --help
+          timeout 30s uv run mojiang-monitor --help
+          timeout 30s uv run mojiang-cache --help
+          timeout 30s uv run mojiang-earnings --help
+          timeout 30s uv run mojiang-flows --help
+          timeout 30s uv run mojiang-semicon --help
+          timeout 30s uv run mojiang-report --help
+          timeout 30s uv run mojiang-agent --help
+          timeout 30s uv run mojiang-mcp --help
+          timeout 30s uv run mojiang-tui --help
+          timeout 30s uv run mojiang --help
       - name: Installed-tool smoke
         env:
-          UV_TOOL_DIR: ${{ runner.temp }}/mommy-tools
-          UV_TOOL_BIN_DIR: ${{ runner.temp }}/mommy-bin
+          UV_TOOL_DIR: ${{ runner.temp }}/mojiang-tools
+          UV_TOOL_BIN_DIR: ${{ runner.temp }}/mojiang-bin
         run: |
-          diff -qr data/supply_chains src/mommy_chaogu/bundled_data/supply_chains
-          cmp data/earnings_preview.json src/mommy_chaogu/bundled_data/earnings_preview.json
+          diff -qr data/supply_chains src/mojiang_chaogu/bundled_data/supply_chains
+          cmp data/earnings_preview.json src/mojiang_chaogu/bundled_data/earnings_preview.json
           uv tool install --python 3.12 .
           cd "$RUNNER_TEMP"
-          "$UV_TOOL_BIN_DIR/mommy" --help
-          "$UV_TOOL_DIR/mommy-chaogu/bin/python" -c "from mommy_chaogu.web.app import _resolve_frontend_dist; p = _resolve_frontend_dist(); assert p is not None and (p / 'index.html').is_file()"
-          "$UV_TOOL_DIR/mommy-chaogu/bin/python" -c "from mommy_chaogu.services.theme_service import ThemeService; assert len(ThemeService().list_themes()) >= 5"
+          "$UV_TOOL_BIN_DIR/mojiang" --help
+          "$UV_TOOL_DIR/mojiang-chaogu/bin/python" -c "from mojiang_chaogu.web.app import _resolve_frontend_dist; p = _resolve_frontend_dist(); assert p is not None and (p / 'index.html').is_file()"
+          "$UV_TOOL_DIR/mojiang-chaogu/bin/python" -c "from mojiang_chaogu.services.theme_service import ThemeService; assert len(ThemeService().list_themes()) >= 5"
 
   docker:
     name: Docker build and smoke
@@ -138,7 +138,7 @@ jobs:
         with:
           context: .
           load: true
-          tags: mommy-chaogu:local
+          tags: mojiang-chaogu:local
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Container health and permissions
@@ -160,8 +160,8 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Python vulnerabilities
         run: |
-          uv export --frozen --no-dev --no-emit-project --format requirements-txt --output-file /tmp/mommy-requirements.txt
-          uvx --from pip-audit pip-audit --disable-pip --no-deps --requirement /tmp/mommy-requirements.txt
+          uv export --frozen --no-dev --no-emit-project --format requirements-txt --output-file /tmp/mojiang-requirements.txt
+          uvx --from pip-audit pip-audit --disable-pip --no-deps --requirement /tmp/mojiang-requirements.txt
       - name: Frontend vulnerabilities
         working-directory: web
         run: npm audit --audit-level=high

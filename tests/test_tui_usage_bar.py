@@ -15,7 +15,7 @@ from typing import Any
 from textual.app import App, ComposeResult
 from textual.containers import Vertical
 
-from mommy_chaogu.tui.widgets.top_bar import TopBar
+from mojiang_chaogu.tui.widgets.top_bar import TopBar
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -66,8 +66,8 @@ class TestAppSessionUsageAccumulation:
     """App 每轮结束后把 usage 累加进 TopBar（真实轮次生命周期）。"""
 
     def test_turn_usage_accumulates_in_topbar(self, tmp_path: Path) -> None:
-        from mommy_chaogu.tui.app import MommyTuiApp
-        from mommy_chaogu.tui.services.bootstrap import FakeServices
+        from mojiang_chaogu.tui.app import MojiangTuiApp
+        from mojiang_chaogu.tui.services.bootstrap import FakeServices
 
         services = FakeServices.create()
 
@@ -84,7 +84,7 @@ class TestAppSessionUsageAccumulation:
         services.agent.watch_background = lambda on_done: False  # type: ignore[method-assign]
 
         async def _test() -> None:
-            app = MommyTuiApp(services=services)  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=services)  # type: ignore[arg-type]
             async with app.run_test(size=(110, 30)) as pilot:
                 top = app.query_one(TopBar)
                 prompt = app.query_one("ChatInput")

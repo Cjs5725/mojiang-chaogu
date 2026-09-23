@@ -11,7 +11,7 @@ import migrate_db_layout as migration
 
 
 def main() -> None:
-    with tempfile.TemporaryDirectory(prefix="mommy-migration-") as directory:
+    with tempfile.TemporaryDirectory(prefix="mojiang-migration-") as directory:
         root = Path(directory)
         data = root / "data"
         data.mkdir()

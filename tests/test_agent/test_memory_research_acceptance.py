@@ -15,18 +15,18 @@ from typing import Any
 import pytest
 from sqlalchemy import text
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.memory_pipeline import MemoryPipeline
-from mommy_chaogu.agent.memory_service import MemoryService
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-from mommy_chaogu.agent.research_context import ResearchContextService
-from mommy_chaogu.agent.research_tools import ResearchToolCatalog
-from mommy_chaogu.agent.semantic_memory import SemanticMemory
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.cache import CachedMarketDataAdapter, CacheStore
-from mommy_chaogu.portfolio.store import PortfolioStore
-from mommy_chaogu.signals.custom_alerts import CustomAlertStore
-from mommy_chaogu.watchlist.store import WatchlistStore
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.memory_pipeline import MemoryPipeline
+from mojiang_chaogu.agent.memory_service import MemoryService
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.research_context import ResearchContextService
+from mojiang_chaogu.agent.research_tools import ResearchToolCatalog
+from mojiang_chaogu.agent.semantic_memory import SemanticMemory
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.cache import CachedMarketDataAdapter, CacheStore
+from mojiang_chaogu.portfolio.store import PortfolioStore
+from mojiang_chaogu.signals.custom_alerts import CustomAlertStore
+from mojiang_chaogu.watchlist.store import WatchlistStore
 from tests.offline_market_adapter import OfflineMarketDataAdapter
 
 

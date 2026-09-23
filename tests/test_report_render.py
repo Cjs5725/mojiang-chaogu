@@ -4,14 +4,14 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-from mommy_chaogu.report_render import (
+from mojiang_chaogu.report_render import (
     parse_markdown_report,
     render_index,
     render_index_html,
     render_one,
     render_report_html,
 )
-from mommy_chaogu.report_render.parser import ReportData, SectorRow, StockRow, _decimal
+from mojiang_chaogu.report_render.parser import ReportData, SectorRow, StockRow, _decimal
 
 
 def _report(tmp_path: Path, today_total: str = "600000000") -> ReportData:

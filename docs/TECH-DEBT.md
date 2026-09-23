@@ -15,12 +15,12 @@
 
 | 原豁免模块 | 收敛方式 |
 |---|---|
-| `mommy_chaogu.cache.*` | `QuoteCacheEntry.quote` 改真实 `Quote` 类型；serializer 补 `-> Quote`；`session()` 返回 `Iterator[Session]`；裸 `dict` 补参数化 |
-| `mommy_chaogu.market_data.tencent/fallback/massive_adapter` | Protocol 签名对齐（返回类型补全 + `cast` 边界宽化）；massive 去重逻辑改 `dict.fromkeys` |
-| `mommy_chaogu.web.*` | deps 单例标注真实类型；路由函数补返回类型；修复 market.py 变量复用与 earnings.py 字段映射两处真 bug |
-| `mommy_chaogu.backtest.*` | 裸 `dict` 参数化；`math.sqrt` 替代 `**0.5`；`counts.get` 改 lambda key |
-| `mommy_chaogu.agent.{service, mcp_server, extractor, consolidator, monitor, narrative, vector_search}` | OpenAI 响应边界窄化（`float(...)`/`list(...)`）；MCP content 类型显式宽化 cast；`_retry_base_delay` 出口 `float()` |
-| `mommy_chaogu.cli`、`cli_commands.*` | REPL 拆出 `cli_repl.py`（strict）；工厂函数 `-> object` 全部改真实类型（CacheManager/ToolContext/FlowService/SemiconStore 等）；`_build_llm_client` 返回 `OpenAI | None` |
+| `mojiang_chaogu.cache.*` | `QuoteCacheEntry.quote` 改真实 `Quote` 类型；serializer 补 `-> Quote`；`session()` 返回 `Iterator[Session]`；裸 `dict` 补参数化 |
+| `mojiang_chaogu.market_data.tencent/fallback/massive_adapter` | Protocol 签名对齐（返回类型补全 + `cast` 边界宽化）；massive 去重逻辑改 `dict.fromkeys` |
+| `mojiang_chaogu.web.*` | deps 单例标注真实类型；路由函数补返回类型；修复 market.py 变量复用与 earnings.py 字段映射两处真 bug |
+| `mojiang_chaogu.backtest.*` | 裸 `dict` 参数化；`math.sqrt` 替代 `**0.5`；`counts.get` 改 lambda key |
+| `mojiang_chaogu.agent.{service, mcp_server, extractor, consolidator, monitor, narrative, vector_search}` | OpenAI 响应边界窄化（`float(...)`/`list(...)`）；MCP content 类型显式宽化 cast；`_retry_base_delay` 出口 `float()` |
+| `mojiang_chaogu.cli`、`cli_commands.*` | REPL 拆出 `cli_repl.py`（strict）；工厂函数 `-> object` 全部改真实类型（CacheManager/ToolContext/FlowService/SemiconStore 等）；`_build_llm_client` 返回 `OpenAI | None` |
 
 保留的第三方 `ignore_missing_imports`（efinance/pandas/sqlalchemy/sqlite_vec/
 tiktoken/qrcode 等）是缺 stub 的库的正常处理方式，不算项目豁免。
@@ -36,9 +36,9 @@ tiktoken/qrcode 等）是缺 stub 的库的正常处理方式，不算项目豁�
 
 ## 结构重构记录
 
-- **`cli.py`（807 → 518 行）**：`_run_mommy_repl` 从 ~330 行减到 ~150 行编排
+- **`cli.py`（807 → 518 行）**：`_run_mojiang_repl` 从 ~330 行减到 ~150 行编排
   循环；渲染/斜杠命令/agent Live 流式视图/工作流打印拆到 `cli_repl.py`
-  （384 行，strict 类型；`_run_mommy_repl`/`_render_logo` 保留 cli 命名空间
+  （384 行，strict 类型；`_run_mojiang_repl`/`_render_logo` 保留 cli 命名空间
   re-export 供既有测试导入）。
 - **`tui/views/chat.py`（946 → 811 行）**：12 个斜杠命令卡片 builder 拆到
   `tui/views/slash_cards.py`（`SlashCardFactory`，196 行）；ChatView 保留

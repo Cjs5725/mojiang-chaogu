@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from decimal import Decimal
 
-from mommy_chaogu.earnings.types import (
+from mojiang_chaogu.earnings.types import (
     VERDICT_LABEL,
     EarningsActual,
     EarningsCalendar,

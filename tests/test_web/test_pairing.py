@@ -16,9 +16,9 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.web.app import create_app
-from mommy_chaogu.web.background import set_service
-from mommy_chaogu.web.security import (
+from mojiang_chaogu.web.app import create_app
+from mojiang_chaogu.web.background import set_service
+from mojiang_chaogu.web.security import (
     SESSION_COOKIE_NAME,
     PairResult,
     WebSecurity,
@@ -45,7 +45,7 @@ def _make_client(
     )
 
     mock_adapter = make_mock_adapter()
-    from mommy_chaogu.web.deps import (
+    from mojiang_chaogu.web.deps import (
         get_adapter,
         get_alerter,
         get_cache_store,
@@ -122,12 +122,12 @@ class TestCliPrint:
     def test_cli_prints_pairing_code_once(
         self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        from mommy_chaogu.cli import build_web_parser, cmd_web_serve
+        from mojiang_chaogu.cli import build_web_parser, cmd_web_serve
 
         captured: dict[str, object] = {}
-        monkeypatch.setenv("MOMMY_API_TOKEN", "owner-secret")
+        monkeypatch.setenv("MOJIANG_API_TOKEN", "owner-secret")
         monkeypatch.setattr(
-            "mommy_chaogu.web.create_app",
+            "mojiang_chaogu.web.create_app",
             lambda **kwargs: captured.update(kwargs) or object(),
         )
         monkeypatch.setattr("uvicorn.run", lambda *_a, **_kw: None)
@@ -154,11 +154,11 @@ class TestCliPrint:
         self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
     ) -> None:
         """Loopback with no token → no pairing code printed."""
-        from mommy_chaogu.cli import build_web_parser, cmd_web_serve
+        from mojiang_chaogu.cli import build_web_parser, cmd_web_serve
 
         captured: dict[str, object] = {}
         monkeypatch.setattr(
-            "mommy_chaogu.web.create_app",
+            "mojiang_chaogu.web.create_app",
             lambda **kwargs: captured.update(kwargs) or object(),
         )
         monkeypatch.setattr("uvicorn.run", lambda *_a, **_kw: None)
@@ -552,7 +552,7 @@ class TestSetupAccessWithCookie:
         app = create_app(api_token="", local_setup_enabled=False)
 
         mock_adapter = make_mock_adapter()
-        from mommy_chaogu.web.deps import (
+        from mojiang_chaogu.web.deps import (
             get_adapter,
             get_alerter,
             get_cache_store,

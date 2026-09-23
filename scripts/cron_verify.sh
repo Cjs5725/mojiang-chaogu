@@ -25,7 +25,7 @@ mkdir -p data
     echo "======================================"
 } >> "$LOG_FILE"
 
-if uv run mommy-agent verify >> "$LOG_FILE" 2>&1; then
+if uv run mojiang-agent verify >> "$LOG_FILE" 2>&1; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] cron_verify 成功" >> "$LOG_FILE"
 else
     rc=$?

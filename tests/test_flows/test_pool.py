@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.flows.pool import (
+from mojiang_chaogu.flows.pool import (
     CustomPool,
     PoolSource,
     SemiconPool,
@@ -79,7 +79,7 @@ def test_watchlist_pool_name() -> None:
     assert pool.name == "watchlist"
 
 
-@patch("mommy_chaogu.watchlist.WatchlistStore")
+@patch("mojiang_chaogu.watchlist.WatchlistStore")
 def test_watchlist_pool_codes(mock_store_cls: MagicMock) -> None:
     mock_instance = mock_store_cls.return_value
     mock_instance.get_all_codes.return_value = ["600519", "000001"]
@@ -88,7 +88,7 @@ def test_watchlist_pool_codes(mock_store_cls: MagicMock) -> None:
     mock_instance.get_all_codes.assert_called_once()
 
 
-@patch("mommy_chaogu.watchlist.WatchlistStore")
+@patch("mojiang_chaogu.watchlist.WatchlistStore")
 def test_watchlist_pool_describe(mock_store_cls: MagicMock) -> None:
     mock_instance = mock_store_cls.return_value
     mock_instance.get_all_codes.return_value = ["600519", "000001"]
@@ -107,7 +107,7 @@ def test_semicon_pool_name() -> None:
     assert pool.name == "semicon"
 
 
-@patch("mommy_chaogu.semicon.SemiconStore")
+@patch("mojiang_chaogu.semicon.SemiconStore")
 def test_semicon_pool_codes(mock_store_cls: MagicMock) -> None:
     mock_instance = mock_store_cls.return_value
     mock_instance.list_codes.return_value = ["300782", "688981"]
@@ -116,7 +116,7 @@ def test_semicon_pool_codes(mock_store_cls: MagicMock) -> None:
     mock_instance.list_codes.assert_called_once()
 
 
-@patch("mommy_chaogu.semicon.SemiconStore")
+@patch("mojiang_chaogu.semicon.SemiconStore")
 def test_semicon_pool_describe(mock_store_cls: MagicMock) -> None:
     mock_instance = mock_store_cls.return_value
     mock_instance.list_codes.return_value = ["300782", "688981"]

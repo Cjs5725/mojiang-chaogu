@@ -12,7 +12,7 @@ from typing import Any
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
 
 def _text(result: Any) -> dict[str, Any]:
@@ -39,11 +39,11 @@ def test_personal_mcp_stdio_full_loop_without_llm_or_network(tmp_path: Path) -> 
     env = dict(os.environ)
     env.update(
         {
-            "MOMMY_CONFIG_DIR": str(config_dir),
-            "MOMMY_MARKET_DB": str(market_db),
-            "MOMMY_PORTFOLIO_DB": str(portfolio_db),
-            "MOMMY_AGENT_DB": str(agent_db),
-            "MOMMY_REFERENCE_DB": str(reference_db),
+            "MOJIANG_CONFIG_DIR": str(config_dir),
+            "MOJIANG_MARKET_DB": str(market_db),
+            "MOJIANG_PORTFOLIO_DB": str(portfolio_db),
+            "MOJIANG_AGENT_DB": str(agent_db),
+            "MOJIANG_REFERENCE_DB": str(reference_db),
             "PYTHONPATH": os.pathsep.join((str(Path.cwd()), str(Path.cwd() / "src"))),
         }
     )

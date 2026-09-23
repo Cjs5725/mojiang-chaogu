@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.vector_search import VectorSearch, _pack_vector, _unpack_vector
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.vector_search import VectorSearch, _pack_vector, _unpack_vector
 
 
 @pytest.fixture

@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.channels import process as gateway_process
-from mommy_chaogu.channels.store import WeixinCredentials, WeixinStore
+from mojiang_chaogu.channels import process as gateway_process
+from mojiang_chaogu.channels.store import WeixinCredentials, WeixinStore
 
 
 def _authorized_store(tmp_path: Path) -> WeixinStore:
@@ -38,7 +38,7 @@ def test_start_gateway_process_detaches_and_records_pid(
     assert result.pid == 2468
     assert (store.root / "gateway.pid").read_text(encoding="utf-8") == "2468\n"
     command = popen.call_args.args[0]
-    assert command[1:3] == ["-m", "mommy_chaogu.channels.worker"]
+    assert command[1:3] == ["-m", "mojiang_chaogu.channels.worker"]
 
 
 def test_start_gateway_process_does_not_duplicate_live_worker(

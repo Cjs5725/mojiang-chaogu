@@ -11,15 +11,15 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.services.theme_service import ThemeService
-from mommy_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.services.theme_service import ThemeService
+from mojiang_chaogu.watchlist import WatchlistStore
 
 
 @pytest.fixture()
 def basket_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
-    from mommy_chaogu.web.app import create_app
-    from mommy_chaogu.web.deps import get_adapter, get_watchlist_store
-    from mommy_chaogu.web.routes import baskets as basket_routes
+    from mojiang_chaogu.web.app import create_app
+    from mojiang_chaogu.web.deps import get_adapter, get_watchlist_store
+    from mojiang_chaogu.web.routes import baskets as basket_routes
 
     store = WatchlistStore(tmp_path / "portfolio.db")
     group = store.add_group("我的组合", "自定义关注")

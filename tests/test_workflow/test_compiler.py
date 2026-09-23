@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from mommy_chaogu.workflow.compiler import WorkflowCompiler
+from mojiang_chaogu.workflow.compiler import WorkflowCompiler
 
 
 def _payload() -> str:
@@ -67,7 +67,7 @@ def test_update_preserves_existing_id_and_injects_old_spec() -> None:
         prompts.append(messages[-1]["content"])
         return _payload()
 
-    from mommy_chaogu.workflow.spec import WorkflowSpec
+    from mojiang_chaogu.workflow.spec import WorkflowSpec
 
     current = WorkflowSpec.from_dict(old)
     result = WorkflowCompiler(chat).compile("更新描述", current_spec=current)

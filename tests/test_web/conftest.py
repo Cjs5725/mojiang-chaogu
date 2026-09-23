@@ -16,7 +16,7 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     Bar,
     BarInterval,
@@ -28,10 +28,10 @@ from mommy_chaogu.market_data.types import (
     Quote,
     QuoteType,
 )
-from mommy_chaogu.monitor import Snapshot, SnapshotRow
-from mommy_chaogu.preferences import default_preferences
-from mommy_chaogu.signals.types import Signal, SignalSeverity
-from mommy_chaogu.watchlist.models import StockEntry
+from mojiang_chaogu.monitor import Snapshot, SnapshotRow
+from mojiang_chaogu.preferences import default_preferences
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.watchlist.models import StockEntry
 
 # ---------- 数据工厂 ----------
 
@@ -275,9 +275,9 @@ def client(
     mock_portfolio_store: MagicMock,
 ) -> TestClient:
     """带 mock 依赖的 FastAPI TestClient（不走 lifespan）。"""
-    from mommy_chaogu.web.app import create_app
-    from mommy_chaogu.web.background import set_service
-    from mommy_chaogu.web.deps import (
+    from mojiang_chaogu.web.app import create_app
+    from mojiang_chaogu.web.background import set_service
+    from mojiang_chaogu.web.deps import (
         get_adapter,
         get_alerter,
         get_cache_store,

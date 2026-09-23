@@ -6,12 +6,12 @@ import json
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.market_data.fundamentals_api import get_fundamentals
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.market_data.fundamentals_api import get_fundamentals
 
 
 class TestGetFundamentals:
-    @patch("mommy_chaogu.market_data.fundamentals_api.requests.get")
+    @patch("mojiang_chaogu.market_data.fundamentals_api.requests.get")
     def test_returns_fundamentals_dict(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
@@ -45,7 +45,7 @@ class TestGetFundamentals:
         assert result["circulating_market_cap"] == Decimal("2100000000000")
         assert result["industry"] == "白酒"
 
-    @patch("mommy_chaogu.market_data.fundamentals_api.requests.get")
+    @patch("mojiang_chaogu.market_data.fundamentals_api.requests.get")
     def test_secid_sh_vs_sz(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {"data": {"f14": "测试"}}
@@ -60,7 +60,7 @@ class TestGetFundamentals:
         get_fundamentals("000001")
         assert mock_get.call_args[1]["params"]["secid"] == "0.000001"
 
-    @patch("mommy_chaogu.market_data.fundamentals_api.requests.get")
+    @patch("mojiang_chaogu.market_data.fundamentals_api.requests.get")
     def test_returns_nulls_on_failure(self, mock_get: MagicMock) -> None:
         mock_get.side_effect = Exception("network error")
 
@@ -76,7 +76,7 @@ class TestFundamentalsTool:
         ctx = ToolContext(adapter=MagicMock())
         registry = ToolRegistry(ctx)
 
-        with patch("mommy_chaogu.market_data.fundamentals_api.requests.get") as mock_get:
+        with patch("mojiang_chaogu.market_data.fundamentals_api.requests.get") as mock_get:
             mock_resp = MagicMock()
             mock_resp.json.return_value = {
                 "data": {

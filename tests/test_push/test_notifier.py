@@ -6,9 +6,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from mommy_chaogu.push.base import SignalNotifier
-from mommy_chaogu.push.deduper import JsonFileDeduper
-from mommy_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.push.base import SignalNotifier
+from mojiang_chaogu.push.deduper import JsonFileDeduper
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
 
 
 def make_signal(

@@ -74,7 +74,7 @@ def fetch_tencent_daily(code: str, market: str) -> list[dict[str, Any]]:
 def fetch_efinance_flow(code: str) -> list[dict[str, Any]]:
     """东财历史资金流。"""
     try:
-        from mommy_chaogu.market_data.efinance_adapter import EfinanceAdapter
+        from mojiang_chaogu.market_data.efinance_adapter import EfinanceAdapter
 
         adapter = EfinanceAdapter()
         flows = adapter.get_history_money_flow(code)

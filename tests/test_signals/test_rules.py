@@ -15,15 +15,15 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     MoneyFlow,
     Quote,
     QuoteType,
 )
-from mommy_chaogu.monitor import Snapshot, SnapshotRow
-from mommy_chaogu.signals.rules import (
+from mojiang_chaogu.monitor import Snapshot, SnapshotRow
+from mojiang_chaogu.signals.rules import (
     GapOpenRule,
     MainFlowThresholdRule,
     PortfolioBreadthRule,
@@ -34,7 +34,7 @@ from mommy_chaogu.signals.rules import (
     VolumeSurgeRule,
     default_rules,
 )
-from mommy_chaogu.signals.types import SignalSeverity
+from mojiang_chaogu.signals.types import SignalSeverity
 
 # ---------- Helpers ----------
 
@@ -353,7 +353,7 @@ def test_signal_format_log_one_line() -> None:
 
 def test_alerter_evaluate_multiple_rules(tmp_path: Path) -> None:
     """Alerter 接收 Snapshot，调度多个规则，合并输出。"""
-    from mommy_chaogu.signals import Alerter
+    from mojiang_chaogu.signals import Alerter
 
     snap = _make_snapshot(
         [
@@ -379,7 +379,7 @@ def test_alerter_evaluate_multiple_rules(tmp_path: Path) -> None:
 
 
 def test_alerter_no_signal_returns_empty(tmp_path: Path) -> None:
-    from mommy_chaogu.signals import Alerter
+    from mojiang_chaogu.signals import Alerter
 
     # 4 只股票中 2 涨 2 跌 = 50/50，不触发任何规则
     snap = _make_snapshot(

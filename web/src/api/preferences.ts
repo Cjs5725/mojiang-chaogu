@@ -89,7 +89,7 @@ export const NOTIFY_SEVERITY_OPTIONS: Array<{ id: NotifySeverity; label: string 
 // ---------- 一次性 localStorage 迁移 ----------
 
 /** 旧版浏览器本地交易风格 key（迁移完成后删除，导出仅供测试） */
-export const LEGACY_STYLE_KEY = 'mommy-trading-style'
+export const LEGACY_STYLE_KEY = 'mojiang-trading-style'
 
 function readLegacyStyle(): TradingStyle | null {
   if (typeof window === 'undefined') return null

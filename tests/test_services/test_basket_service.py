@@ -10,9 +10,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.services.basket_service import BasketService
-from mommy_chaogu.services.theme_service import ThemeService
-from mommy_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.services.basket_service import BasketService
+from mojiang_chaogu.services.theme_service import ThemeService
+from mojiang_chaogu.watchlist import WatchlistStore
 
 
 @pytest.fixture()

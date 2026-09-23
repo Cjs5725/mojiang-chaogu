@@ -7,10 +7,10 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from mommy_chaogu.agent.tools import ToolContext
-from mommy_chaogu.cli_commands import workflow as workflow_cli
-from mommy_chaogu.market_data.types import BarInterval, Money, MoneyFlow
-from mommy_chaogu.workflow.spec import WorkflowSpec
+from mojiang_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.cli_commands import workflow as workflow_cli
+from mojiang_chaogu.market_data.types import BarInterval, Money, MoneyFlow
+from mojiang_chaogu.workflow.spec import WorkflowSpec
 
 
 def _flow() -> MoneyFlow:

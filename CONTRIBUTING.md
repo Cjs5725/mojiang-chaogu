@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你有兴趣参与 **mommy-chaogu** 的开发！🎉
+感谢你有兴趣参与 **mojiang-chaogu** 的开发！🎉
 
 ## 项目目标
 
@@ -18,8 +18,8 @@
 ### 1. Fork + Branch
 
 ```bash
-git clone https://github.com/<your-fork>/mommy-chaogu.git
-cd mommy-chaogu
+git clone https://github.com/<your-fork>/mojiang-chaogu.git
+cd mojiang-chaogu
 git checkout -b feat/your-feature-name
 ```
 
@@ -85,19 +85,19 @@ gh pr create --fill
 
 ## CLI 入口
 
-项目有两层 CLI 入口，**写文档 / 报 bug 时请优先用 `mommy` 风格**：
+项目有两层 CLI 入口，**写文档 / 报 bug 时请优先用 `mojiang` 风格**：
 
 ```bash
 # 主入口：自然语言
-uv run mommy                    # 交互式 REPL
-uv run mommy 今天怎么样          # 单次查询
-uv run mommy watchlist list     # 自然语言工作流（新风格）
+uv run mojiang                    # 交互式 REPL
+uv run mojiang 今天怎么样          # 单次查询
+uv run mojiang watchlist list     # 自然语言工作流（新风格）
 
 # 透传到底层子命令（高级用户）
-uv run mommy --raw watchlist list
+uv run mojiang --raw watchlist list
 ```
 
-旧风格的底层子命令（`mommy-watchlist`、`mommy-monitor` 等）仍然可用，但文档和 Issue 中请使用 `mommy` 入口，因为这才是面向用户的用法。
+旧风格的底层子命令（`mojiang-watchlist`、`mojiang-monitor` 等）仍然可用，但文档和 Issue 中请使用 `mojiang` 入口，因为这才是面向用户的用法。
 
 ---
 
@@ -212,7 +212,7 @@ UNIQUE(code, period, source) 约束保证跨券商不重复。
 ### Bug Report
 
 请在 GitHub Issue 页面选择 **「Bug 报告 🐛」** 模板（`.github/ISSUE_TEMPLATE/bug_report.yml`），包含：
-- 复现步骤（用 `mommy` 入口命令描述，例如 `uv run mommy 今天怎么样`）
+- 复现步骤（用 `mojiang` 入口命令描述，例如 `uv run mojiang 今天怎么样`）
 - 期望行为 vs 实际行为
 - 环境信息（Python 版本 / OS / 妈妈用什么终端）
 - 截图 / 日志
@@ -226,7 +226,7 @@ UNIQUE(code, period, source) 约束保证跨券商不重复。
 
 ### 其他讨论
 
-想法 / 提问 / 经验分享不需要开 Issue，请去 [Discussions](https://github.com/hanyan0x1/mommy-chaogu/discussions)（Issue 模板的 config 里也加了入口链接）。
+想法 / 提问 / 经验分享不需要开 Issue，请去 [Discussions](https://github.com/hanyan0x1/mojiang-chaogu/discussions)（Issue 模板的 config 里也加了入口链接）。
 
 ---
 

@@ -7,7 +7,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from mommy_chaogu.services.theme_service import (
+from mojiang_chaogu.services.theme_service import (
     THEME_FLOW_MAX_ATTEMPTS,
     THEME_FLOW_MAX_STOCKS,
     THEME_QUOTE_BATCH_SIZE,

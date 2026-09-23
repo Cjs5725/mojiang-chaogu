@@ -4,7 +4,7 @@ set -eu
 
 DATA_DIR=/app/data
 SEED_DIR=/app/data-seed
-EXPECTED_USER=mommy
+EXPECTED_USER=mojiang
 
 if [ -n "${RAILWAY_VOLUME_MOUNT_PATH:-}" ] \
     && [ "$RAILWAY_VOLUME_MOUNT_PATH" != "$DATA_DIR" ]; then

@@ -1,6 +1,6 @@
 # K 线技术规格（KLINE-SPEC）
 
-> mommy-chaogu K 线模块完整技术文档
+> mojiang-chaogu K 线模块完整技术文档
 > 最后更新：2026-06-28
 
 ---
@@ -41,7 +41,7 @@
 
 ### 2.1 后端 `Bar` dataclass
 
-**位置**：`src/mommy_chaogu/market_data/types.py:150`
+**位置**：`src/mojiang_chaogu/market_data/types.py:150`
 
 ```python
 @dataclass(frozen=True, slots=True)
@@ -113,7 +113,7 @@ class BarOut(BaseModel):
 | 周 K | `W1` | `1w` | 102 | ✅ 前端 Tab |
 | 月 K | `M` | `1M` | 103 | ✅ 前端 Tab |
 
-**枚举定义**：`src/mommy_chaogu/market_data/types.py:43` (`BarInterval`, StrEnum)
+**枚举定义**：`src/mojiang_chaogu/market_data/types.py:43` (`BarInterval`, StrEnum)
 
 ### 3.2 复权方式
 
@@ -135,7 +135,7 @@ class BarOut(BaseModel):
 GET /api/quotes/{code}/bars?interval=1d&limit=250&adjustment=forward
 ```
 
-**位置**：`src/mommy_chaogu/web/routes/quotes.py:53`
+**位置**：`src/mojiang_chaogu/web/routes/quotes.py:53`
 
 **参数**：
 | 参数 | 类型 | 默认 | 约束 |
@@ -160,7 +160,7 @@ CachedMarketDataAdapter        ← 第 1 层：SQLite 缓存
 
 #### 第 1 层：CachedMarketDataAdapter
 
-**位置**：`src/mommy_chaogu/cache/adapter.py`
+**位置**：`src/mojiang_chaogu/cache/adapter.py`
 
 策略：**按日期永久缓存**
 
@@ -174,7 +174,7 @@ CachedMarketDataAdapter        ← 第 1 层：SQLite 缓存
 
 #### 第 2 层：FallbackAdapter
 
-**位置**：`src/mommy_chaogu/market_data/fallback.py`
+**位置**：`src/mojiang_chaogu/market_data/fallback.py`
 
 - 依次调用主源 → 失败（异常/空）→ 自动切备源
 - `get_bars()` 只走了 efinance（腾讯不支持历史 K 线）
@@ -182,7 +182,7 @@ CachedMarketDataAdapter        ← 第 1 层：SQLite 缓存
 
 #### 第 3 层：EfinanceAdapter
 
-**位置**：`src/mommy_chaogu/market_data/efinance_adapter.py:287`
+**位置**：`src/mojiang_chaogu/market_data/efinance_adapter.py:287`
 
 核心调用：
 
@@ -216,7 +216,7 @@ ef.stock.get_quote_history(
 ### 4.3 SQLite 缓存表结构
 
 ```sql
--- 位置：src/mommy_chaogu/cache/schema.py:21
+-- 位置：src/mojiang_chaogu/cache/schema.py:21
 CREATE TABLE IF NOT EXISTS bar_cache (
     code       TEXT NOT NULL,
     interval   TEXT NOT NULL,    -- "1d" / "5m" / ...
@@ -371,15 +371,15 @@ MA 均线由 klinecharts 自动计算并绘制，后端只返回原始 OHLCV 数
 
 | 文件 | 职责 |
 |---|---|
-| `src/mommy_chaogu/market_data/types.py` | Bar / BarInterval / AdjustmentType 定义 |
-| `src/mommy_chaogu/market_data/efinance_adapter.py` | 东方财富 K 线拉取 + 日期范围算法 |
-| `src/mommy_chaogu/market_data/fallback.py` | 主备源切换 |
-| `src/mommy_chaogu/cache/adapter.py` | K 线缓存装饰器 |
-| `src/mommy_chaogu/cache/store.py` | bar_cache SQLite CRUD |
-| `src/mommy_chaogu/cache/schema.py` | bar_cache DDL |
-| `src/mommy_chaogu/web/routes/quotes.py` | `/api/quotes/{code}/bars` 端点 |
-| `src/mommy_chaogu/web/mappers.py` | Bar → BarOut 转换 |
-| `src/mommy_chaogu/web/schemas.py` | BarOut Pydantic 模型 |
+| `src/mojiang_chaogu/market_data/types.py` | Bar / BarInterval / AdjustmentType 定义 |
+| `src/mojiang_chaogu/market_data/efinance_adapter.py` | 东方财富 K 线拉取 + 日期范围算法 |
+| `src/mojiang_chaogu/market_data/fallback.py` | 主备源切换 |
+| `src/mojiang_chaogu/cache/adapter.py` | K 线缓存装饰器 |
+| `src/mojiang_chaogu/cache/store.py` | bar_cache SQLite CRUD |
+| `src/mojiang_chaogu/cache/schema.py` | bar_cache DDL |
+| `src/mojiang_chaogu/web/routes/quotes.py` | `/api/quotes/{code}/bars` 端点 |
+| `src/mojiang_chaogu/web/mappers.py` | Bar → BarOut 转换 |
+| `src/mojiang_chaogu/web/schemas.py` | BarOut Pydantic 模型 |
 | `web/src/pages/detail/index.vue` | K 线详情页 + klinecharts 渲染 |
 | `web/src/api/index.ts` | `getBars()` API client |
 | `web/src/api/types.ts` | Bar TS 接口 |

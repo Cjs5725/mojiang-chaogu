@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from mommy_chaogu.cli_commands.agent_managed import (
+from mojiang_chaogu.cli_commands.agent_managed import (
     connect_payload,
     detect_payload,
     doctor_payload,
@@ -15,14 +15,14 @@ from mommy_chaogu.cli_commands.agent_managed import (
     repair_payload,
     run_agent_managed,
 )
-from mommy_chaogu.cli_commands.connect import ConnectError
-from mommy_chaogu.coding_agents.base import ConnectionSpec
+from mojiang_chaogu.cli_commands.connect import ConnectError
+from mojiang_chaogu.coding_agents.base import ConnectionSpec
 
 
 def _spec(profile: str = "market-only") -> ConnectionSpec:
     return ConnectionSpec(
         command="/usr/bin/python3",
-        args=["-m", "mommy_chaogu.agent.mcp_server", "--profile", profile],
+        args=["-m", "mojiang_chaogu.agent.mcp_server", "--profile", profile],
         env={},
         cwd="/tmp/project",
         profile=profile,  # type: ignore[arg-type]
@@ -56,18 +56,18 @@ def _healthy_tools(profile: str = "market-only") -> list[str]:
 def _skill_checks() -> list[dict[str, object]]:
     return [
         {"name": name, "status": "ok", "path": f"/skills/{name}", "managed": True}
-        for name in ("mommy-onboard", "mommy-research", "mommy-strategy")
+        for name in ("mojiang-onboard", "mojiang-research", "mojiang-strategy")
     ]
 
 
 def test_detect_explains_the_toolbox_without_claiming_generic_managed_support() -> None:
     with (
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._state_connections",
+            "mojiang_chaogu.cli_commands.agent_managed._state_connections",
             return_value={},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._host_status",
+            "mojiang_chaogu.cli_commands.agent_managed._host_status",
             side_effect=lambda host, _connections: {
                 "host": host,
                 "installed": False,
@@ -91,11 +91,11 @@ def test_plan_is_read_only_and_shows_every_change(
     monkeypatch.setenv("CODEX_SKILLS_DIR", str(tmp_path / "skills"))
     with (
         patch(
-            "mommy_chaogu.cli_commands.agent_managed.detect_payload",
+            "mojiang_chaogu.cli_commands.agent_managed.detect_payload",
             return_value={"auto_selected": "codex", "auto_candidates": ["codex"]},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._connection_spec",
+            "mojiang_chaogu.cli_commands.agent_managed._connection_spec",
             return_value=_spec("market-only"),
         ),
     ):
@@ -109,9 +109,9 @@ def test_plan_is_read_only_and_shows_every_change(
     skills = changes["skills"]
     assert isinstance(skills, list)
     assert [item["name"] for item in skills] == [
-        "mommy-onboard",
-        "mommy-research",
-        "mommy-strategy",
+        "mojiang-onboard",
+        "mojiang-research",
+        "mojiang-strategy",
         "market-watch-loop",
         "basket-analysis",
         "food-security-analysis",
@@ -125,21 +125,21 @@ def test_plan_is_read_only_and_shows_every_change(
 def test_doctor_runs_real_probe_and_enforces_requested_timeout() -> None:
     previous = _previous("personal")
     with (
-        patch("mommy_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
+        patch("mojiang_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._state_connections",
+            "mojiang_chaogu.cli_commands.agent_managed._state_connections",
             return_value={"kimi": previous},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._host_status",
+            "mojiang_chaogu.cli_commands.agent_managed._host_status",
             return_value={"configured": True, "state": "已连接"},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._skill_checks",
+            "mojiang_chaogu.cli_commands.agent_managed._skill_checks",
             return_value=_skill_checks(),
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._probe_sync",
+            "mojiang_chaogu.cli_commands.agent_managed._probe_sync",
             return_value=_healthy_tools("personal"),
         ) as probe,
     ):
@@ -160,21 +160,21 @@ def test_doctor_runs_real_probe_and_enforces_requested_timeout() -> None:
 def test_doctor_never_infers_mcp_health_from_configuration_only() -> None:
     previous = _previous()
     with (
-        patch("mommy_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
+        patch("mojiang_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._state_connections",
+            "mojiang_chaogu.cli_commands.agent_managed._state_connections",
             return_value={"kimi": previous},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._host_status",
+            "mojiang_chaogu.cli_commands.agent_managed._host_status",
             return_value={"configured": True, "state": "已连接"},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._skill_checks",
+            "mojiang_chaogu.cli_commands.agent_managed._skill_checks",
             return_value=_skill_checks(),
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._probe_sync",
+            "mojiang_chaogu.cli_commands.agent_managed._probe_sync",
             side_effect=ConnectError("MCP initialize 超时"),
         ),
     ):
@@ -190,21 +190,21 @@ def test_doctor_never_infers_mcp_health_from_configuration_only() -> None:
 def test_market_only_doctor_fails_on_private_tool_leak() -> None:
     previous = _previous()
     with (
-        patch("mommy_chaogu.cli_commands.agent_managed._resolve_host", return_value="codex"),
+        patch("mojiang_chaogu.cli_commands.agent_managed._resolve_host", return_value="codex"),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._state_connections",
+            "mojiang_chaogu.cli_commands.agent_managed._state_connections",
             return_value={"codex": previous},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._host_status",
+            "mojiang_chaogu.cli_commands.agent_managed._host_status",
             return_value={"configured": True, "state": "已连接"},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._skill_checks",
+            "mojiang_chaogu.cli_commands.agent_managed._skill_checks",
             return_value=_skill_checks(),
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._probe_sync",
+            "mojiang_chaogu.cli_commands.agent_managed._probe_sync",
             return_value=[*_healthy_tools(), "strategy_save"],
         ),
     ):
@@ -226,10 +226,10 @@ def test_connect_uses_existing_connector_then_requires_real_doctor() -> None:
         return 0
 
     with (
-        patch("mommy_chaogu.cli_commands.agent_managed._resolve_host", return_value="codex"),
-        patch("mommy_chaogu.cli_commands.agent_managed._connect", side_effect=fake_connect),
+        patch("mojiang_chaogu.cli_commands.agent_managed._resolve_host", return_value="codex"),
+        patch("mojiang_chaogu.cli_commands.agent_managed._connect", side_effect=fake_connect),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed.doctor_payload",
+            "mojiang_chaogu.cli_commands.agent_managed.doctor_payload",
             return_value={"ok": False, "blocking_checks": ["mcp_initialize_and_list_tools"]},
         ),
     ):
@@ -246,31 +246,31 @@ def test_repair_preserves_modified_skill_instead_of_forcing() -> None:
     previous = _previous()
     modified = [
         {
-            "name": "mommy-strategy",
+            "name": "mojiang-strategy",
             "status": "modified",
-            "path": "/skills/mommy-strategy",
+            "path": "/skills/mojiang-strategy",
             "managed": True,
         }
     ]
     with (
-        patch("mommy_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
+        patch("mojiang_chaogu.cli_commands.agent_managed._resolve_host", return_value="kimi"),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed.doctor_payload",
+            "mojiang_chaogu.cli_commands.agent_managed.doctor_payload",
             return_value={"ok": False},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._state_connections",
+            "mojiang_chaogu.cli_commands.agent_managed._state_connections",
             return_value={"kimi": previous},
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._skill_checks",
+            "mojiang_chaogu.cli_commands.agent_managed._skill_checks",
             return_value=modified,
         ),
         patch(
-            "mommy_chaogu.cli_commands.agent_managed._host_status",
+            "mojiang_chaogu.cli_commands.agent_managed._host_status",
             return_value={"state": "已连接"},
         ),
-        patch("mommy_chaogu.cli_commands.agent_managed._connect") as connect,
+        patch("mojiang_chaogu.cli_commands.agent_managed._connect") as connect,
     ):
         result = repair_payload("kimi", 20.0, apply=True)
 

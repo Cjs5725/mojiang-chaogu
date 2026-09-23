@@ -15,21 +15,21 @@ def test_runtime_user_can_write_efinance_cache() -> None:
     cache_dir = "/app/.venv/lib/python3.12/site-packages/efinance/data"
 
     assert DOCKERFILE.count(cache_dir) == 2
-    assert "chown -R mommy:mommy" in DOCKERFILE
+    assert "chown -R mojiang:mojiang" in DOCKERFILE
 
 
 def test_web_process_and_healthcheck_use_platform_port() -> None:
     assert "os.environ.get('PORT', '8000')" in DOCKERFILE
-    assert "MOMMY_WEB_DIST=/app/web/dist" in DOCKERFILE
-    assert 'CMD ["mommy-web", "--host", "0.0.0.0"]' in DOCKERFILE
+    assert "MOJIANG_WEB_DIST=/app/web/dist" in DOCKERFILE
+    assert 'CMD ["mojiang-web", "--host", "0.0.0.0"]' in DOCKERFILE
     assert "${PORT" not in DOCKERFILE
 
 
 def test_volume_entrypoint_is_installed_before_non_root_runtime() -> None:
     assert "apt-get install -y --no-install-recommends gosu" in DOCKERFILE
     assert "COPY --chmod=755 docker/entrypoint.sh" in DOCKERFILE
-    assert 'ENTRYPOINT ["mommy-entrypoint"]' in DOCKERFILE
-    assert DOCKERFILE.index("ENTRYPOINT") > DOCKERFILE.index("USER mommy")
+    assert 'ENTRYPOINT ["mojiang-entrypoint"]' in DOCKERFILE
+    assert DOCKERFILE.index("ENTRYPOINT") > DOCKERFILE.index("USER mojiang")
 
 
 def test_volume_entrypoint_seeds_data_and_drops_privileges() -> None:

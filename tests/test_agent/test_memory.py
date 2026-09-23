@@ -10,9 +10,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from sqlalchemy import text
 
-from mommy_chaogu.agent.memory import ConversationMemory
-from mommy_chaogu.agent.service import AgentService
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent.memory import ConversationMemory
+from mojiang_chaogu.agent.service import AgentService
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture

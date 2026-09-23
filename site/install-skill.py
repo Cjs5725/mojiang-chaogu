@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install a downloaded mommy-chaogu Skill bundle into a host's Skill directory.
+"""Install a downloaded mojiang-chaogu Skill bundle into a host's Skill directory.
 
 The script is intentionally dependency-free so it can be downloaded next to a
 ZIP/TAR.GZ from the static Skills store and inspected before execution.
@@ -21,7 +21,7 @@ from pathlib import Path, PurePosixPath
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="安装 mommy-chaogu Skills 归档（zip / tar.gz），默认目标为 Codex。"
+        description="安装 mojiang-chaogu Skills 归档（zip / tar.gz），默认目标为 Codex。"
     )
     parser.add_argument("archive", type=Path, help="下载的 .zip 或 .tar.gz 文件")
     parser.add_argument(
@@ -165,7 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         destination_root = (
             (args.destination or _default_destination(args.target)).expanduser().resolve()
         )
-        with tempfile.TemporaryDirectory(prefix="mommy-skill-verify-") as temp_dir:
+        with tempfile.TemporaryDirectory(prefix="mojiang-skill-verify-") as temp_dir:
             extracted = Path(temp_dir)
             _extract(archive, extracted)
             skill_root, skill_name = _find_skill_root(extracted)

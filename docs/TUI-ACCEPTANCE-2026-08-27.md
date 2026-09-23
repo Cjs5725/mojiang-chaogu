@@ -1,7 +1,7 @@
 # TUI 真机验收记录（Kimi Code 级交互升级）
 
 > 日期: 2026-08-27（验收执行于 2026-08-26 晚间）
-> 范围: 真实 Terminal.app 中运行 `uv run mommy-tui`，走通「启动自动恢复 → 提问流式
+> 范围: 真实 Terminal.app 中运行 `uv run mojiang-tui`，走通「启动自动恢复 → 提问流式
 > 回答 → 思考折叠展开 → 工具轨迹展开 → 写操作确认(y/n) → /resume /new」整条链路
 > 方法: 本地 OpenAI 兼容 mock 网关（仅标准库 SSE）+ AppleScript TTY 注入 + Terminal
 > `contents of tab` 屏显文本读取（验收时屏幕处于锁定状态，无法截屏，全部证据取自
@@ -20,7 +20,7 @@
 
 ## 验收环境与方法
 
-- **隔离**：`MOMMY_DATA_DIR=/tmp/mommy_demo_data`（种子 4 条历史），未触碰真实数据。
+- **隔离**：`MOJIANG_DATA_DIR=/tmp/mojiang_demo_data`（种子 4 条历史），未触碰真实数据。
 - **LLM 通路**：本机无 API Key，起本地 mock 网关 `127.0.0.1:8399`（OpenAI 兼容
   SSE：reason_content delta → tool_calls → content delta → usage 尾块；非流式
   回退路径也实现）。为此在 `llm.py` 新增 `{PROVIDER}_BASE_URL` 环境覆盖。

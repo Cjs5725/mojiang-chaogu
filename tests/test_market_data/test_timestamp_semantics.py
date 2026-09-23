@@ -17,13 +17,13 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-from mommy_chaogu.market_data import BarInterval, EfinanceAdapter, TencentAdapter
-from mommy_chaogu.market_data.tencent_adapter import _ts_from_str
+from mojiang_chaogu.market_data import BarInterval, EfinanceAdapter, TencentAdapter
+from mojiang_chaogu.market_data.tencent_adapter import _ts_from_str
 
 # 2026-06-26 16:14:08 北京时间 → 2026-06-26T08:14:08Z
 _EXPECTED_UTC = datetime(2026, 6, 26, 8, 14, 8, tzinfo=UTC)
 
-_EF_MODULE = "mommy_chaogu.market_data.efinance_adapter.ef.stock"
+_EF_MODULE = "mojiang_chaogu.market_data.efinance_adapter.ef.stock"
 
 
 def _assert_aware_utc(ts: datetime, expected: datetime) -> None:

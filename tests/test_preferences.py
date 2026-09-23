@@ -13,7 +13,7 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.preferences import (
+from mojiang_chaogu.preferences import (
     DEFAULT_PREFERENCES,
     HOLD_PERIOD_TO_DAYS,
     default_hold_days,

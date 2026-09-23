@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
-from mommy_chaogu.earnings.signals import (
+from mojiang_chaogu.earnings.signals import (
     EarningsApproachingRule,
     EarningsBeatRule,
     EarningsContext,
@@ -14,7 +14,7 @@ from mommy_chaogu.earnings.signals import (
     default_earnings_rules,
     evaluate_all,
 )
-from mommy_chaogu.signals.types import SignalSeverity
+from mojiang_chaogu.signals.types import SignalSeverity
 
 
 def make_ctx(**overrides) -> EarningsContext:

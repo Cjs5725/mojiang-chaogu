@@ -13,8 +13,8 @@ from collections.abc import Coroutine
 from decimal import Decimal
 from typing import Any
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.services.bootstrap import FakeServices
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.services.bootstrap import FakeServices
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
@@ -66,7 +66,7 @@ class TestAppInstantiation:
     """Verify the app can be constructed without external resources."""
 
     def test_app_construction(self) -> None:
-        app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+        app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
         assert app.services is not None
         assert app.services.data.source_label() == "东方财富 实时"
 
@@ -93,11 +93,11 @@ class TestSingleScreenSmoke:
         """单屏：无 ContentSwitcher/看板，启动焦点在输入框。"""
         from textual.widgets import ContentSwitcher, Input
 
-        from mommy_chaogu.tui.views.chat import ChatView
-        from mommy_chaogu.tui.widgets.top_bar import TopBar
+        from mojiang_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.widgets.top_bar import TopBar
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test():
                 # 单屏组件齐备
                 app.query_one(TopBar)
@@ -116,9 +116,9 @@ class TestSingleScreenSmoke:
         from textual.widgets import Static
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
-                from mommy_chaogu.tui.views.chat import ChatView
+                from mojiang_chaogu.tui.views.chat import ChatView
 
                 chat = app.query_one(ChatView)
 
@@ -138,10 +138,10 @@ class TestSingleScreenSmoke:
 
     def test_topbar_ai_unconfigured(self) -> None:
         """TopBar：无 agent 时 AI⚪ 未配置。"""
-        from mommy_chaogu.tui.widgets.top_bar import TopBar
+        from mojiang_chaogu.tui.widgets.top_bar import TopBar
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test():
                 top = app.query_one(TopBar)
                 assert "⚪" in top.ai_label
@@ -153,10 +153,10 @@ class TestSingleScreenSmoke:
         """输入 /today → 今日总览卡出现在对话流。"""
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)
@@ -174,10 +174,10 @@ class TestSingleScreenSmoke:
         """普通文本（FakeServices 无 agent）→ 降级提示。"""
         from textual.widgets import Input
 
-        from mommy_chaogu.tui.views.chat import ChatView
+        from mojiang_chaogu.tui.views.chat import ChatView
 
         async def _test() -> None:
-            app = MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+            app = MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
             async with app.run_test() as pilot:
                 chat = app.query_one(ChatView)
                 prompt = chat.query_one("#prompt", Input)

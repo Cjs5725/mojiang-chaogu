@@ -188,7 +188,7 @@ test.beforeEach(async ({ page }) => {
 
 test('desktop starts with Today and exposes the focused navigation', async ({ page }) => {
   await page.goto('/#/')
-  await expect(page).toHaveTitle('妈妈炒股')
+  await expect(page).toHaveTitle('墨匠工坊')
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused()
   await page.keyboard.press('Enter')

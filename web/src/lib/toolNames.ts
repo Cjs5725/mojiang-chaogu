@@ -1,5 +1,5 @@
 // 工具名 → 中文显示名
-// 移植自 src/mommy_chaogu/tui/widgets/tool_indicator.py TOOL_DISPLAY_NAMES
+// 移植自 src/mojiang_chaogu/tui/widgets/tool_indicator.py TOOL_DISPLAY_NAMES
 // 覆盖 agent/tools/ 的 25 个工具；新工具若缺中文会 fallback 到原名。
 
 export const TOOL_DISPLAY_NAMES: Record<string, string> = {

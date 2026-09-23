@@ -1,6 +1,6 @@
-# mommy-chaogu GitHub Pages
+# mojiang-chaogu GitHub Pages
 
-这是项目宣传站和静态 `mommy-chaogu plugins store` 的源文件。站点不需要 Node 或运行时服务，GitHub Pages 直接托管 `site/` 目录。
+这是项目宣传站和静态 `mojiang-chaogu plugins store` 的源文件。站点不需要 Node 或运行时服务，GitHub Pages 直接托管 `site/` 目录。
 
 本地预览：
 

@@ -11,10 +11,10 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.backtest.costs import DEFAULT_COSTS
-from mommy_chaogu.backtest.engine import BacktestEngine, BacktestResult
-from mommy_chaogu.cache.store import CacheStore
-from mommy_chaogu.market_data import MarketType, Money, Quote, QuoteType
+from mojiang_chaogu.backtest.costs import DEFAULT_COSTS
+from mojiang_chaogu.backtest.engine import BacktestEngine, BacktestResult
+from mojiang_chaogu.cache.store import CacheStore
+from mojiang_chaogu.market_data import MarketType, Money, Quote, QuoteType
 
 # ---------- 辅助函数 ----------
 

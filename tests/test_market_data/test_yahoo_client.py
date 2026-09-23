@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 from requests import HTTPError, Response, Timeout
 
-from mommy_chaogu.market_data.yahoo_client import DEFAULT_BASE_URL, YahooClient
+from mojiang_chaogu.market_data.yahoo_client import DEFAULT_BASE_URL, YahooClient
 
 # ---------- 工具 ----------
 

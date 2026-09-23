@@ -15,8 +15,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     Quote,
@@ -114,7 +114,7 @@ class TestListThemes:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("list_themes", {})
         data = json.loads(result)
@@ -133,7 +133,7 @@ class TestListThemes:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.services.theme_service.ThemeService", _FakeThemeService(themes=[])
+            "mojiang_chaogu.services.theme_service.ThemeService", _FakeThemeService(themes=[])
         )
         result = registry.call("list_themes", {})
         assert json.loads(result) == []
@@ -155,7 +155,7 @@ class TestGetThemeStocks:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         fake = _FakeThemeService(quotes=[])
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
         result = registry.call("get_theme_stocks", {"theme_id": "nonexistent"})
         data = json.loads(result)
         assert "error" in data
@@ -186,7 +186,7 @@ class TestGetThemeStocks:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("get_theme_stocks", {"theme_id": "semiconductor"})
         data = json.loads(result)
@@ -230,7 +230,7 @@ class TestGetThemeStocks:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("get_theme_stocks", {"theme_id": "test"})
         data = json.loads(result)
@@ -260,7 +260,7 @@ class TestGetThemeStocks:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("get_theme_stocks", {"theme_id": "test"})
 
@@ -293,7 +293,7 @@ class TestGetThemeStocks:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("get_theme_stocks", {"theme_id": "earnings_watch"})
         data = json.loads(result)
@@ -327,7 +327,7 @@ class TestGetThemeStocks:
                 }
             ]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         result = registry.call("get_theme_stocks", {"theme_id": "test"})
         data = json.loads(result)
@@ -345,7 +345,7 @@ class TestGetThemeStocks:
         fake = _FakeThemeService(
             quotes=[{"code": "600519", "name": "x", "price": None, "error": None}]
         )
-        monkeypatch.setattr("mommy_chaogu.services.theme_service.ThemeService", fake)
+        monkeypatch.setattr("mojiang_chaogu.services.theme_service.ThemeService", fake)
 
         registry.call("get_theme_stocks", {"theme_id": "test"})
         assert fake.adapter is ctx.adapter

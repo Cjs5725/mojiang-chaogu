@@ -1,13 +1,13 @@
 services:
-  mommy-web:
+  mojiang-web:
     build: .
-    image: mommy-chaogu:local
-    container_name: mommy-chaogu
+    image: mojiang-chaogu:local
+    container_name: mojiang-chaogu
     ports:
       - "127.0.0.1:8000:8000"
-    command: ["mommy-web", "--host", "0.0.0.0", "--port", "8000", "--allow-unauthenticated-remote"]
+    command: ["mojiang-web", "--host", "0.0.0.0", "--port", "8000", "--allow-unauthenticated-remote"]
     volumes:
-      - mommy-data:/app/data
+      - mojiang-data:/app/data
     # 用户只需创建 .env 即可；未创建时回退到 .env.example
     env_file:
       - path: .env
@@ -17,4 +17,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  mommy-data:
+  mojiang-data:

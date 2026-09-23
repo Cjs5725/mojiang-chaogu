@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.semicon.store import (
+from mojiang_chaogu.semicon.store import (
     ChainPosition,
     SemiconStore,
     StockAlreadyExistsError,

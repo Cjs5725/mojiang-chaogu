@@ -8,14 +8,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.market_data.adapter import MarketDataAdapter
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.market_data.adapter import MarketDataAdapter
+from mojiang_chaogu.market_data.types import (
     AdjustmentType,
     BarInterval,
     MarketType,
     QuoteType,
 )
-from mommy_chaogu.market_data.yahoo_adapter import YahooAdapter, _is_us_ticker
+from mojiang_chaogu.market_data.yahoo_adapter import YahooAdapter, _is_us_ticker
 
 
 def _ts(y: int, m: int, d: int, h: int = 0) -> int:
@@ -343,7 +343,7 @@ class TestHealthCheck:
 
 class TestChainRouting:
     def test_index_falls_through_massive_to_yahoo(self, monkeypatch):
-        import mommy_chaogu.market_data as md
+        import mojiang_chaogu.market_data as md
 
         hits: list[str] = []
 
@@ -383,7 +383,7 @@ class TestChainRouting:
 
     def test_massive_skips_caret_index_codes(self):
         """Massive 对 ^ 前缀快速返回 None（_is_us_code 不认），Yahoo 才有机会接管。"""
-        from mommy_chaogu.market_data.massive_adapter import MassiveAdapter
+        from mojiang_chaogu.market_data.massive_adapter import MassiveAdapter
 
         adapter = MassiveAdapter(api_key="test_key")
         adapter._client = MagicMock()

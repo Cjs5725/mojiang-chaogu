@@ -18,9 +18,9 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.web.app import create_app
-from mommy_chaogu.web.background import set_service
-from mommy_chaogu.web.weixin_pairing import WeixinPairingManager
+from mojiang_chaogu.web.app import create_app
+from mojiang_chaogu.web.background import set_service
+from mojiang_chaogu.web.weixin_pairing import WeixinPairingManager
 
 from .conftest import make_mock_adapter, make_mock_service
 
@@ -28,8 +28,8 @@ from .conftest import make_mock_adapter, make_mock_service
 @pytest.fixture(autouse=True)
 def _isolate_weixin_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Isolate env so tests never touch real user/project secrets or channel state."""
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(tmp_path / "user-config"))
-    monkeypatch.setenv("MOMMY_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(tmp_path / "user-config"))
+    monkeypatch.setenv("MOJIANG_CHANNEL_STATE_DIR", str(tmp_path / "channel-state"))
     for key in (
         "DEEPSEEK_API_KEY",
         "OPENAI_API_KEY",
@@ -38,7 +38,7 @@ def _isolate_weixin_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
         "MINIMAX_API_KEY",
         "AGENT_PROVIDER",
         "AGENT_MODEL",
-        "MOMMY_API_TOKEN",
+        "MOJIANG_API_TOKEN",
     ):
         monkeypatch.setenv(key, "")
 
@@ -137,7 +137,7 @@ def _make_test_client(manager: WeixinPairingManager) -> TestClient:
     app.state.weixin_pairing = manager
 
     mock_adapter = make_mock_adapter()
-    from mommy_chaogu.web.deps import (
+    from mojiang_chaogu.web.deps import (
         get_adapter,
         get_alerter,
         get_cache_store,
@@ -569,7 +569,7 @@ class TestErrorSecrecy:
         assert "FakeApiError" not in result.message
 
     def test_weixin_api_error_does_not_leak_str(self) -> None:
-        from mommy_chaogu.channels.weixin import WeixinApiError
+        from mojiang_chaogu.channels.weixin import WeixinApiError
 
         sentinel = "SECRET-BOT-TOKEN-IN-ERROR"
 
@@ -750,7 +750,7 @@ class TestNoAuthCoupling:
         app = create_app(api_token="owner-secret", local_setup_enabled=True)
         app.state.weixin_pairing = manager
 
-        from mommy_chaogu.web.deps import (
+        from mojiang_chaogu.web.deps import (
             get_adapter,
             get_alerter,
             get_cache_store,
@@ -785,7 +785,7 @@ class TestNoAuthCoupling:
         app = create_app(api_token="owner-secret", local_setup_enabled=False)
         app.state.weixin_pairing = manager
 
-        from mommy_chaogu.web.deps import (
+        from mojiang_chaogu.web.deps import (
             get_adapter,
             get_alerter,
             get_cache_store,

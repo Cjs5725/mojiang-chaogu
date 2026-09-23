@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from mommy_chaogu.earnings.adapter import (
+from mojiang_chaogu.earnings.adapter import (
     EarningsAdapter,
     MockEarningsAdapter,
 )

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from unittest.mock import MagicMock, patch
 
-from mommy_chaogu.market_data.news_api import (
+from mojiang_chaogu.market_data.news_api import (
     get_announcements,
     get_longhuban,
     search_news,
@@ -13,7 +13,7 @@ from mommy_chaogu.market_data.news_api import (
 
 
 class TestSearchNews:
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_news_list(self, mock_get: MagicMock) -> None:
         # 东财 JSONP 格式
         jsonp_data = {
@@ -41,13 +41,13 @@ class TestSearchNews:
         assert "创新药" in items[0]["title"]
         assert items[0]["source"] == "财联社"
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_empty_on_failure(self, mock_get: MagicMock) -> None:
         mock_get.side_effect = Exception("network error")
         items = search_news("test")
         assert items == []
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_strips_em_tags(self, mock_get: MagicMock) -> None:
         jsonp_data = {
             "result": {
@@ -74,7 +74,7 @@ class TestSearchNews:
 
 
 class TestGetAnnouncements:
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_announcement_list(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
@@ -98,12 +98,12 @@ class TestGetAnnouncements:
         assert items[0]["title"] == "关于xxx的公告"
         assert items[0]["date"] == "2026-06-22"
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_empty_on_failure(self, mock_get: MagicMock) -> None:
         mock_get.side_effect = Exception("network error")
         assert get_announcements("600519") == []
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_accepts_eastmoney_columns_list(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
@@ -127,7 +127,7 @@ class TestGetAnnouncements:
 
 
 class TestGetLonghuban:
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_longhuban_list(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
@@ -155,12 +155,12 @@ class TestGetLonghuban:
         assert items[0]["name"] == "贵州茅台"
         assert items[0]["change_rate"] == 3.25
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_empty_on_failure(self, mock_get: MagicMock) -> None:
         mock_get.side_effect = Exception("network error")
         assert get_longhuban() == []
 
-    @patch("mommy_chaogu.market_data.news_api.requests.get")
+    @patch("mojiang_chaogu.market_data.news_api.requests.get")
     def test_returns_empty_on_success_false(self, mock_get: MagicMock) -> None:
         mock_resp = MagicMock()
         mock_resp.json.return_value = {"success": False}

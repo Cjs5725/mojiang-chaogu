@@ -4,7 +4,7 @@ Covers:
 - Timezone-aware market_phase() (Finding 2)
 - Colorblind theme color remapping in change_color() (Finding 3)
 - HelpScreen BINDINGS (not BINDING)
-- mommy-tui CLI --help / --version
+- mojiang-tui CLI --help / --version
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from mommy_chaogu.tui.services.formatting import change_color
+from mojiang_chaogu.tui.services.formatting import change_color
 
 # ---------------------------------------------------------------------------
 # Finding 2: Timezone — market_phase() must use Asia/Shanghai
@@ -51,7 +51,7 @@ class TestMarketPhaseTimezone:
 
         _time.tzset()
 
-        from mommy_chaogu.tui.widgets import top_bar as tb_mod
+        from mojiang_chaogu.tui.widgets import top_bar as tb_mod
 
         # Monkey-patch datetime.now in top_bar to return our fixed time
         original_now = datetime.now
@@ -112,7 +112,7 @@ class TestColorblindTheme:
 
 class TestHelpScreenBindings:
     def test_help_screen_has_bindings(self) -> None:
-        from mommy_chaogu.tui.screens.help import HelpScreen
+        from mojiang_chaogu.tui.screens.help import HelpScreen
 
         # BINDINGS must exist as class attribute
         assert hasattr(HelpScreen, "BINDINGS")
@@ -122,17 +122,17 @@ class TestHelpScreenBindings:
 
 class TestTuiCli:
     def test_help_exits_without_starting_tui(self, capsys: pytest.CaptureFixture[str]) -> None:
-        from mommy_chaogu.tui.app import build_tui_parser
+        from mojiang_chaogu.tui.app import build_tui_parser
 
         with pytest.raises(SystemExit) as exc_info:
             build_tui_parser().parse_args(["--help"])
 
         assert exc_info.value.code == 0
-        assert "mommy-tui" in capsys.readouterr().out
+        assert "mojiang-tui" in capsys.readouterr().out
 
     def test_version_exits_without_starting_tui(self, capsys: pytest.CaptureFixture[str]) -> None:
-        from mommy_chaogu import __version__
-        from mommy_chaogu.tui.app import build_tui_parser
+        from mojiang_chaogu import __version__
+        from mojiang_chaogu.tui.app import build_tui_parser
 
         with pytest.raises(SystemExit) as exc_info:
             build_tui_parser().parse_args(["--version"])

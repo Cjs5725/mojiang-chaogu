@@ -43,7 +43,7 @@
 
 ### F4 `build_nl_runtime()` 统一三入口装配
 
-- **问题**：CLI（`cli.py:636-713`）/ TUI（`tui/services/bootstrap.py:243-335`）/ Web（`web/routes/agent.py:76-111`）三处重复装配 ToolContext→Registry→AgentService→Summarizer→Executor→NLRouter；`_AgentSummarizer` 两处逐字复制；**用户自定义工作流（`mommy workflow add`）只在 CLI merge，TUI/Web 不可见**；无任何跨入口一致性测试。
+- **问题**：CLI（`cli.py:636-713`）/ TUI（`tui/services/bootstrap.py:243-335`）/ Web（`web/routes/agent.py:76-111`）三处重复装配 ToolContext→Registry→AgentService→Summarizer→Executor→NLRouter；`_AgentSummarizer` 两处逐字复制；**用户自定义工作流（`mojiang workflow add`）只在 CLI merge，TUI/Web 不可见**；无任何跨入口一致性测试。
 - **修复**：新增共享装配工厂（建议 `workflow/assembly.py`：`build_nl_runtime()` 返回 router+agent+registry bundle，内置 WorkflowStore merge、共享 summarizer、hit recorder 钩子），三入口改用工厂，入口特有差异（TUI 的 ConversationMemory/取消回调、Web 的 lru_cache/reload、CLI 的 recorder/close）以参数注入。
 - **验收**：新增测试：工厂 merge 自定义工作流；TUI bootstrap 与 Web router 装配后自定义工作流可路由；现有三入口测试全过。
 
@@ -64,9 +64,9 @@
 
 - **问题**：
   1. `pyproject.toml:69-73` 把 `bundled_skills/market-watch-loop` 从 wheel exclude，而 `connect.py`/`base.py`（工作区在途）已把它捆为第 4 个 skill——wheel 安装后 `connect` 会在 `copytree` 直接 FileNotFoundError；
-  2. `agent_managed.py:5-6,431` 与 `mommy-onboard/SKILL.md:9,94,116` 仍写"三个 Skills"；
+  2. `agent_managed.py:5-6,431` 与 `mojiang-onboard/SKILL.md:9,94,116` 仍写"三个 Skills"；
   3. 存量连接升级（新增 skill）后 doctor `skill_integrity` 报 missing，但提示不可操作。
-- **修复**：移除 market-watch-loop 的 wheel exclude（`market-monitoring-test` 保留排除）；计数改四处（含 onboard skill 文案）；missing-skill 失败信息附 `mommy agent repair --apply` 指引；新增绊网测试：pyproject exclude 集合不得包含任何 bundled skill 目录（显式实验目录除外，白名单声明）。
+- **修复**：移除 market-watch-loop 的 wheel exclude（`market-monitoring-test` 保留排除）；计数改四处（含 onboard skill 文案）；missing-skill 失败信息附 `mojiang agent repair --apply` 指引；新增绊网测试：pyproject exclude 集合不得包含任何 bundled skill 目录（显式实验目录除外，白名单声明）。
 - **验收**：绊网测试过；`uv build` 产物含 4 个 skill 目录（或以等价文件清单断言）；lifecycle 测试更新后过。
 
 ### F8 文档真相对齐
@@ -74,7 +74,7 @@
 - **问题**（均已验证）：
   1. `AGENT-INTERFACE-EVOLUTION.md:121-125` 明文"投研用户不应该走 coding agent 这条路"，与已上线的 agent-first 主路线正面矛盾；
   2. `AGENT-INTERACTION-GUIDE.md:50` "25 个工具" vs 实际 36，且前半篇是内置 AgentService 人格叙事、读者混淆；
-  3. 仓库 dev 副本 `.kimi-code/skills/mommy-research/SKILL.md`（8/6 旧版）与捆绑版（8/11）教两种冲突的隐私流程；
+  3. 仓库 dev 副本 `.kimi-code/skills/mojiang-research/SKILL.md`（8/6 旧版）与捆绑版（8/11）教两种冲突的隐私流程；
   4. `TUI-AUDIT-2026-07-25.md` 12 个已修问题未标"已解决"；
   5. `workflow/definitions.py` 注释"9 个工作流"实际 10；`vector_search.py:9` 宣称 DeepSeek embedding 与 `llm.py`（`embedding_model: None`）矛盾。
 - **修复**：逐条改写/同步/标注；TUI audit 只标**经代码验证确已修复**的项（逐项核对，不许整页批量勾选）。
@@ -140,7 +140,7 @@
 | F13 | tencent 死节流字段移除 | P3 | 数据层评审 |
 | F14 | coding_agents 四份 inspect_status 骨架上移 base | P2 | Agent 评审 |
 | F15 | 东财直连三 API（fundamentals/sector/news）金额 Decimal 化 | P1-P2 | 数据层评审 |
-| F16 | main_mommy 拆分 + CLI 入口补测试 | P1 | 入口层评审 |
+| F16 | main_mojiang 拆分 + CLI 入口补测试 | P1 | 入口层评审 |
 | F17 | web create_app 对 deps 的 monkeypatch 参数化（评估后定） | P2 | 入口层评审 |
 
 ## 各项明细
@@ -190,11 +190,11 @@
 - **修复**：金额/估值字段改 Decimal（安全转换函数），边界序列化处 str()；非金额的纯比率字段（PE/PB/ROE/涨跌幅）随源语义保留 float 或一并 Decimal，以调用方序列化需求为准。
 - **验收**：各 API 现有测试更新后通过；类型断言 Decimal。
 
-### F16 main_mommy 拆分 + CLI 入口测试
+### F16 main_mojiang 拆分 + CLI 入口测试
 
-- **问题**：`cli.py` 旧 `main_mommy` 305 行巨型函数（env 加载 + dispatch + argparse + onboarding + 80 行装配 + 单发/REPL 双模式混杂）；CLI 入口仅 4 个测试（覆盖率 19.3%）。
+- **问题**：`cli.py` 旧 `main_mojiang` 305 行巨型函数（env 加载 + dispatch + argparse + onboarding + 80 行装配 + 单发/REPL 双模式混杂）；CLI 入口仅 4 个测试（覆盖率 19.3%）。
 - **修复**：拆出 `_resolve_command` / `_run_single_query` / 装配（F4 工厂已收走大半）等私有函数；为 dispatch 表、`--raw` 透传、单次查询模式补集成测试。
-- **验收**：新增 CLI 入口测试 ≥ 5 个；`main_mommy` 主体降至 ~100 行以内。
+- **验收**：新增 CLI 入口测试 ≥ 5 个；`main_mojiang` 主体降至 ~100 行以内。
 
 ### F17 web create_app monkeypatch（评估后定）
 
@@ -221,7 +221,7 @@
 | F13 | ✅ | aceeb27 | tencent+timestamp 28 passed |
 | F14 | ✅ | 9d5527d | coding_agents 全家 45 passed；净 -27 行 |
 | F15 | ✅ | 729761f | test_agent 全套 542 passed / 0 failures；ruff+mypy（8 文件）无错 |
-| F16 | ✅ | c8fabbd | test_cli_repl 12 新用例全过；main_mommy 258→109 行；ruff+mypy 无错 |
+| F16 | ✅ | c8fabbd | test_cli_repl 12 新用例全过；main_mojiang 258→109 行；ruff+mypy 无错 |
 | F17 | ✅ | 2bab397 | 评估中升级为真 bug：--db 只替换 get_db_path 属性，store 重建仍读默认路径。改为 deps.set_portfolio_db_override 走解析链 + 重建单例；test_web 369 passed（新增 2 用例） |
 
 ---

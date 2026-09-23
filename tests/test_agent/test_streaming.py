@@ -20,8 +20,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.agent.service import AgentService, ChatCallbacks
-from mommy_chaogu.agent.tools import ToolContext
+from mojiang_chaogu.agent.service import AgentService, ChatCallbacks
+from mojiang_chaogu.agent.tools import ToolContext
 
 
 @pytest.fixture
@@ -385,7 +385,7 @@ class TestUsageAccumulation:
     @patch("openai.OpenAI")
     def test_usage_default_empty_dict(self, _mock_openai: MagicMock, mock_ctx: ToolContext) -> None:
         """AgentResponse.usage 默认是空 dict（向后兼容）。"""
-        from mommy_chaogu.agent.service import AgentResponse
+        from mojiang_chaogu.agent.service import AgentResponse
 
         resp = AgentResponse(text="test")
         assert resp.usage == {}

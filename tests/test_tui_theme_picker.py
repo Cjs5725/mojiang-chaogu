@@ -6,17 +6,17 @@ import asyncio
 from collections.abc import Coroutine
 from typing import Any
 
-from mommy_chaogu.tui.app import MommyTuiApp
-from mommy_chaogu.tui.screens.theme_picker import ThemePickerScreen
-from mommy_chaogu.tui.services.bootstrap import FakeServices
+from mojiang_chaogu.tui.app import MojiangTuiApp
+from mojiang_chaogu.tui.screens.theme_picker import ThemePickerScreen
+from mojiang_chaogu.tui.services.bootstrap import FakeServices
 
 
 def _run(coro: Coroutine[Any, Any, None]) -> None:
     asyncio.run(coro)
 
 
-def _boot() -> MommyTuiApp:
-    return MommyTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
+def _boot() -> MojiangTuiApp:
+    return MojiangTuiApp(services=FakeServices.create())  # type: ignore[arg-type]
 
 
 class TestThemePicker:

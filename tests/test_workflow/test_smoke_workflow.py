@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
-from mommy_chaogu.cli_commands import workflow as workflow_cli
-from mommy_chaogu.workflow.spec import WorkflowSpec
-from mommy_chaogu.workflow.store import WorkflowStore
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.cli_commands import workflow as workflow_cli
+from mojiang_chaogu.workflow.spec import WorkflowSpec
+from mojiang_chaogu.workflow.store import WorkflowStore
 
 
 def _spec(tool_name: str = "screen_inflow_stocks") -> WorkflowSpec:

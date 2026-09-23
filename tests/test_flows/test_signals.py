@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
-from mommy_chaogu.flows.signals import (
+from mojiang_chaogu.flows.signals import (
     FlowRule,
     FlowSignal,
     Severity,

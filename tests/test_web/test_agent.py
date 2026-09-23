@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.web.app import create_app
-from mommy_chaogu.web.background import set_service
-from mommy_chaogu.web.deps import get_agent_memory, get_agent_service
+from mojiang_chaogu.web.app import create_app
+from mojiang_chaogu.web.background import set_service
+from mojiang_chaogu.web.deps import get_agent_memory, get_agent_service
 
 from .conftest import make_mock_service
 

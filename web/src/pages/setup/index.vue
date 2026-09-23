@@ -402,7 +402,7 @@ onUnmounted(() => {
     <header class="mx-auto mb-5 flex w-full max-w-2xl items-center gap-3">
       <BrandMark alt="" size="md" class="shrink-0" />
       <div class="min-w-0">
-        <p class="text-sm font-semibold text-primary">妈妈炒股</p>
+        <p class="text-sm font-semibold text-primary">墨匠工坊</p>
         <h1 class="text-xl font-bold tracking-tight text-balance">一次配置，之后直接使用</h1>
         <p class="text-sm text-muted-foreground text-pretty">密钥只保存在这台设备；微信扫码仅用于连接消息通道。</p>
       </div>

@@ -17,7 +17,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.earnings.types import (
+from mojiang_chaogu.earnings.types import (
     EarningsActual,
     EarningsCalendar,
     EarningsScore,
@@ -140,7 +140,7 @@ def patch_store(monkeypatch: pytest.MonkeyPatch) -> Any:
         assert holder["store"] is not None, "test forgot to call factory"
         return holder["store"]
 
-    monkeypatch.setattr("mommy_chaogu.web.routes.earnings._store", _fake_store)
+    monkeypatch.setattr("mojiang_chaogu.web.routes.earnings._store", _fake_store)
     return _factory
 
 

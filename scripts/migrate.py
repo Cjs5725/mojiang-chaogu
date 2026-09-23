@@ -27,8 +27,8 @@ EP_DB = PROJECT_ROOT / "data" / "earnings_preview.db"
 WL_DB = PROJECT_ROOT / "data" / "watchlist.db"
 SUPPLY_CHAINS = PROJECT_ROOT / "data" / "supply_chains"
 
-# hub 路径（相对于 mommy-chaogu 的位置）
-HUB_CHAINS = PROJECT_ROOT.parent / "mommy-hub" / "data" / "chains"
+# hub 路径（相对于 mojiang-chaogu 的位置）
+HUB_CHAINS = PROJECT_ROOT.parent / "mojiang-hub" / "data" / "chains"
 
 
 def header(msg: str) -> None:
@@ -271,7 +271,7 @@ def main() -> None:
     parser.add_argument("--check", action="store_true", help="只检查不执行（dry-run）")
     args = parser.parse_args()
 
-    header("mommy-chaogu 数据迁移")
+    header("mojiang-chaogu 数据迁移")
     print(f"项目根目录: {PROJECT_ROOT}")
 
     # 前置检查

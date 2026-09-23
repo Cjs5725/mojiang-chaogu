@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.agent.llm import SUPPORTED_PROVIDERS
-from mommy_chaogu.config import (
+from mojiang_chaogu.agent.llm import SUPPORTED_PROVIDERS
+from mojiang_chaogu.config import (
     AppConfig,
     create_default_config,
     load_config,
@@ -26,9 +26,9 @@ _ENV_KEYS = (
     "SERVER_CHAN_KEY",
     "AGENT_PROVIDER",
     "AGENT_MODEL",
-    "MOMMY_CONFIG_DIR",
-    "MOMMY_API_TOKEN",
-    "MOMMY_CORS_ORIGINS",
+    "MOJIANG_CONFIG_DIR",
+    "MOJIANG_API_TOKEN",
+    "MOJIANG_CORS_ORIGINS",
 )
 
 
@@ -140,7 +140,7 @@ def test_user_env_is_fallback_when_project_env_missing(
         "AGENT_PROVIDER=zai\nAGENT_MODEL=glm-5\nZAI_API_KEY=user-key\n",
         encoding="utf-8",
     )
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(user_config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(user_config))
     monkeypatch.delenv("AGENT_PROVIDER")
     monkeypatch.delenv("AGENT_MODEL")
     monkeypatch.delenv("ZAI_API_KEY")
@@ -164,7 +164,7 @@ def test_project_env_overrides_user_env(monkeypatch: pytest.MonkeyPatch, tmp_pat
         "AGENT_PROVIDER=openai\nAGENT_MODEL=gpt-5-mini\nOPENAI_API_KEY=project-key\n",
         encoding="utf-8",
     )
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(user_config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(user_config))
     for key in ("AGENT_PROVIDER", "AGENT_MODEL", "ZAI_API_KEY", "OPENAI_API_KEY"):
         monkeypatch.delenv(key)
 
@@ -195,7 +195,7 @@ def test_project_provider_without_model_uses_its_default_instead_of_user_model(
         "AGENT_PROVIDER=zai\nZAI_API_KEY=project-key\n",
         encoding="utf-8",
     )
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(user_config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(user_config))
     for key in (
         "AGENT_PROVIDER",
         "AGENT_MODEL",
@@ -223,7 +223,7 @@ def test_runtime_env_reload_replaces_values_injected_by_previous_file(
         "AGENT_PROVIDER=deepseek\nAGENT_MODEL=deepseek-chat\nDEEPSEEK_API_KEY=old-key\n",
         encoding="utf-8",
     )
-    monkeypatch.setenv("MOMMY_CONFIG_DIR", str(user_config))
+    monkeypatch.setenv("MOJIANG_CONFIG_DIR", str(user_config))
     for key in (
         "AGENT_PROVIDER",
         "AGENT_MODEL",
@@ -301,8 +301,8 @@ def test_invalid_provider_fails_fast(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
 
 def test_web_security_env_overrides(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
-    monkeypatch.setenv("MOMMY_API_TOKEN", "owner-secret")
-    monkeypatch.setenv("MOMMY_CORS_ORIGINS", "https://one.example.com, https://two.example.com")
+    monkeypatch.setenv("MOJIANG_API_TOKEN", "owner-secret")
+    monkeypatch.setenv("MOJIANG_CORS_ORIGINS", "https://one.example.com, https://two.example.com")
     cfg = load_config(tmp_path / "missing.toml")
     assert cfg.web.api_token == "owner-secret"
     assert cfg.web.cors_origins == ["https://one.example.com", "https://two.example.com"]
@@ -351,4 +351,4 @@ def test_env_example_matches_supported_llm_profiles():
     assert "NOVA" not in content
     assert "AGENT_PROVIDER=" in content
     assert "AGENT_MODEL=" in content
-    assert "mommy setup" in content
+    assert "mojiang setup" in content

@@ -1,6 +1,6 @@
-# Mommy Chaogu TUI
+# Mojiang Chaogu TUI
 
-> 单屏对话即界面的投研 Agent 终端。`uv run mommy-tui` 启动。
+> 单屏对话即界面的投研 Agent 终端。`uv run mojiang-tui` 启动。
 
 这套 TUI 的目标是对齐 Claude Code / Kimi Code 的交互品质，同时保留 A 股投研
 工具箱的特色（红涨绿跌、资金流、策略卡）。本文档是它的功能地图、按键速查、
@@ -17,7 +17,7 @@
 | 富卡片 | 报价/资金流/K线/预测/信号等 10 种卡片，工具结果自动渲染 | 自动 |
 | 会话恢复 | 启动自动回到上次对话；`/resume` 列表切换、`/new` 开新会话 | 自动 + 命令 |
 | 用量可见 | 顶栏常驻会话累计 token（∑ 1.8k tok）；工作行显示轮内实时 token 与耗时 | 自动 |
-| 首启引导 | 未配置 Key 时渲染三步引导卡；`uv run mommy setup` 一分钟配好 | 自动 |
+| 首启引导 | 未配置 Key 时渲染三步引导卡；`uv run mojiang setup` 一分钟配好 | 自动 |
 | slash 命令 | /today /watch /portfolio /flows /quote /predictions /signals /memory /status /resume /new /help /clear /theme /quit | 手动 |
 | @ 联想 | 自选股+产业链+行情缓存模糊匹配，Tab 插入代码 | 手动 |
 
@@ -73,7 +73,7 @@ tui/
 
 ```bash
 uv run pytest -m "not network"   # 全量离线用例（TUI 相关见 tests/test_tui_*.py）
-uv run mommy-tui                 # 亲手跑一轮：提问 → 轨迹 → 确认 → 恢复
+uv run mojiang-tui                 # 亲手跑一轮：提问 → 轨迹 → 确认 → 恢复
 ```
 
 最近一次真机验收记录（含逐步骤证据与遗留观察项）：

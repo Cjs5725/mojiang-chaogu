@@ -9,13 +9,13 @@ from typing import Any
 
 import pytest
 
-from mommy_chaogu.agent.research_tools import (
+from mojiang_chaogu.agent.research_tools import (
     MARKET_ONLY_BASE_TOOLS,
     ResearchToolCatalog,
     allowed_research_tool_names,
     normalize_mcp_profile,
 )
-from mommy_chaogu.agent.tools.base import ToolContext
+from mojiang_chaogu.agent.tools.base import ToolContext
 
 
 class FakeRegistry:
@@ -123,7 +123,7 @@ def test_personal_stock_research_supports_single_call_opt_out(tmp_path: Path) ->
 
     assert result["memory_recorded"] is False
     assert all(name != "get_memory_context" for name, _ in registry.calls)
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     assert EpisodicMemory(db_path).query() == []
 
@@ -136,7 +136,7 @@ def test_personal_research_does_not_write_by_default(tmp_path: Path) -> None:
 
     assert result["memory_recorded"] is False
     assert "research_session_id" not in result
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     assert EpisodicMemory(db_path).query() == []
 
@@ -188,8 +188,8 @@ def test_personal_profile_records_conclusion_and_prediction(tmp_path: Path) -> N
     assert result["event_id"] > 0
     assert result["prediction_id"] > 0
 
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
     events = EpisodicMemory(db_path).query(code="600519")
     prediction = PredictionTracker(db_path).get_by_id(result["prediction_id"])
@@ -212,7 +212,7 @@ def test_conclusion_requires_explicit_save_confirmation(tmp_path: Path) -> None:
 
     assert result["saved"] is False
     assert result["confirmation_required"] is True
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     assert EpisodicMemory(db_path).query() == []
 
@@ -237,7 +237,7 @@ def test_invalid_prediction_does_not_partially_write_event(tmp_path: Path) -> No
     )
     assert "error" in result
 
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     assert EpisodicMemory(db_path).query() == []
 
@@ -249,7 +249,7 @@ def test_successful_personal_research_records_fact_session(tmp_path: Path) -> No
 
     assert result["memory_recorded"] is True
     assert result["research_session_id"]
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     events = EpisodicMemory(db_path).query(code="600519")
     assert len(events) == 1
@@ -276,16 +276,16 @@ def test_conclusion_write_is_idempotent(tmp_path: Path) -> None:
 
     assert first["saved"] is True
     assert second["reused"] is True
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
     assert len(EpisodicMemory(db_path).query(code="600519")) == 1
     assert len(PredictionTracker(db_path).by_code("600519")) == 1
 
 
 def test_idempotent_retry_repairs_missing_prediction(tmp_path: Path) -> None:
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
     db_path = tmp_path / "agent.db"
     key = "turn-after-event-commit"
@@ -325,8 +325,8 @@ def test_idempotent_retry_repairs_missing_prediction(tmp_path: Path) -> None:
 
 
 def test_structured_context_uses_exact_code_scope_without_embedding(tmp_path: Path) -> None:
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.research_context import ResearchContextService
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.research_context import ResearchContextService
 
     db_path = tmp_path / "agent.db"
     episodic = EpisodicMemory(db_path)
@@ -343,8 +343,8 @@ def test_structured_context_uses_exact_code_scope_without_embedding(tmp_path: Pa
 
 
 def test_structured_context_aggregates_current_cost_basis(tmp_path: Path) -> None:
-    from mommy_chaogu.agent.research_context import ResearchContextService
-    from mommy_chaogu.portfolio.store import PortfolioStore
+    from mojiang_chaogu.agent.research_context import ResearchContextService
+    from mojiang_chaogu.portfolio.store import PortfolioStore
 
     agent_db = tmp_path / "agent.db"
     portfolio_db = tmp_path / "portfolio.db"
@@ -369,8 +369,8 @@ def test_structured_context_aggregates_current_cost_basis(tmp_path: Path) -> Non
 
 
 def test_structured_context_recognizes_us_ticker_position(tmp_path: Path) -> None:
-    from mommy_chaogu.agent.research_context import ResearchContextService
-    from mommy_chaogu.portfolio.store import PortfolioStore
+    from mojiang_chaogu.agent.research_context import ResearchContextService
+    from mojiang_chaogu.portfolio.store import PortfolioStore
 
     store = PortfolioStore(tmp_path / "portfolio.db")
     store.add_position("AAPL", "Apple", Decimal("180"), 5)
@@ -419,7 +419,7 @@ def test_market_only_whitelist_adds_deterministic_analysis_tools() -> None:
 
 def test_market_only_doctor_allows_new_tools_without_private_leak() -> None:
     """新工具进白名单后，doctor 的 market-only 泄漏检查不应把它们当泄漏。"""
-    from mommy_chaogu.cli_commands.agent_managed import _MARKET_ONLY_ALLOWED_TOOLS
+    from mojiang_chaogu.cli_commands.agent_managed import _MARKET_ONLY_ALLOWED_TOOLS
 
     assert "check_kline_signal" in _MARKET_ONLY_ALLOWED_TOOLS
     assert "screen_inflow_stocks" in _MARKET_ONLY_ALLOWED_TOOLS

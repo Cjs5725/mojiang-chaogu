@@ -18,9 +18,9 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.market_data.rankings import IndexQuote
-from mommy_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
-from mommy_chaogu.web.routes.market import _ranking
+from mojiang_chaogu.market_data.rankings import IndexQuote
+from mojiang_chaogu.market_data.types import MarketType, Money, Quote, QuoteType
+from mojiang_chaogu.web.routes.market import _ranking
 
 # ---------- helpers ----------
 
@@ -72,7 +72,7 @@ class TestGetIndexes:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.fetch_indexes",
+            "mojiang_chaogu.web.routes.market.fetch_indexes",
             lambda: [
                 IndexQuote(
                     code="sh000001",
@@ -99,7 +99,7 @@ class TestGetIndexes:
         client: TestClient,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.setattr("mommy_chaogu.web.routes.market.fetch_indexes", lambda: [])
+        monkeypatch.setattr("mojiang_chaogu.web.routes.market.fetch_indexes", lambda: [])
         resp = client.get("/api/market/indexes")
         assert resp.status_code == 200
         assert resp.json() == []
@@ -115,7 +115,7 @@ class TestGetUsIndexes:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.fetch_us_market_brief",
+            "mojiang_chaogu.web.routes.market.fetch_us_market_brief",
             lambda adapter: [
                 {
                     "code": "^GSPC",
@@ -148,7 +148,7 @@ class TestGetUsIndexes:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.fetch_us_market_brief", lambda adapter: []
+            "mojiang_chaogu.web.routes.market.fetch_us_market_brief", lambda adapter: []
         )
         resp = client.get("/api/market/us")
         assert resp.status_code == 200
@@ -165,7 +165,7 @@ class TestGetSectors:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.fetch_sector_ranking",
+            "mojiang_chaogu.web.routes.market.fetch_sector_ranking",
             lambda limit=30: [
                 {
                     "code": "BK0475",
@@ -191,7 +191,7 @@ class TestGetSectors:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.fetch_sector_ranking",
+            "mojiang_chaogu.web.routes.market.fetch_sector_ranking",
             lambda limit=30: [
                 {
                     "code": "BK0475",
@@ -276,7 +276,7 @@ class TestStockDecisionContext:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.market.StockContextService.get",
+            "mojiang_chaogu.web.routes.market.StockContextService.get",
             lambda _self, code: {
                 "code": code,
                 "holding": {

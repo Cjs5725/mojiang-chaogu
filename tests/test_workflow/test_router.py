@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from mommy_chaogu.workflow.definitions import get_default_registry
-from mommy_chaogu.workflow.engine import (
+from mojiang_chaogu.workflow.definitions import get_default_registry
+from mojiang_chaogu.workflow.engine import (
     WorkflowExecutor,
     WorkflowRegistry,
 )
-from mommy_chaogu.workflow.router import NLRouter
+from mojiang_chaogu.workflow.router import NLRouter
 
 
 class FakeToolRegistry:

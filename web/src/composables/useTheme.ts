@@ -5,9 +5,9 @@ import { ref, watch } from 'vue'
 
 type Mode = 'light' | 'dark'
 
-const STORAGE_KEY = 'mommy_theme'
+const STORAGE_KEY = 'mojiang_theme'
 const STORAGE_VERSION = 3
-const VERSION_KEY = 'mommy_theme_v'
+const VERSION_KEY = 'mojiang_theme_v'
 const currentMode = ref<Mode>('light')
 
 // 初始化：版本不匹配 → 强制 light；否则尊重显式存过的偏好

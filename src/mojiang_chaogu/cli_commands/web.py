@@ -1,0 +1,140 @@
+"""web command family."""
+
+from __future__ import annotations
+
+# Shared CLI dependencies are deliberately exported by cli_support.
+# ruff: noqa: F403,F405
+from mojiang_chaogu.cli_support import *
+
+# ============================================================
+# web 子命令
+# ============================================================
+
+
+def _default_web_port() -> int:
+    """Use a valid platform-provided port, otherwise keep the local default."""
+    try:
+        port = int(os.environ.get("PORT", "8000"))
+    except ValueError:
+        return 8000
+    return port if 1 <= port <= 65535 else 8000
+
+
+def build_web_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="mojiang-web",
+        description="墨匠工坊 - Web 后端服务（FastAPI + WebSocket）",
+    )
+    p.add_argument("--host", default="127.0.0.1", help="监听地址 (默认 127.0.0.1)")
+    p.add_argument(
+        "--port",
+        type=int,
+        default=_default_web_port(),
+        help="监听端口 (默认读取 $PORT，否则 8000)",
+    )
+    p.add_argument(
+        "--db", default=str(DEFAULT_DB_PATH), help=f"数据库路径 (默认 {DEFAULT_DB_PATH})"
+    )
+    p.add_argument("--poll-interval", type=float, default=5.0, help="后台轮询间隔（秒）(默认 5)")
+    p.add_argument(
+        "--server-chan-key",
+        default=os.environ.get("SERVER_CHAN_KEY", ""),
+        help="Server酱 SendKey（启用微信推送，默认读 $SERVER_CHAN_KEY）",
+    )
+    p.add_argument(
+        "--web-base-url",
+        default=os.environ.get("WEB_BASE_URL", ""),
+        help="Web 前端的公网/HTTPS URL（推送消息里带 K 线链接用）",
+    )
+    p.add_argument("--reload", action="store_true", help="开发模式热重载")
+    p.add_argument("--log-level", default="info", choices=["debug", "info", "warning", "error"])
+    p.add_argument(
+        "--api-token",
+        default=None,
+        help="显式启用 Bearer 认证；本机模式默认忽略配置文件中的旧令牌",
+    )
+    p.add_argument(
+        "--require-auth",
+        action="store_true",
+        help="本机监听也启用认证（默认仅远程监听要求认证）",
+    )
+    p.add_argument(
+        "--cors-origin",
+        action="append",
+        default=None,
+        help="允许的 Web 前端 origin（可重复）",
+    )
+    p.add_argument(
+        "--allow-unauthenticated-remote",
+        action="store_true",
+        help="仅用于已由宿主机限制为 localhost 的容器网络",
+    )
+    return p
+
+
+def cmd_web_serve(args: argparse.Namespace) -> int:
+    """启动 Web 服务。"""
+    import uvicorn
+
+    from mojiang_chaogu.config import load_config
+    from mojiang_chaogu.web import create_app
+
+    cfg = load_config()
+    is_loopback = args.host in {"127.0.0.1", "localhost", "::1"}
+    explicit_token = (args.api_token or "").strip()
+    if is_loopback and not explicit_token and not args.require_auth:
+        # 本机浏览器由操作系统用户边界保护。不要让曾为公网部署配置过的
+        # MOJIANG_API_TOKEN 污染日常本地开发体验。
+        api_token = ""
+    else:
+        api_token = explicit_token or cfg.web.api_token
+
+    if args.require_auth and not api_token:
+        print("❌ --require-auth 需要配置 MOJIANG_API_TOKEN（或 --api-token）。", file=sys.stderr)
+        return 2
+    if not is_loopback and not api_token and not args.allow_unauthenticated_remote:
+        print(
+            "❌ 非本机 Web 监听必须设置 MOJIANG_API_TOKEN（或 --api-token）。",
+            file=sys.stderr,
+        )
+        return 2
+
+    # When an api_token is in effect (remote bind, --require-auth, or explicit
+    # --api-token), generate a one-time 6-digit pairing code so the browser can
+    # obtain a session cookie without copy/pasting MOJIANG_API_TOKEN. Only the
+    # HMAC digest is passed to create_app; the plaintext is printed once then
+    # discarded.
+    pairing_digest = ""
+    if api_token:
+        from mojiang_chaogu.web.security import generate_pairing_code_and_digest
+
+        code, pairing_digest = generate_pairing_code_and_digest(api_token)
+        print(f"浏览器配对码：{code}（10 分钟内有效，仅可使用一次）")
+
+    app = create_app(
+        db_path=Path(args.db),
+        poll_interval_seconds=args.poll_interval,
+        server_chan_key=args.server_chan_key or None,
+        web_base_url=args.web_base_url,
+        api_token=api_token,
+        cors_origins=args.cors_origin if args.cors_origin is not None else cfg.web.cors_origins,
+        ws_ticket_ttl_seconds=cfg.web.ws_ticket_ttl_seconds,
+        agent_max_concurrency=cfg.web.agent_max_concurrency,
+        session_retention_days=cfg.web.session_retention_days,
+        local_setup_enabled=is_loopback,
+        pairing_digest=pairing_digest,
+    )
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        reload=args.reload,
+        log_level=args.log_level,
+    )
+    return 0
+
+
+def main_web() -> NoReturn:
+    parser = build_web_parser()
+    args = parser.parse_args()
+    sys.exit(cmd_web_serve(args))

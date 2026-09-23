@@ -7,14 +7,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-from mommy_chaogu.agent.extractor import (
+from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+from mojiang_chaogu.agent.extractor import (
     _correct_data_coverage,
     _truncate_to_tokens,
     extract_from_conversation,
     store_extraction,
 )
-from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
 
 @pytest.fixture

@@ -15,12 +15,12 @@ from decimal import Decimal
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from mommy_chaogu.channels.notify import (
+from mojiang_chaogu.channels.notify import (
     WeixinNotifyDeduper,
     _format_notification,
     send_signal_notifications,
 )
-from mommy_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
 
 
 def _make_signal(
@@ -59,7 +59,7 @@ class TestSendSignalNotifications:
 
     def test_not_connected_returns_zero(self, tmp_path: Path) -> None:
         """未连接微信通道时返回 0，不报错。"""
-        with patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls:
+        with patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls:
             mock_store = MagicMock()
             mock_store.load_credentials.return_value = None
             mock_store_cls.return_value = mock_store
@@ -75,8 +75,8 @@ class TestSendSignalNotifications:
         deduper = WeixinNotifyDeduper(db_path=tmp_path / "weixin_pushed.json")
 
         with (
-            patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls,
-            patch("mommy_chaogu.channels.notify.WeixinClient") as mock_client_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinClient") as mock_client_cls,
         ):
             mock_store = MagicMock()
             mock_store.load_credentials.return_value = _mock_creds()
@@ -103,8 +103,8 @@ class TestSendSignalNotifications:
         deduper = WeixinNotifyDeduper(db_path=tmp_path / "weixin_pushed.json")
 
         with (
-            patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls,
-            patch("mommy_chaogu.channels.notify.WeixinClient") as mock_client_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinClient") as mock_client_cls,
         ):
             mock_store = MagicMock()
             mock_store.load_credentials.return_value = _mock_creds()
@@ -123,8 +123,8 @@ class TestSendSignalNotifications:
     def test_send_failure_does_not_raise(self, tmp_path: Path) -> None:
         """单条发送失败不影响整体流程。"""
         with (
-            patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls,
-            patch("mommy_chaogu.channels.notify.WeixinClient") as mock_client_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinClient") as mock_client_cls,
         ):
             mock_store = MagicMock()
             mock_store.load_credentials.return_value = _mock_creds()
@@ -144,7 +144,7 @@ class TestSendSignalNotifications:
     def test_clear_then_retrigger_sends_again(self, tmp_path: Path) -> None:
         deduper = WeixinNotifyDeduper(tmp_path / "state.json")
         mock_client = MagicMock()
-        with patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls:
+        with patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls:
             mock_store_cls.return_value.load_credentials.return_value = _mock_creds()
             signal = _make_signal()
 
@@ -156,7 +156,7 @@ class TestSendSignalNotifications:
     def test_severity_escalation_sends_again(self, tmp_path: Path) -> None:
         deduper = WeixinNotifyDeduper(tmp_path / "state.json")
         mock_client = MagicMock()
-        with patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls:
+        with patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls:
             mock_store_cls.return_value.load_credentials.return_value = _mock_creds()
 
             assert (
@@ -180,7 +180,7 @@ class TestSendSignalNotifications:
         deduper = WeixinNotifyDeduper(tmp_path / "state.json")
         mock_client = MagicMock()
         with (
-            patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls,
+            patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls,
             patch.object(deduper, "_save", side_effect=OSError("read only")),
         ):
             mock_store_cls.return_value.load_credentials.return_value = _mock_creds()
@@ -231,7 +231,7 @@ class TestPreferenceFiltering:
         now: datetime,
     ) -> tuple[int, MagicMock]:
         mock_client = MagicMock()
-        with patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls:
+        with patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls:
             mock_store_cls.return_value.load_credentials.return_value = _mock_creds()
             result = send_signal_notifications(
                 [signal],
@@ -244,7 +244,7 @@ class TestPreferenceFiltering:
 
     @staticmethod
     def _prefs(**overrides: object) -> dict:
-        from mommy_chaogu.preferences import default_preferences
+        from mojiang_chaogu.preferences import default_preferences
 
         prefs = default_preferences()
         prefs.update(overrides)
@@ -303,7 +303,7 @@ class TestPreferenceFiltering:
             raise RuntimeError("db locked")
 
         mock_client = MagicMock()
-        with patch("mommy_chaogu.channels.notify.WeixinStore") as mock_store_cls:
+        with patch("mojiang_chaogu.channels.notify.WeixinStore") as mock_store_cls:
             mock_store_cls.return_value.load_credentials.return_value = _mock_creds()
             result = send_signal_notifications(
                 [_make_signal()],

@@ -1,6 +1,6 @@
 """/api/agent 路由的行为测试。
 
-覆盖 src/mommy_chaogu/web/routes/agent.py 的未测端点与分支：
+覆盖 src/mojiang_chaogu/web/routes/agent.py 的未测端点与分支：
 - POST /api/agent/chat       — 单轮问答（降级 + 正常）
 - POST /api/agent/route      — 工作流路由（未命中）
 - GET  /api/agent/history    — 对话历史（含异常分支 + session_id 透传）
@@ -15,8 +15,8 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from mommy_chaogu.preferences import default_preferences
-from mommy_chaogu.web.deps import get_agent_memory, get_agent_service
+from mojiang_chaogu.preferences import default_preferences
+from mojiang_chaogu.web.deps import get_agent_memory, get_agent_service
 
 # ---------------------------------------------------------------------------
 # Fakes
@@ -218,7 +218,7 @@ class TestChatEndpoint:
         client.app.dependency_overrides[get_agent_service] = lambda: agent
         client.app.dependency_overrides[get_agent_memory] = lambda: _FakeChatMemory()
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.page_context_addendum",
+            "mojiang_chaogu.web.routes.agent.page_context_addendum",
             lambda context, _portfolio, _watchlist: (
                 f"<page_context>{context.stock_code}:{context.tab}</page_context>"
             ),
@@ -261,7 +261,7 @@ class TestHistoryEndpoint:
             {"role": "assistant", "content": "你好呀"},
         ]
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_agent_memory",
+            "mojiang_chaogu.web.routes.agent.get_agent_memory",
             lambda: _FakeHistoryMemory(rows=rows),
         )
         resp = client.get("/api/agent/history")
@@ -274,7 +274,7 @@ class TestHistoryEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_agent_memory",
+            "mojiang_chaogu.web.routes.agent.get_agent_memory",
             lambda: _FakeHistoryMemory(exc=RuntimeError("db locked")),
         )
         resp = client.get("/api/agent/history")
@@ -284,7 +284,7 @@ class TestHistoryEndpoint:
     def test_session_id_param(self, client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
         fake = _FakeHistoryMemory(rows=[])
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_agent_memory",
+            "mojiang_chaogu.web.routes.agent.get_agent_memory",
             lambda: fake,
         )
         resp = client.get(
@@ -305,7 +305,7 @@ class TestPredictionsEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: None,
         )
         resp = client.get("/api/agent/predictions")
@@ -321,7 +321,7 @@ class TestPredictionsEndpoint:
             {"code": "600519", "prediction": "C"},
         ]
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: _FakeTracker(rows=rows),
         )
 
@@ -335,7 +335,7 @@ class TestPredictionsEndpoint:
     def test_returns_predictions(self, client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
         rows = [{"code": "600519", "prediction": "突破 1700", "status": "pending"}]
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: _FakeTracker(rows=rows),
         )
         resp = client.get("/api/agent/predictions")
@@ -348,7 +348,7 @@ class TestPredictionsEndpoint:
         self, client: TestClient, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent.get_prediction_tracker_safe",
+            "mojiang_chaogu.web.routes.agent.get_prediction_tracker_safe",
             lambda: _FakeTracker(exc=RuntimeError("boom")),
         )
         resp = client.get("/api/agent/predictions")
@@ -363,22 +363,22 @@ class TestPredictionsEndpoint:
 
 class TestPredictionTrackerSafeHelper:
     def test_returns_tracker_when_available(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        import mommy_chaogu.web.routes.agent as agent_mod
+        import mojiang_chaogu.web.routes.agent as agent_mod
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.deps.get_prediction_tracker",
+            "mojiang_chaogu.web.deps.get_prediction_tracker",
             lambda: "tracker-instance",
         )
         assert agent_mod.get_prediction_tracker_safe() == "tracker-instance"
 
     def test_returns_none_on_exception(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        import mommy_chaogu.web.routes.agent as agent_mod
+        import mojiang_chaogu.web.routes.agent as agent_mod
 
         def _boom() -> Any:
             raise RuntimeError("no db")
 
         monkeypatch.setattr(
-            "mommy_chaogu.web.deps.get_prediction_tracker",
+            "mojiang_chaogu.web.deps.get_prediction_tracker",
             _boom,
         )
         assert agent_mod.get_prediction_tracker_safe() is None
@@ -395,7 +395,7 @@ class TestRouteEndpoint:
     ) -> None:
         fake_router = _FakeNLRouter(_FakeRouteResult(matched=False))
         monkeypatch.setattr(
-            "mommy_chaogu.web.routes.agent._get_router",
+            "mojiang_chaogu.web.routes.agent._get_router",
             lambda: fake_router,
         )
         resp = client.post("/api/agent/route", json={"message": "随便说点什么"})

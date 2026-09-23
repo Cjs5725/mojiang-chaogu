@@ -4,7 +4,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from mommy_chaogu.services.stock_context_service import StockContextService
+from mojiang_chaogu.services.stock_context_service import StockContextService
 
 
 def test_aggregates_open_positions_and_basket_memberships(monkeypatch) -> None:
@@ -30,7 +30,7 @@ def test_aggregates_open_positions_and_basket_memberships(monkeypatch) -> None:
     }
     watchlist = MagicMock()
     monkeypatch.setattr(
-        "mommy_chaogu.services.stock_context_service.BasketService.list_baskets",
+        "mojiang_chaogu.services.stock_context_service.BasketService.list_baskets",
         lambda _self: [
             {
                 "id": "theme:liquor",
@@ -66,7 +66,7 @@ def test_returns_empty_context_for_unheld_stock(monkeypatch) -> None:
     portfolio = MagicMock()
     portfolio.summary.return_value = {"positions": []}
     monkeypatch.setattr(
-        "mommy_chaogu.services.stock_context_service.BasketService.list_baskets",
+        "mojiang_chaogu.services.stock_context_service.BasketService.list_baskets",
         lambda _self: [],
     )
 

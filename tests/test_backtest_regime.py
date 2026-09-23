@@ -1,8 +1,8 @@
-"""市场环境分组分析模块 ``mommy_chaogu.backtest.regime_analysis`` 的测试。"""
+"""市场环境分组分析模块 ``mojiang_chaogu.backtest.regime_analysis`` 的测试。"""
 
 from __future__ import annotations
 
-from mommy_chaogu.backtest.regime_analysis import (
+from mojiang_chaogu.backtest.regime_analysis import (
     analyze_by_regime,
     classify_market_regime,
     compare_strategies_across_regimes,

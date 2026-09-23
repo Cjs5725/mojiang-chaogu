@@ -8,9 +8,9 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
-from mommy_chaogu.monitor import SnapshotRow
-from mommy_chaogu.watchlist.models import Group, StockEntry
-from mommy_chaogu.web.mappers import (
+from mojiang_chaogu.monitor import SnapshotRow
+from mojiang_chaogu.watchlist.models import Group, StockEntry
+from mojiang_chaogu.web.mappers import (
     _quote_to_out,
     bar_to_out,
     group_to_out,
@@ -207,7 +207,7 @@ class TestSignalToOut:
         assert out.threshold_value == Decimal("80000000")
 
     def test_severity_warning(self) -> None:
-        from mommy_chaogu.signals.types import SignalSeverity
+        from mojiang_chaogu.signals.types import SignalSeverity
 
         sig = make_signal(severity=SignalSeverity.WARNING)
         out = signal_to_out(sig)

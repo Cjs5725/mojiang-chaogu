@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.push.server_chan import ServerChanPusher
-from mommy_chaogu.signals.types import Signal, SignalSeverity
+from mojiang_chaogu.push.server_chan import ServerChanPusher
+from mojiang_chaogu.signals.types import Signal, SignalSeverity
 
 
 def make_signal(
@@ -62,7 +62,7 @@ def test_endpoint_construction():
 def test_push_success_critical():
     pusher = ServerChanPusher("test_key")
     signal = make_signal(severity=SignalSeverity.CRITICAL)
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_post.return_value = make_mock_response(code=0)
         assert pusher.push(signal) is True
         mock_post.assert_called_once()
@@ -77,7 +77,7 @@ def test_push_success_critical():
 def test_push_success_warning():
     pusher = ServerChanPusher("test_key")
     signal = make_signal(severity=SignalSeverity.WARNING)
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_post.return_value = make_mock_response()
         assert pusher.push(signal) is True
         kwargs = mock_post.call_args.kwargs
@@ -87,7 +87,7 @@ def test_push_success_warning():
 def test_push_includes_web_link_when_configured():
     pusher = ServerChanPusher("test_key", web_base_url="https://mama.example.com")
     signal = make_signal()
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_post.return_value = make_mock_response()
         pusher.push(signal)
         desp = mock_post.call_args.kwargs["data"]["desp"]
@@ -103,7 +103,7 @@ def test_push_includes_web_link_when_configured():
 def test_push_failure_non_zero_code():
     pusher = ServerChanPusher("bad_key")
     signal = make_signal()
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_post.return_value = make_mock_response(code=40001, msg="SendKey 错误")
         assert pusher.push(signal) is False
 
@@ -113,7 +113,7 @@ def test_push_network_error():
 
     pusher = ServerChanPusher("test_key")
     signal = make_signal()
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_post.side_effect = requests.ConnectionError("network down")
         assert pusher.push(signal) is False
 
@@ -123,7 +123,7 @@ def test_push_http_status_error():
 
     pusher = ServerChanPusher("test_key")
     signal = make_signal()
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_resp = MagicMock()
         mock_resp.raise_for_status.side_effect = requests.HTTPError("500")
         mock_post.return_value = mock_resp
@@ -133,7 +133,7 @@ def test_push_http_status_error():
 def test_push_invalid_json():
     pusher = ServerChanPusher("test_key")
     signal = make_signal()
-    with patch("mommy_chaogu.push.server_chan.requests.post") as mock_post:
+    with patch("mojiang_chaogu.push.server_chan.requests.post") as mock_post:
         mock_resp = MagicMock()
         mock_resp.json.side_effect = ValueError("not json")
         mock_resp.raise_for_status = MagicMock()

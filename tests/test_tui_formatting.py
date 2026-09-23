@@ -10,7 +10,7 @@ from decimal import Decimal
 
 import pytest
 
-from mommy_chaogu.tui.services.formatting import (  # type: ignore[import-untyped]
+from mojiang_chaogu.tui.services.formatting import (  # type: ignore[import-untyped]
     change_arrow,
     change_color,
     format_amount,

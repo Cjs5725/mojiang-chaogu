@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from mommy_chaogu.agent.token_tracker import (
+from mojiang_chaogu.agent.token_tracker import (
     DEFAULT_PRICING,
     TokenTracker,
 )

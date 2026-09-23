@@ -59,14 +59,14 @@ def main() -> int:
 
     catalog = json.loads((SITE / "plugins.json").read_text(encoding="utf-8"))
     expected_plugins = (
-        "mommy-onboard",
-        "mommy-research",
-        "mommy-strategy",
+        "mojiang-onboard",
+        "mojiang-research",
+        "mojiang-strategy",
         "market-watch-loop",
         "basket-analysis",
         "food-security-analysis",
     )
-    if catalog.get("store") != "mommy-chaogu plugins store":
+    if catalog.get("store") != "mojiang-chaogu plugins store":
         raise AssertionError("plugins.json store name is incorrect")
     actual_plugins = tuple(plugin["name"] for plugin in catalog.get("plugins", []))
     if actual_plugins != expected_plugins:

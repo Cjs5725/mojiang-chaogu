@@ -28,7 +28,7 @@ def backfill(db_path: Path, *, dry_run: bool = False) -> int:
     """回填 trade_date 为 NULL 的行，返回受影响行数。"""
     from sqlalchemy import text
 
-    from mommy_chaogu.db import create_sqlite_engine
+    from mojiang_chaogu.db import create_sqlite_engine
 
     engine = create_sqlite_engine(db_path)
     with engine.begin() as conn:
@@ -58,7 +58,7 @@ def backfill(db_path: Path, *, dry_run: bool = False) -> int:
 
 
 def main() -> int:
-    from mommy_chaogu.db_paths import AGENT_DB
+    from mojiang_chaogu.db_paths import AGENT_DB
 
     parser = argparse.ArgumentParser(description="回填 episodic_events 的 NULL trade_date")
     parser.add_argument("--db", default=None, help=f"数据库路径 (默认 {AGENT_DB})")

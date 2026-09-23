@@ -55,12 +55,12 @@ def run_verify(db_path: Path, logger: logging.Logger) -> dict[str, int]:
     复用 ``cmd_agent_verify`` 里的依赖装配 + ``verify_pending`` 调用，
     而不是走 argparse，这样 cron 调用更轻量也更可测。
     """
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-    from mommy_chaogu.agent.verify_engine import verify_pending
-    from mommy_chaogu.cache import CachedMarketDataAdapter, CacheStore
-    from mommy_chaogu.db_paths import MARKET_DB
-    from mommy_chaogu.market_data import create_adapter_chain
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.verify_engine import verify_pending
+    from mojiang_chaogu.cache import CachedMarketDataAdapter, CacheStore
+    from mojiang_chaogu.db_paths import MARKET_DB
+    from mojiang_chaogu.market_data import create_adapter_chain
 
     tracker = PredictionTracker(db_path)
     episodic = EpisodicMemory(db_path)

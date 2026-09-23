@@ -9,10 +9,10 @@ from pathlib import Path
 
 import pytest
 
-from mommy_chaogu.earnings.adapter import MockEarningsAdapter
-from mommy_chaogu.earnings.service import EarningsService
-from mommy_chaogu.earnings.store import EarningsStore
-from mommy_chaogu.earnings.types import EarningsVerdict
+from mojiang_chaogu.earnings.adapter import MockEarningsAdapter
+from mojiang_chaogu.earnings.service import EarningsService
+from mojiang_chaogu.earnings.store import EarningsStore
+from mojiang_chaogu.earnings.types import EarningsVerdict
 
 
 @pytest.fixture
@@ -111,7 +111,7 @@ def test_score_one_no_actual(service: EarningsService):
 
 def test_score_one_no_predicted(service: EarningsService, earnings_store: EarningsStore):
     """如果 preview 库没有这只股，score 应返回 None。"""
-    from mommy_chaogu.earnings.types import EarningsActual, EarningsSource
+    from mojiang_chaogu.earnings.types import EarningsActual, EarningsSource
 
     a = EarningsActual(
         code="999999",
@@ -140,7 +140,7 @@ def test_score_all_batch(service: EarningsService):
 
 def test_score_verdict_logic_at_low(service: EarningsService):
     """如果实际 = low，应为 MEET（边界）。"""
-    from mommy_chaogu.earnings.types import EarningsActual, EarningsSource
+    from mojiang_chaogu.earnings.types import EarningsActual, EarningsSource
 
     # 手动写入 actual = low = 188
     a = EarningsActual(
@@ -161,7 +161,7 @@ def test_score_verdict_logic_at_low(service: EarningsService):
 
 def test_score_verdict_above_high(service: EarningsService):
     """actual > high 应为 SUPER_BEAT。"""
-    from mommy_chaogu.earnings.types import EarningsActual, EarningsSource
+    from mojiang_chaogu.earnings.types import EarningsActual, EarningsSource
 
     a = EarningsActual(
         code="603662",
@@ -185,7 +185,7 @@ def test_score_verdict_deep_miss(service: EarningsService):
     For 603662: low=188, mid=202.5, half_loss=195.25
     So actual < 195.25 → DEEP_MISS
     """
-    from mommy_chaogu.earnings.types import EarningsActual, EarningsSource
+    from mojiang_chaogu.earnings.types import EarningsActual, EarningsSource
 
     a = EarningsActual(
         code="603662",
@@ -205,7 +205,7 @@ def test_score_verdict_deep_miss(service: EarningsService):
 
 def test_summary_returns_counts(service: EarningsService):
     """summary 应返回 verdict 分布。"""
-    from mommy_chaogu.earnings.types import EarningsActual, EarningsSource
+    from mojiang_chaogu.earnings.types import EarningsActual, EarningsSource
 
     # 1 个 SUPER_BEAT
     a1 = EarningsActual(
@@ -244,7 +244,7 @@ def test_watch_calendar_empty(service: EarningsService):
 
 def test_watch_calendar_with_data(service: EarningsService):
     """有数据时按日期排序。"""
-    from mommy_chaogu.earnings.types import EarningsCalendar
+    from mojiang_chaogu.earnings.types import EarningsCalendar
 
     c1 = EarningsCalendar(
         code="603662",

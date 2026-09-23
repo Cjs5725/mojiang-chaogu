@@ -10,7 +10,7 @@ import {
 import { toApiError, type ApiError } from '@/api/client'
 import ErrorState from '@/components/ErrorState.vue'
 
-const LEGACY_FOLLOW_KEY = 'mommy-followed-themes'
+const LEGACY_FOLLOW_KEY = 'mojiang-followed-themes'
 const baskets = ref<Basket[]>([])
 const loading = ref(true)
 const error = ref<ApiError | null>(null)

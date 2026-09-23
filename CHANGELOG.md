@@ -1,6 +1,6 @@
 # 更新日志 (Changelog)
 
-> mommy-chaogu 的所有重要变更记录。
+> mojiang-chaogu 的所有重要变更记录（2026-09 由 `mommy-chaogu` 更名而来，更名前条目保持原样）。
 > 格式基于 [Keep a Changelog](https://keepachangelog.com/)。
 
 ---
@@ -8,6 +8,17 @@
 ## [Unreleased]
 
 后续变更将在这里记录。
+
+## [1.6.0] - 2026-09-23
+
+### 变更
+
+- **品牌改名：`mommy` → `mojiang`**——本发行版完成品牌对齐。命令行入口、
+  Python 包名（`mojiang_chaogu`）、内置 Skill、安装脚本、文档与站点全面更名；
+  安装脚本此前写死从上游仓库取包，本次一并修正为从本仓库取包。
+- **不留 `mommy` 兼容别名**——本发行版尚无存量用户，不做双名过渡。
+- 代码行为、`market-only` 权限边界与全部测试语义未做任何改变。
+- 未覆盖：iOS 工程（`ios/`）涉及 bundle id 与签名，单列二期。
 
 ## [1.5.0] - 2026-08-19
 

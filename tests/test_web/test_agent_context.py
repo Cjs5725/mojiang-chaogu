@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from pydantic import ValidationError
 
-from mommy_chaogu.web.agent_context import AgentPageContext, page_context_addendum
+from mojiang_chaogu.web.agent_context import AgentPageContext, page_context_addendum
 
 
 def test_page_context_is_allow_listed() -> None:
@@ -43,7 +43,7 @@ def test_addendum_uses_server_owned_holding_and_valid_basket(monkeypatch) -> Non
         ]
     }
     monkeypatch.setattr(
-        "mommy_chaogu.services.stock_context_service.BasketService.list_baskets",
+        "mojiang_chaogu.services.stock_context_service.BasketService.list_baskets",
         lambda _self: [
             {
                 "id": "theme:liquor",

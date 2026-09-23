@@ -4,8 +4,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from mommy_chaogu.semicon import SemiconStore
-from mommy_chaogu.watchlist import WatchlistStore
+from mojiang_chaogu.semicon import SemiconStore
+from mojiang_chaogu.watchlist import WatchlistStore
 
 DB_DIR = Path("data")
 

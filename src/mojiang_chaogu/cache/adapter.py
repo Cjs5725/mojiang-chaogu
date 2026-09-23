@@ -1,0 +1,666 @@
+"""CachedMarketDataAdapter：装饰器，包装任意 MarketDataAdapter 加缓存层。
+
+设计哲学（按团长要求）：
+1. 数据库有数据 → 直接返回 + 标注 fetched_at（妈妈看得见新鲜度）
+2. 数据库没数据 → 尝试拉新（失败返回 None）
+3. 拉新有节流：距离上次拉新尝试 < interval → 跳过（用旧数据）
+4. 拉新失败 → 静默 + warning 日志，保留旧数据
+
+接口契约：
+- 实现 MarketDataAdapter Protocol（runtime_checkable）
+- 业务层使用无感 — 像直接调底层 adapter 一样
+"""
+
+from __future__ import annotations
+
+import logging
+from datetime import UTC, datetime
+from typing import Any, cast
+from zoneinfo import ZoneInfo
+
+from mojiang_chaogu.cache.config import CacheConfig
+from mojiang_chaogu.cache.store import CacheStore, QuoteCacheEntry
+from mojiang_chaogu.market_data import MarketDataAdapter, Quote
+from mojiang_chaogu.market_data.types import (
+    AdjustmentType,
+    Bar,
+    BarInterval,
+    Board,
+    Money,
+    MoneyFlow,
+    OrderBook,
+)
+
+_log = logging.getLogger(__name__)
+
+# K 线交易日历：时间戳统一 aware UTC 后，直接 strftime 会把北京午夜
+# （UTC 前一天 16:00）落到错误的日期，落库 trade_date 必须按北京时区取。
+_TZ_BEIJING = ZoneInfo("Asia/Shanghai")
+
+
+def _bar_trade_date(ts: datetime) -> str:
+    """K 线时间戳 → 北京时区的交易日字符串（YYYY-MM-DD）。"""
+    if ts.tzinfo is None:
+        # 防御：naive 视为北京墙时间（与 F2 之前 adapter 的历史语义一致）
+        ts = ts.replace(tzinfo=_TZ_BEIJING)
+    return ts.astimezone(_TZ_BEIJING).strftime("%Y-%m-%d")
+
+
+def _utcnow() -> datetime:
+    return datetime.now(UTC)
+
+
+class CachedMarketDataAdapter:
+    """缓存装饰器。
+
+    用法：
+        base = EfinanceAdapter()
+        store = CacheStore(Path("data/market.db"))
+        adapter = CachedMarketDataAdapter(base, store)
+        # 用法和 base 一样，但会自动读/写缓存
+        quote = adapter.get_quote("600519")
+    """
+
+    def __init__(
+        self,
+        inner: MarketDataAdapter,
+        store: CacheStore,
+        config: CacheConfig | None = None,
+    ) -> None:
+        self.inner = inner
+        self.store = store
+        self.config = config or CacheConfig()
+        self.name = f"cached({inner.name})"
+        # 内部状态：每个 (method, code) 上次尝试拉新的时间
+        self._last_fetch_attempt: dict[str, datetime] = {}
+        # 指标统计
+        self.stats_counters: dict[str, int] = {
+            "hits": 0,
+            "fetches": 0,
+            "fetch_ok": 0,
+            "fetch_fail": 0,
+            "miss": 0,
+        }
+        # 最近一次数据来源（供调用方感知数据新鲜度）
+        self.last_source: str = (
+            ""  # "network", "cache", "stale_cache", "snapshot", "stale_snapshot", ""
+        )
+
+    def close(self) -> None:
+        """Release the cache store owned by this adapter."""
+        self.store.close()
+
+    # ============================================================
+    # 内部：拉新节流判断
+    # ============================================================
+
+    def _should_fetch(self, key: str, interval_seconds: int) -> bool:
+        last = self._last_fetch_attempt.get(key)
+        if last is None:
+            return True
+        return (_utcnow() - last).total_seconds() >= interval_seconds
+
+    def _mark_fetched(self, key: str) -> None:
+        self._last_fetch_attempt[key] = _utcnow()
+
+    # ============================================================
+    # 实时报价
+    # ============================================================
+
+    def get_quote(self, code: str) -> Quote | None:
+        """优先级：缓存（若新） > 底层拉新 > 缓存（哪怕旧）> None"""
+        cached = self.store.get_quote(code)
+        key = f"quote:{code}"
+
+        # 判断是否需要尝试拉新
+        if self._should_fetch(key, self.config.quote_fetch_interval_seconds):
+            self._mark_fetched(key)
+            self.stats_counters["fetches"] += 1
+            try:
+                fresh = self.inner.get_quote(code)
+            except Exception as e:
+                self.stats_counters["fetch_fail"] += 1
+                _log.warning("fetch quote(%s) failed: %s", code, e)
+                fresh = None
+
+            if fresh is not None:
+                self.stats_counters["fetch_ok"] += 1
+                try:
+                    self.store.set_quote(code, fresh)
+                except Exception as e:
+                    _log.error("cache set_quote(%s) failed: %s", code, e)
+                self.last_source = "network"
+                return fresh
+
+            # 拉新失败
+            if cached is not None:
+                self.stats_counters["hits"] += 1
+                _log.info(
+                    "serving cached quote(%s) age=%.0fs (fetch failed)", code, cached.age_seconds
+                )
+                self.last_source = "stale_cache"
+                return cached.quote
+
+            self.stats_counters["miss"] += 1
+            self.last_source = ""
+            return None
+
+        # 不到拉新间隔 → 直接用缓存
+        if cached is not None:
+            self.stats_counters["hits"] += 1
+            self.last_source = "cache"
+            return cached.quote
+        # 缓存为空但不到拉新间隔（理论上不会发生，但兜底）
+        self.stats_counters["miss"] += 1
+        self.last_source = ""
+        return None
+
+    def get_quotes(self, codes: list[str]) -> list[Quote]:
+        """批量拉取：先查缓存，未命中的 codes 一次性走底层批量 API。
+
+        与 get_quote 的优先级一致：缓存（若在节流窗口内） > 底层批量拉新。
+        把 N 次单股往返压成 1 次批量调用（腾讯接口一次拉 80 只）。
+        """
+        unique_codes = list(dict.fromkeys(codes))
+        if not unique_codes:
+            return []
+
+        # 1. 逐 code 读缓存 + 判断节流窗口
+        cached_entries: dict[str, QuoteCacheEntry | None] = {}
+        miss_codes: list[str] = []
+        for code in unique_codes:
+            cached_entries[code] = self.store.get_quote(code)
+            if self._should_fetch(f"quote:{code}", self.config.quote_fetch_interval_seconds):
+                miss_codes.append(code)
+
+        # 2. 未命中的 codes 一次性批量拉（关键：走 inner.get_quotes 而非逐个 get_quote）
+        fresh_map: dict[str, Quote] = {}
+        batch_fetch_failed = False
+        if miss_codes:
+            for code in miss_codes:
+                self._mark_fetched(f"quote:{code}")
+            self.stats_counters["fetches"] += 1
+            try:
+                fresh_list = self.inner.get_quotes(miss_codes)
+            except Exception as e:
+                self.stats_counters["fetch_fail"] += 1
+                _log.warning("fetch get_quotes(%s) failed: %s", miss_codes, e)
+                fresh_list = []
+                batch_fetch_failed = True
+            if fresh_list:
+                self.stats_counters["fetch_ok"] += 1
+                for q in fresh_list:
+                    fresh_map[q.code] = q
+                    try:
+                        self.store.set_quote(q.code, q)
+                    except Exception as e:
+                        _log.error("cache set_quote(%s) failed: %s", q.code, e)
+
+        # 3. 合并：fresh 优先，缺失的 fallback 到缓存（含拉新失败的旧缓存）
+        out: list[Quote] = []
+        used_network = False
+        used_cache = False
+        used_stale = False
+        stale_candidates = set(miss_codes) if batch_fetch_failed else set()
+        for code in unique_codes:
+            fresh_q = fresh_map.get(code)
+            if fresh_q is not None:
+                out.append(fresh_q)
+                used_network = True
+                continue
+            entry = cached_entries.get(code)
+            if entry is not None:
+                out.append(entry.quote)
+                self.stats_counters["hits"] += 1
+                used_cache = True
+                if code in stale_candidates:
+                    used_stale = True
+        # 标注优先级：stale_cache > network > cache —— 只要有一条数据来自
+        # "拉新失败后翻出的旧缓存"，就必须让下游看见（与单股路径一致）
+        if used_stale:
+            self.last_source = "stale_cache"
+        elif used_network:
+            self.last_source = "network"
+        elif used_cache:
+            self.last_source = "cache"
+        return out
+
+    def list_market_quotes(self) -> list[Quote]:
+        """全市场快照：优先缓存（保留最新 + 历史），否则拉新并缓存。"""
+        snap = self.store.get_latest_market_snapshot()
+        key = "market_snapshot:all"
+        should_fetch = self._should_fetch(key, self.config.market_snapshot_fetch_interval_seconds)
+
+        if snap is not None and not should_fetch:
+            self.stats_counters["hits"] += 1
+            # 从快照还原 Quote 对象列表
+            from mojiang_chaogu.cache.serializer import quote_from_dict
+
+            self.last_source = "snapshot"
+            return [quote_from_dict(d) for d in snap[3]]
+
+        # 尝试拉新
+        self._mark_fetched(key)
+        self.stats_counters["fetches"] += 1
+        try:
+            fresh = self.inner.list_market_quotes()
+        except Exception as e:
+            self.stats_counters["fetch_fail"] += 1
+            _log.warning("fetch list_market_quotes failed: %s", e)
+            fresh = None
+
+        if fresh:
+            self.stats_counters["fetch_ok"] += 1
+            try:
+                from mojiang_chaogu.cache.serializer import quote_to_dict
+
+                quote_dicts = [quote_to_dict(q) for q in fresh]
+                quote_ts = fresh[0].timestamp if fresh else None
+                self.store.save_market_snapshot(quote_dicts, quote_ts=quote_ts)
+                self.store.trim_market_snapshots(self.config.market_snapshot_history_keep)
+            except Exception as e:
+                _log.error("cache save_market_snapshot failed: %s", e)
+            self.last_source = "snapshot"
+            return fresh
+
+        # 拉新失败 → 用旧快照
+        if snap is not None:
+            self.stats_counters["hits"] += 1
+            from mojiang_chaogu.cache.serializer import quote_from_dict
+
+            _log.info(
+                "serving cached market_snapshot age=%.0fs (fetch failed)",
+                (_utcnow() - snap[1]).total_seconds(),
+            )
+            self.last_source = "stale_snapshot"
+            return [quote_from_dict(d) for d in snap[3]]
+
+        self.stats_counters["miss"] += 1
+        self.last_source = ""
+        return []
+
+    # ============================================================
+    # 5档盘口（不缓存，实时性要求太高）
+    # ============================================================
+
+    def get_order_book(self, code: str) -> OrderBook | None:
+        return self.inner.get_order_book(code)
+
+    # ============================================================
+    # K 线（按日期永久缓存）
+    # ============================================================
+
+    def get_bars(  # type: ignore[no-untyped-def]
+        self,
+        code: str,
+        interval: BarInterval = BarInterval.D1,
+        adjustment: AdjustmentType = AdjustmentType.FORWARD,
+        start=None,
+        end=None,
+        limit: int | None = None,
+    ) -> list[Bar]:
+        """K 线缓存：按日期永久保留。
+
+        - 请求区间内的缓存 → 节流窗口外增量拉新，拉新后重读缓存（当次调用即见新数据）
+        - 无缓存（整体或该区间内都没有）→ 拉新并缓存
+        - start/end 为闭区间：缓存读取与返回结果都按区间过滤
+        """
+        interval_str = interval.value
+        adj_str = adjustment.value
+        start_str = start.isoformat() if start is not None else None
+        end_str = end.isoformat() if end is not None else None
+        key = f"bar:{code}:{interval_str}:{adj_str}"
+
+        def _read_cache() -> list[dict[str, Any]] | None:
+            return self.store.get_bars(
+                code, interval_str, adj_str, start_date=start_str, end_date=end_str
+            )
+
+        def _persist(fresh: list[Bar]) -> None:
+            from dataclasses import asdict
+
+            for bar in fresh:
+                trade_date = _bar_trade_date(bar.timestamp)
+                bar_dict = asdict(bar)
+                bar_dict["timestamp"] = bar.timestamp.isoformat()
+                bar_dict["interval"] = interval_str
+                bar_dict["adjustment"] = adj_str
+                bar_dict = cast(dict[str, Any], _recursive_safe(bar_dict))
+                try:
+                    self.store.set_bar(code, interval_str, adj_str, trade_date, bar_dict)
+                except Exception as e:
+                    _log.error("cache set_bar failed: %s", e)
+
+        cached_bars = _read_cache()
+
+        if not cached_bars:
+            # 该区间内无缓存 → 尝试拉新（节流窗口内不重复打上游）
+            if not self._should_fetch(key, self.config.bar_fetch_interval_seconds):
+                self.last_source = "cache"
+                return []
+            self._mark_fetched(key)
+            self.stats_counters["fetches"] += 1
+            try:
+                fresh = self.inner.get_bars(
+                    code,
+                    interval=interval,
+                    adjustment=adjustment,
+                    start=start,
+                    end=end,
+                    limit=limit,
+                )
+                self.stats_counters["fetch_ok"] += 1
+            except Exception as e:
+                self.stats_counters["fetch_fail"] += 1
+                _log.warning("fetch bars(%s) failed: %s", code, e)
+                self.last_source = "cache"
+                return []
+
+            # 底层 adapter 可能违反 list 契约返回 None → 当作无数据
+            if fresh is None:
+                self.last_source = "cache"
+                return []
+
+            _persist(fresh)
+            self.last_source = "network"
+            return fresh
+
+        # 区间内有缓存 → 节流窗口外尝试增量拉新，拉新后重读缓存
+        if self._should_fetch(key, self.config.bar_fetch_interval_seconds):
+            self._mark_fetched(key)
+            self.stats_counters["fetches"] += 1
+            try:
+                fresh = self.inner.get_bars(
+                    code,
+                    interval=interval,
+                    adjustment=adjustment,
+                    start=start,
+                    end=end,
+                    limit=limit,
+                )
+                self.stats_counters["fetch_ok"] += 1
+                if fresh is not None:
+                    _persist(fresh)
+                    refreshed = _read_cache()
+                    if refreshed:
+                        cached_bars = refreshed
+            except Exception as e:
+                _log.warning("refetch bars(%s) failed (using cache): %s", code, e)
+
+        # 从缓存构造 Bar 列表
+        self.stats_counters["hits"] += 1
+        self.last_source = "cache"
+
+        bars: list[Bar] = []
+        for bar_dict in cached_bars:
+            ts = bar_dict["timestamp"]
+            if isinstance(ts, str):
+                ts = datetime.fromisoformat(ts)
+            from decimal import Decimal
+
+            bars.append(
+                Bar(
+                    code=code,
+                    name=bar_dict.get("name", ""),
+                    interval=interval,
+                    adjustment=adjustment,
+                    timestamp=ts,
+                    open=Decimal(bar_dict["open"]),
+                    high=Decimal(bar_dict["high"]),
+                    low=Decimal(bar_dict["low"]),
+                    close=Decimal(bar_dict["close"]),
+                    volume=bar_dict["volume"],
+                    turnover=_bar_turnover(bar_dict.get("turnover")),
+                    change_pct=Decimal(bar_dict["change_pct"])
+                    if bar_dict.get("change_pct")
+                    else None,
+                    turnover_rate=Decimal(bar_dict["turnover_rate"])
+                    if bar_dict.get("turnover_rate")
+                    else None,
+                    amplitude=Decimal(bar_dict["amplitude"]) if bar_dict.get("amplitude") else None,
+                )
+            )
+        if limit is not None:
+            bars = bars[-limit:]
+        return bars
+
+    # ============================================================
+    # Tick / 成交明细（不缓存，实时性要求高）
+    # ============================================================
+
+    def get_ticks(self, code: str, limit: int | None = None) -> list[Any]:
+        return self.inner.get_ticks(code, limit=limit)
+
+    # ============================================================
+    # 资金流
+    # ============================================================
+
+    def get_today_money_flow(self, code: str) -> list[MoneyFlow]:
+        """当日资金流：节流缓存（默认 5 分钟）。"""
+        cached = self.store.get_today_money_flow(code)
+        key = f"today_flow:{code}"
+
+        if not self._should_fetch(key, self.config.today_money_flow_fetch_interval_seconds):
+            # 不到拉新间隔 → 直接用缓存
+            if cached is not None:
+                self.stats_counters["hits"] += 1
+                self.last_source = "cache"
+                return [_money_flow_from_dict(d) for d in cached]
+            self.last_source = ""
+            return []
+
+        # 到拉新间隔 → 尝试拉新
+        self._mark_fetched(key)
+        self.stats_counters["fetches"] += 1
+        try:
+            fresh = self.inner.get_today_money_flow(code)
+            self.stats_counters["fetch_ok"] += 1
+        except Exception as e:
+            self.stats_counters["fetch_fail"] += 1
+            _log.warning("fetch today_money_flow(%s) failed: %s", code, e)
+            fresh = None
+
+        if fresh is not None:
+            flow_dicts = [_money_flow_to_dict(f) for f in fresh]
+            try:
+                self.store.set_today_money_flow(code, flow_dicts)
+            except Exception as e:
+                _log.error("cache set_today_money_flow failed: %s", e)
+            self.last_source = "network"
+            return fresh
+
+        # 拉新失败 → fallback 到旧缓存
+        if cached is not None:
+            self.stats_counters["hits"] += 1
+            _log.info("serving cached today_money_flow(%s) (fetch failed)", code)
+            self.last_source = "stale_cache"
+            return [_money_flow_from_dict(d) for d in cached]
+        self.last_source = ""
+        return []
+
+    def get_history_money_flow(self, code: str, days: int = 30) -> list[MoneyFlow]:
+        """历史资金流：按日期永久缓存。"""
+        cached = self.store.get_money_flow_history(code)
+        key = f"history_flow:{code}"
+
+        if cached is None or len(cached) == 0:
+            self._mark_fetched(key)
+            self.stats_counters["fetches"] += 1
+            try:
+                fresh = self.inner.get_history_money_flow(code, days=days)
+                self.stats_counters["fetch_ok"] += 1
+            except Exception as e:
+                self.stats_counters["fetch_fail"] += 1
+                _log.warning("fetch history_money_flow(%s) failed: %s", code, e)
+                self.last_source = "cache"
+                return []
+
+            # 按 trade_date 分组存
+            from collections import defaultdict
+
+            by_date: dict[str, list[MoneyFlow]] = defaultdict(list)
+            for f in fresh:
+                trade_date = f.timestamp.strftime("%Y-%m-%d")
+                by_date[trade_date].append(f)
+            for trade_date, flows in by_date.items():
+                flow_dicts = [_money_flow_to_dict(f) for f in flows]
+                self.store.set_money_flow_history(code, trade_date, flow_dicts)
+            self.last_source = "cache"
+            return fresh
+
+        # 有缓存
+        self.stats_counters["hits"] += 1
+        self.last_source = "cache"
+        out: list[MoneyFlow] = []
+        for d in cached:
+            flows = d.get("flows", [])
+            out.extend(_money_flow_from_dict(f) for f in flows)
+        return out
+
+    # ============================================================
+    # 板块（不缓存，每次直接拉新）
+    # ============================================================
+
+    def get_belonging_boards(self, code: str) -> list[Board]:
+        return self.inner.get_belonging_boards(code)
+
+    # ============================================================
+    # 健康检查（直接走底层）
+    # ============================================================
+
+    def health_check(self) -> bool:
+        """健康：缓存有数据 或 底层能拉新。"""
+        cached_codes = self.store.get_all_quote_codes()
+        if len(cached_codes) > 0:
+            return True
+        try:
+            return self.inner.health_check()
+        except Exception:
+            return False
+
+    # ============================================================
+    # 工具
+    # ============================================================
+
+    def data_freshness_report(self) -> list[dict[str, Any]]:
+        """返回 [{code, age_seconds, quote_ts, ...}, ...] 给妈妈看新鲜度。"""
+        entries = self.store.get_all_quote_entries()
+        now = _utcnow()
+        out_list: list[dict[str, Any]] = []
+        for e in entries:
+            out_list.append(
+                {
+                    "code": e.code,
+                    "name": e.quote.name,
+                    "fetched_at": e.fetched_at,
+                    "quote_ts": e.quote_ts,
+                    "age_seconds": (now - e.fetched_at).total_seconds(),
+                }
+            )
+        out_list.sort(key=lambda x: x["age_seconds"])  # 最新的在前
+        return out_list
+
+    # ============================================================
+    # 数据来源标注
+    # ============================================================
+
+    def format_source_label(self) -> str:
+        """返回用户可读的数据来源标注，如 '东方财富 实时' 或 '本地缓存'。"""
+        if not self.last_source:
+            return ""
+        if self.last_source in ("network", "snapshot"):
+            inner_name = getattr(self.inner, "__class__", None)
+            inner_name = inner_name.__name__ if inner_name else ""
+            if "Efinance" in inner_name:
+                return "东方财富 实时"
+            elif "Tencent" in inner_name:
+                return "腾讯财经 实时"
+            return "实时数据"
+        if self.last_source == "cache":
+            return "本地缓存"
+        if self.last_source in ("stale_cache", "stale_snapshot"):
+            # 拉新失败后翻出的旧数据——与"刚缓存"区分，妈妈看得见可能过期
+            return "本地缓存（拉新失败，可能过期）"
+        return self.last_source
+
+
+# ---------- 内部：MoneyFlow 序列化（简化版） ----------
+
+
+def _money_flow_to_dict(f: MoneyFlow) -> dict[str, Any]:
+    """MoneyFlow → JSON-safe dict。
+
+    Money 拆 {amount: str, currency}，Decimal → str，datetime → ISO str。
+    """
+
+    def _money(m: Money) -> dict[str, str]:
+        return {"amount": str(m.amount), "currency": m.currency}
+
+    return {
+        "code": f.code,
+        "name": f.name,
+        "timestamp": f.timestamp.isoformat(),
+        "main_net": _money(f.main_net),
+        "small_net": _money(f.small_net),
+        "medium_net": _money(f.medium_net),
+        "large_net": _money(f.large_net),
+        "super_large_net": _money(f.super_large_net),
+        "main_net_ratio": str(f.main_net_ratio) if f.main_net_ratio is not None else None,
+    }
+
+
+def _recursive_safe(obj: object) -> object:
+    """递归把所有 Decimal/datetime 转 JSON-safe。"""
+    from decimal import Decimal
+
+    if isinstance(obj, Decimal):
+        return str(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, dict):
+        return {k: _recursive_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_recursive_safe(v) for v in obj]
+    return obj
+
+
+def _bar_turnover(v: object) -> Any:
+    """把缓存里的 turnover 字段还原为 Money。
+
+    兼容三种历史形态：Money dataclass、``{amount, currency}`` dict、标量。
+    """
+    from decimal import Decimal
+
+    from mojiang_chaogu.market_data.types import Money
+
+    if isinstance(v, dict):
+        return Money(Decimal(str(v["amount"])), v.get("currency", "CNY"))
+    if hasattr(v, "amount") and not isinstance(v, dict):
+        return Money(Decimal(str(v.amount)), getattr(v, "currency", "CNY"))
+    return Money(Decimal(str(v)), "CNY")
+
+
+def _money_flow_from_dict(d: dict[str, Any]) -> MoneyFlow:
+    from decimal import Decimal
+
+    from mojiang_chaogu.market_data.types import Money, MoneyFlow
+
+    def _money(v: object) -> Money:
+        if isinstance(v, dict):
+            return Money(Decimal(str(v["amount"])), v.get("currency", "CNY"))
+        return Money(Decimal(str(v)), "CNY")
+
+    ts = d["timestamp"]
+    if isinstance(ts, str):
+        ts = datetime.fromisoformat(ts)
+    return MoneyFlow(
+        code=d["code"],
+        name=d.get("name", ""),
+        timestamp=ts,
+        main_net=_money(d["main_net"]),
+        small_net=_money(d["small_net"]),
+        medium_net=_money(d["medium_net"]),
+        large_net=_money(d["large_net"]),
+        super_large_net=_money(d["super_large_net"]),
+        main_net_ratio=Decimal(str(d["main_net_ratio"])) if d.get("main_net_ratio") else None,
+    )

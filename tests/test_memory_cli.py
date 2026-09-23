@@ -1,4 +1,4 @@
-"""mommy-memory CLI 测试：parser 构建 + stats 子命令。"""
+"""mojiang-memory CLI 测试：parser 构建 + stats 子命令。"""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mommy_chaogu.cli import build_memory_parser, cmd_memory_stats
-from mommy_chaogu.cli_commands.memory import _memory_pipeline
+from mojiang_chaogu.cli import build_memory_parser, cmd_memory_stats
+from mojiang_chaogu.cli_commands.memory import _memory_pipeline
 
 
 def test_build_memory_parser_has_subcommands():
@@ -35,7 +35,7 @@ def test_build_memory_parser_has_subcommands():
 
 def test_memory_parser_default_db_is_agent_db():
     """默认 --db 应为 AGENT_DB 路径。"""
-    from mommy_chaogu.db_paths import AGENT_DB
+    from mojiang_chaogu.db_paths import AGENT_DB
 
     parser = build_memory_parser()
     args = parser.parse_args(["--db", str(AGENT_DB), "stats"])
@@ -45,7 +45,7 @@ def test_memory_parser_default_db_is_agent_db():
 def test_memory_pipeline_uses_configured_llm(tmp_path: Path) -> None:
     client = MagicMock()
     with patch(
-        "mommy_chaogu.agent.mcp_server._build_llm",
+        "mojiang_chaogu.agent.mcp_server._build_llm",
         return_value=(client, "test-model", None),
     ):
         pipeline = _memory_pipeline(tmp_path / "agent.db")
@@ -57,11 +57,11 @@ def test_memory_pipeline_vector_failure_degrades_cleanly(tmp_path: Path) -> None
     client = MagicMock()
     with (
         patch(
-            "mommy_chaogu.agent.mcp_server._build_llm",
+            "mojiang_chaogu.agent.mcp_server._build_llm",
             return_value=(client, "test-model", "embedding-model"),
         ),
         patch(
-            "mommy_chaogu.agent.vector_search.VectorSearch",
+            "mojiang_chaogu.agent.vector_search.VectorSearch",
             side_effect=RuntimeError("extension unavailable"),
         ),
     ):
@@ -87,10 +87,10 @@ def test_memory_stats_runs_with_empty_db(tmp_path: Path, capsys: pytest.CaptureF
 
 def test_memory_stats_with_data(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     """写入一些数据后 stats 应显示正确的计数。"""
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
-    from mommy_chaogu.agent.memory import ConversationMemory
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
-    from mommy_chaogu.agent.semantic_memory import SemanticMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.memory import ConversationMemory
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
     db = tmp_path / "agent.db"
 
@@ -133,7 +133,7 @@ def test_memory_stats_with_data(tmp_path: Path, capsys: pytest.CaptureFixture[st
 
 def test_memory_events_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     """events 子命令应显示事件。"""
-    from mommy_chaogu.agent.episodic_memory import EpisodicMemory
+    from mojiang_chaogu.agent.episodic_memory import EpisodicMemory
 
     db = tmp_path / "agent.db"
     em = EpisodicMemory(db)
@@ -156,7 +156,7 @@ def test_memory_events_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[
 
 def test_memory_predictions_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     """predictions 子命令应显示预测。"""
-    from mommy_chaogu.agent.prediction_tracker import PredictionTracker
+    from mojiang_chaogu.agent.prediction_tracker import PredictionTracker
 
     db = tmp_path / "agent.db"
     tracker = PredictionTracker(db)
@@ -179,7 +179,7 @@ def test_memory_predictions_subcommand(tmp_path: Path, capsys: pytest.CaptureFix
 
 def test_memory_knowledge_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     """knowledge 子命令应显示知识条目。"""
-    from mommy_chaogu.agent.semantic_memory import SemanticMemory
+    from mojiang_chaogu.agent.semantic_memory import SemanticMemory
 
     db = tmp_path / "agent.db"
     sm = SemanticMemory(db)
@@ -200,7 +200,7 @@ def test_memory_knowledge_subcommand(tmp_path: Path, capsys: pytest.CaptureFixtu
 
 def test_memory_history_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     """history 子命令应显示对话历史。"""
-    from mommy_chaogu.agent.memory import ConversationMemory
+    from mojiang_chaogu.agent.memory import ConversationMemory
 
     db = tmp_path / "agent.db"
     conv = ConversationMemory(db)

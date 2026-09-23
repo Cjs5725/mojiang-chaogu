@@ -15,7 +15,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.agent.tools import ToolContext, ToolRegistry
+from mojiang_chaogu.agent.tools import ToolContext, ToolRegistry
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ class TestGetSectorRanking:
                 },
             ]
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.sector.fetch_sector_ranking", fake_fetch)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.sector.fetch_sector_ranking", fake_fetch)
 
         result = registry.call("get_sector_ranking", {"limit": 10})
         data = json.loads(result)
@@ -74,7 +74,7 @@ class TestGetSectorRanking:
             captured["limit"] = limit
             return []
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.sector.fetch_sector_ranking", fake_fetch)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.sector.fetch_sector_ranking", fake_fetch)
 
         registry.call("get_sector_ranking", {})
         assert captured["limit"] == 30
@@ -85,7 +85,7 @@ class TestGetSectorRanking:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.sector.fetch_sector_ranking",
+            "mojiang_chaogu.agent.tools.sector.fetch_sector_ranking",
             lambda limit=30: [],
         )
         result = registry.call("get_sector_ranking", {})
@@ -110,7 +110,7 @@ class TestSearchSector:
                 {"code": "BK1107", "name": "创新药械", "secid": "90.BK1107"},
             ]
 
-        monkeypatch.setattr("mommy_chaogu.agent.tools.sector.search_sector", fake_search)
+        monkeypatch.setattr("mojiang_chaogu.agent.tools.sector.search_sector", fake_search)
 
         result = registry.call("search_sector", {"keyword": "创新药"})
         data = json.loads(result)
@@ -125,7 +125,7 @@ class TestSearchSector:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.sector.search_sector",
+            "mojiang_chaogu.agent.tools.sector.search_sector",
             lambda keyword: [],
         )
         result = registry.call("search_sector", {"keyword": "不存在的板块"})
@@ -161,7 +161,7 @@ class TestGetSectorStocks:
             ]
 
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.sector.fetch_sector_stocks", fake_fetch_stocks
+            "mojiang_chaogu.agent.tools.sector.fetch_sector_stocks", fake_fetch_stocks
         )
 
         result = registry.call(
@@ -193,7 +193,7 @@ class TestGetSectorStocks:
             return []
 
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.sector.fetch_sector_stocks", fake_fetch_stocks
+            "mojiang_chaogu.agent.tools.sector.fetch_sector_stocks", fake_fetch_stocks
         )
 
         registry.call("get_sector_stocks", {"board_code": "BK0475"})
@@ -206,7 +206,7 @@ class TestGetSectorStocks:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setattr(
-            "mommy_chaogu.agent.tools.sector.fetch_sector_stocks",
+            "mojiang_chaogu.agent.tools.sector.fetch_sector_stocks",
             lambda board_code, sort_by="change_pct", limit=30: [],
         )
         result = registry.call("get_sector_stocks", {"board_code": "BK9999"})

@@ -17,9 +17,9 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
-from mommy_chaogu.cache import CacheConfig, CacheManager, CacheStore
-from mommy_chaogu.market_data import Quote
-from mommy_chaogu.market_data.types import (
+from mojiang_chaogu.cache import CacheConfig, CacheManager, CacheStore
+from mojiang_chaogu.market_data import Quote
+from mojiang_chaogu.market_data.types import (
     MarketType,
     Money,
     QuoteType,
@@ -101,7 +101,7 @@ def main() -> int:
         # 短间隔：2 秒
         cfg = CacheConfig(quote_fetch_interval_seconds=2)
         mock = MockAdapter(mk_quote("600519", "1184.98"))
-        from mommy_chaogu.cache import CachedMarketDataAdapter
+        from mojiang_chaogu.cache import CachedMarketDataAdapter
 
         adapter = CachedMarketDataAdapter(mock, store, config=cfg)
         mgr = CacheManager(store=store, adapter=adapter)

@@ -14,7 +14,7 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-from mommy_chaogu.market_data import (
+from mojiang_chaogu.market_data import (
     AdjustmentType,
     BarInterval,
     EfinanceAdapter,
@@ -81,7 +81,7 @@ def test_get_quotes_uses_one_market_snapshot(monkeypatch: pytest.MonkeyPatch) ->
     )
     fetch_snapshot = MagicMock(return_value=snapshot)
     monkeypatch.setattr(
-        "mommy_chaogu.market_data.efinance_adapter.ef.stock.get_realtime_quotes",
+        "mojiang_chaogu.market_data.efinance_adapter.ef.stock.get_realtime_quotes",
         fetch_snapshot,
     )
 

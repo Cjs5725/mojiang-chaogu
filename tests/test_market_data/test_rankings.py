@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from mommy_chaogu.market_data.rankings import fetch_indexes
+from mojiang_chaogu.market_data.rankings import fetch_indexes
 
 
 def test_fetch_indexes_uses_one_batched_request(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -27,7 +27,7 @@ def test_fetch_indexes_uses_one_batched_request(monkeypatch: pytest.MonkeyPatch)
         }
     }
     get = MagicMock(return_value=response)
-    monkeypatch.setattr("mommy_chaogu.market_data.rankings.requests.get", get)
+    monkeypatch.setattr("mojiang_chaogu.market_data.rankings.requests.get", get)
 
     indexes = fetch_indexes()
 
@@ -39,7 +39,7 @@ def test_fetch_indexes_uses_one_batched_request(monkeypatch: pytest.MonkeyPatch)
 
 def test_fetch_indexes_returns_empty_on_batch_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "mommy_chaogu.market_data.rankings.requests.get",
+        "mojiang_chaogu.market_data.rankings.requests.get",
         MagicMock(side_effect=TimeoutError("offline")),
     )
     assert fetch_indexes() == []

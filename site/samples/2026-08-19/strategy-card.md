@@ -49,7 +49,7 @@
 
 - [ ] **不保存** — 当聊天看, 不落盘
 - [ ] **保存为草稿** — 写到 `portfolio.db` 的 `strategy_cards` 表
-- [ ] **保存为可用** — 状态 `active`, 配合 `mommy monitor` 准备监测
+- [ ] **保存为可用** — 状态 `active`, 配合 `mojiang monitor` 准备监测
 
 ---
 
